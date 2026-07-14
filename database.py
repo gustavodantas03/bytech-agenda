@@ -40,6 +40,12 @@ def init_db():
     ativo INTEGER DEFAULT 1
 );
 
+CREATE TABLE IF NOT EXISTS usuarios_master (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario TEXT NOT NULL UNIQUE,
+    senha TEXT NOT NULL
+);
+
         CREATE TABLE IF NOT EXISTS servicos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             empresa_id INTEGER NOT NULL,
@@ -83,6 +89,7 @@ def init_db():
             FOREIGN KEY (empresa_id) REFERENCES empresas(id)
         );
         """
+        
     )
 
     if not _column_exists(conn, "empresas", "logo"):
@@ -159,6 +166,22 @@ def init_db():
                     (empresa_id, "Carlos", "Barbeiro"),
                 ],
             )
+    master = conn.execute(
+        """
+        SELECT id
+        FROM usuarios_master
+        WHERE usuario = ?
+        """,
+        ("bytech",),
+    ).fetchone()
 
+    if not master:
+        conn.execute(
+            """
+            INSERT INTO usuarios_master (usuario, senha)
+            VALUES (?, ?)
+            """,
+            ("bytech", "trocar123"),
+        )
     conn.commit()
     conn.close()

@@ -1,0 +1,89 @@
+{% extends 'master/base.html' %}
+
+{% block title %}
+Nova barbearia
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+        <span>Cadastro</span>
+        <h1>Nova barbearia</h1>
+    </div>
+
+    <a
+        class="btn btn-secondary"
+        href="{{ url_for('master_dashboard') }}"
+    >
+        Voltar
+    </a>
+
+</header>
+
+<section class="panel narrow-panel">
+
+    <form method="post">
+
+        <label>Nome da barbearia</label>
+
+        <input
+            name="nome"
+            placeholder="Ex.: Bruto's Barbearia"
+            required
+        >
+
+        <label>Link personalizado</label>
+
+        <input
+            name="slug"
+            placeholder="Ex.: brutos-barbearia"
+            required
+        >
+
+        <label>Telefone</label>
+
+        <input
+            name="telefone"
+            placeholder="(85) 99999-9999"
+        >
+
+        <label>Endereço</label>
+
+        <input
+            name="endereco"
+            placeholder="Rua, número e bairro"
+        >
+
+        <label>Horário de funcionamento</label>
+
+        <input
+            name="horario_texto"
+            placeholder="Segunda a sábado, das 09h às 18h"
+        >
+
+        <label>Usuário do administrador</label>
+
+        <input
+            name="usuario"
+            required
+        >
+
+        <label>Senha provisória</label>
+
+        <input
+            type="password"
+            name="senha"
+            required
+        >
+
+        <button class="btn btn-primary full">
+            Criar barbearia
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}

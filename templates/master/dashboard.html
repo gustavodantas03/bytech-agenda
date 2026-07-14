@@ -1,0 +1,98 @@
+{% extends 'master/base.html' %}
+
+{% block title %}
+Barbearias
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+        <span>Bytech Agenda</span>
+        <h1>Barbearias cadastradas</h1>
+    </div>
+
+    <a
+        class="btn btn-primary"
+        href="{{ url_for('master_nova_empresa') }}"
+    >
+        + Nova barbearia
+    </a>
+
+</header>
+
+<section class="panel">
+
+    {% if empresas %}
+
+        <div class="service-admin-list">
+
+            {% for empresa in empresas %}
+
+                <div class="service-admin-item">
+
+                    <div>
+
+                        <strong>
+                            {{ empresa.nome }}
+                        </strong>
+
+                        <span>
+                            /{{ empresa.slug }}
+                            · Usuário: {{ empresa.usuario or 'Não criado' }}
+                            · {{ empresa.total_funcionarios }} funcionários
+                            · {{ empresa.total_servicos }} serviços
+                        </span>
+
+                    </div>
+
+                    <div class="actions">
+
+                        <a
+                            class="btn btn-small btn-secondary"
+                            href="{{ url_for(
+                                'landing',
+                                slug=empresa.slug
+                            ) }}"
+                            target="_blank"
+                        >
+                            Abrir página
+                        </a>
+
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'master_alternar_empresa',
+                                empresa_id=empresa.id
+                            ) }}"
+                        >
+
+                            <button
+                                class="btn btn-small
+                                {{ 'btn-danger' if empresa.ativo else 'btn-secondary' }}"
+                            >
+                                {{ 'Bloquear' if empresa.ativo else 'Ativar' }}
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            Nenhuma barbearia cadastrada.
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

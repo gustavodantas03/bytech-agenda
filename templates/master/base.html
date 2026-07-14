@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Bytech Master{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-page">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="logo-mark small">
+                B
+            </div>
+
+            <div>
+                <strong>Bytech</strong>
+                <span>Master</span>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('master_dashboard') }}">
+                Barbearias
+            </a>
+
+            <a href="{{ url_for('master_nova_empresa') }}">
+                Nova barbearia
+            </a>
+
+            <a href="{{ url_for('master_sair') }}">
+                Sair
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <main class="admin-content">
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <div class="alert {{ categoria }}">
+                    {{ mensagem }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+</body>
+</html>

@@ -50,11 +50,207 @@ def gerar_horarios():
 
     return horarios
 
+def master_login_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if not session.get("master_id"):
+            return redirect(url_for("master_login"))
+
+        return view(*args, **kwargs)
+
+    return wrapped_view
+
+@app.route("/master/login", methods=["GET", "POST"])
+def master_login():
+    if request.method == "POST":
+        usuario = request.form.get("usuario", "").strip()
+        senha = request.form.get("senha", "").strip()
+
+        conn = get_connection()
+
+        master = conn.execute(
+            """
+            SELECT *
+            FROM usuarios_master
+            WHERE usuario = ?
+              AND senha = ?
+            """,
+            (usuario, senha),
+        ).fetchone()
+
+        conn.close()
+
+        if master:
+            session.clear()
+            session["master_id"] = master["id"]
+
+            return redirect(url_for("master_dashboard"))
+
+        flash("Usuário ou senha inválidos.", "erro")
+
+    return render_template("master/login.html")
 
 @app.before_request
 def setup():
     init_db()
 
+@app.route("/master/sair")
+def master_sair():
+    session.clear()
+    return redirect(url_for("master_login"))
+
+@app.route("/master")
+@master_login_required
+def master_dashboard():
+    conn = get_connection()
+
+    empresas = conn.execute(
+        """
+        SELECT
+            e.*,
+            u.usuario,
+            (
+                SELECT COUNT(*)
+                FROM funcionarios f
+                WHERE f.empresa_id = e.id
+            ) AS total_funcionarios,
+            (
+                SELECT COUNT(*)
+                FROM servicos s
+                WHERE s.empresa_id = e.id
+            ) AS total_servicos
+        FROM empresas e
+        LEFT JOIN usuarios u
+            ON u.empresa_id = e.id
+        ORDER BY e.nome
+        """
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "master/dashboard.html",
+        empresas=empresas,
+    )
+
+@app.route("/master/empresas/nova", methods=["GET", "POST"])
+@master_login_required
+def master_nova_empresa():
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        slug = request.form.get("slug", "").strip().lower()
+        telefone = request.form.get("telefone", "").strip()
+        endereco = request.form.get("endereco", "").strip()
+        horario_texto = request.form.get("horario_texto", "").strip()
+        usuario = request.form.get("usuario", "").strip()
+        senha = request.form.get("senha", "").strip()
+
+        if not all([nome, slug, usuario, senha]):
+            flash("Preencha os campos obrigatórios.", "erro")
+            return redirect(url_for("master_nova_empresa"))
+
+        conn = get_connection()
+
+        slug_existente = conn.execute(
+            "SELECT id FROM empresas WHERE slug = ?",
+            (slug,),
+        ).fetchone()
+
+        usuario_existente = conn.execute(
+            "SELECT id FROM usuarios WHERE usuario = ?",
+            (usuario,),
+        ).fetchone()
+
+        if slug_existente:
+            conn.close()
+            flash("Este link já está sendo utilizado.", "erro")
+            return redirect(url_for("master_nova_empresa"))
+
+        if usuario_existente:
+            conn.close()
+            flash("Este usuário já está sendo utilizado.", "erro")
+            return redirect(url_for("master_nova_empresa"))
+
+        cursor = conn.execute(
+            """
+            INSERT INTO empresas (
+                nome,
+                slug,
+                telefone,
+                endereco,
+                horario_texto,
+                descricao,
+                ativo
+            )
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+            """,
+            (
+                nome,
+                slug,
+                telefone,
+                endereco,
+                horario_texto,
+                "Agende seu horário de forma rápida e simples.",
+            ),
+        )
+
+        empresa_id = cursor.lastrowid
+
+        conn.execute(
+            """
+            INSERT INTO usuarios (
+                empresa_id,
+                usuario,
+                senha
+            )
+            VALUES (?, ?, ?)
+            """,
+            (
+                empresa_id,
+                usuario,
+                senha,
+            ),
+        )
+
+        conn.commit()
+        conn.close()
+
+        flash("Barbearia cadastrada com sucesso.", "sucesso")
+
+        return redirect(url_for("master_dashboard"))
+
+    return render_template("master/empresa_nova.html")
+
+@app.route(
+    "/master/empresas/<int:empresa_id>/alternar",
+    methods=["POST"],
+)
+@master_login_required
+def master_alternar_empresa(empresa_id):
+    conn = get_connection()
+
+    empresa = conn.execute(
+        "SELECT * FROM empresas WHERE id = ?",
+        (empresa_id,),
+    ).fetchone()
+
+    if empresa:
+        novo_status = 0 if empresa["ativo"] else 1
+
+        conn.execute(
+            """
+            UPDATE empresas
+            SET ativo = ?
+            WHERE id = ?
+            """,
+            (novo_status, empresa_id),
+        )
+
+        conn.commit()
+
+    conn.close()
+
+    return redirect(url_for("master_dashboard"))
 
 @app.route("/")
 def index():
