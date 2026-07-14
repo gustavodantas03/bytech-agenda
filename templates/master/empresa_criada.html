@@ -1,0 +1,95 @@
+{% extends 'master/base.html' %}
+
+{% block title %}
+Barbearia criada
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <div>
+        <span>Implantação concluída</span>
+        <h1>{{ empresa.nome }}</h1>
+    </div>
+</header>
+
+<section class="panel narrow-panel">
+
+    <div class="success-box">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>Barbearia criada com sucesso!</h2>
+
+        <p>
+            A empresa, o usuário, os serviços padrão e o funcionário inicial foram criados.
+        </p>
+
+    </div>
+
+    <div class="summary">
+
+        <p>
+            <strong>Página pública:</strong>
+        </p>
+
+        <a
+            href="{{ url_for(
+                'landing',
+                slug=empresa.slug
+            ) }}"
+            target="_blank"
+        >
+            {{ request.host_url }}{{ empresa.slug }}
+        </a>
+
+        <p>
+            <strong>Painel administrativo:</strong>
+        </p>
+
+        <a
+            href="{{ url_for('admin_login') }}"
+            target="_blank"
+        >
+            {{ request.host_url }}admin/login
+        </a>
+
+        <p>
+            <strong>Usuário:</strong>
+            {{ empresa.usuario }}
+        </p>
+
+        <p>
+            <strong>Senha provisória:</strong>
+            {{ empresa.senha }}
+        </p>
+
+    </div>
+
+    <div class="page-header-actions">
+
+        <a
+            class="btn btn-primary"
+            href="{{ url_for(
+                'landing',
+                slug=empresa.slug
+            ) }}"
+            target="_blank"
+        >
+            Abrir página
+        </a>
+
+        <a
+            class="btn btn-secondary"
+            href="{{ url_for('master_dashboard') }}"
+        >
+            Voltar ao painel
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

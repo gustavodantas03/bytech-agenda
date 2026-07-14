@@ -140,14 +140,19 @@ def master_nova_empresa():
         nome = request.form.get("nome", "").strip()
         slug = request.form.get("slug", "").strip().lower()
         telefone = request.form.get("telefone", "").strip()
+        instagram = request.form.get("instagram", "").strip()
         endereco = request.form.get("endereco", "").strip()
+        maps_url = request.form.get("maps_url", "").strip()
         horario_texto = request.form.get("horario_texto", "").strip()
+        descricao = request.form.get("descricao", "").strip()
         usuario = request.form.get("usuario", "").strip()
         senha = request.form.get("senha", "").strip()
 
         if not all([nome, slug, usuario, senha]):
             flash("Preencha os campos obrigatórios.", "erro")
             return redirect(url_for("master_nova_empresa"))
+
+        slug = slug.replace(" ", "-")
 
         conn = get_connection()
 
@@ -171,55 +176,161 @@ def master_nova_empresa():
             flash("Este usuário já está sendo utilizado.", "erro")
             return redirect(url_for("master_nova_empresa"))
 
-        cursor = conn.execute(
-            """
-            INSERT INTO empresas (
-                nome,
-                slug,
-                telefone,
-                endereco,
-                horario_texto,
-                descricao,
-                ativo
+        try:
+            cursor = conn.execute(
+                """
+                INSERT INTO empresas (
+                    nome,
+                    slug,
+                    telefone,
+                    instagram,
+                    endereco,
+                    maps_url,
+                    descricao,
+                    horario_texto,
+                    ativo
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                """,
+                (
+                    nome,
+                    slug,
+                    telefone,
+                    instagram,
+                    endereco,
+                    maps_url,
+                    descricao or "Agende seu horário de forma rápida e simples.",
+                    horario_texto,
+                ),
             )
-            VALUES (?, ?, ?, ?, ?, ?, 1)
-            """,
-            (
-                nome,
-                slug,
-                telefone,
-                endereco,
-                horario_texto,
-                "Agende seu horário de forma rápida e simples.",
-            ),
-        )
 
-        empresa_id = cursor.lastrowid
+            empresa_id = cursor.lastrowid
 
-        conn.execute(
-            """
-            INSERT INTO usuarios (
-                empresa_id,
-                usuario,
-                senha
+            conn.execute(
+                """
+                INSERT INTO usuarios (
+                    empresa_id,
+                    usuario,
+                    senha
+                )
+                VALUES (?, ?, ?)
+                """,
+                (
+                    empresa_id,
+                    usuario,
+                    senha,
+                ),
             )
-            VALUES (?, ?, ?)
-            """,
-            (
-                empresa_id,
-                usuario,
-                senha,
-            ),
-        )
 
-        conn.commit()
-        conn.close()
+            servicos_padrao = [
+                ("Corte masculino", 25.00, 40),
+                ("Barba", 15.00, 30),
+                ("Corte + barba", 35.00, 60),
+            ]
 
-        flash("Barbearia cadastrada com sucesso.", "sucesso")
+            conn.executemany(
+                """
+                INSERT INTO servicos (
+                    empresa_id,
+                    nome,
+                    valor,
+                    duracao,
+                    ativo
+                )
+                VALUES (?, ?, ?, ?, 1)
+                """,
+                [
+                    (
+                        empresa_id,
+                        nome_servico,
+                        valor,
+                        duracao,
+                    )
+                    for nome_servico, valor, duracao in servicos_padrao
+                ],
+            )
 
-        return redirect(url_for("master_dashboard"))
+            funcionarios_padrao = [
+                ("Barbeiro 1", "Barbeiro"),
+            ]
+
+            conn.executemany(
+                """
+                INSERT INTO funcionarios (
+                    empresa_id,
+                    nome,
+                    cargo,
+                    ativo
+                )
+                VALUES (?, ?, ?, 1)
+                """,
+                [
+                    (
+                        empresa_id,
+                        nome_funcionario,
+                        cargo,
+                    )
+                    for nome_funcionario, cargo in funcionarios_padrao
+                ],
+            )
+
+            conn.commit()
+            conn.close()
+
+            flash(
+                f"Barbearia criada com sucesso. Link: /{slug}",
+                "sucesso",
+            )
+
+            return redirect(
+                url_for(
+                    "master_empresa_criada",
+                    empresa_id=empresa_id,
+                )
+            )
+
+        except Exception:
+            conn.rollback()
+            conn.close()
+
+            flash(
+                "Não foi possível criar a barbearia.",
+                "erro",
+            )
+
+            return redirect(url_for("master_nova_empresa"))
 
     return render_template("master/empresa_nova.html")
+
+@app.route("/master/empresas/<int:empresa_id>/criada")
+@master_login_required
+def master_empresa_criada(empresa_id):
+    conn = get_connection()
+
+    empresa = conn.execute(
+        """
+        SELECT
+            e.*,
+            u.usuario,
+            u.senha
+        FROM empresas e
+        LEFT JOIN usuarios u
+            ON u.empresa_id = e.id
+        WHERE e.id = ?
+        """,
+        (empresa_id,),
+    ).fetchone()
+
+    conn.close()
+
+    if not empresa:
+        flash("Barbearia não encontrada.", "erro")
+        return redirect(url_for("master_dashboard"))
+
+    return render_template(
+        "master/empresa_criada.html",
+        empresa=empresa,
+    )
 
 @app.route(
     "/master/empresas/<int:empresa_id>/alternar",

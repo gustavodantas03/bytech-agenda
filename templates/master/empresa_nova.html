@@ -7,9 +7,8 @@ Nova barbearia
 {% block content %}
 
 <header class="page-header">
-
     <div>
-        <span>Cadastro</span>
+        <span>Implantação</span>
         <h1>Nova barbearia</h1>
     </div>
 
@@ -19,23 +18,20 @@ Nova barbearia
     >
         Voltar
     </a>
-
 </header>
 
 <section class="panel narrow-panel">
 
     <form method="post">
 
-        <label>Nome da barbearia</label>
-
+        <label>Nome da barbearia *</label>
         <input
             name="nome"
             placeholder="Ex.: Bruto's Barbearia"
             required
         >
 
-        <label>Link personalizado</label>
-
+        <label>Link personalizado *</label>
         <input
             name="slug"
             placeholder="Ex.: brutos-barbearia"
@@ -43,43 +39,61 @@ Nova barbearia
         >
 
         <label>Telefone</label>
-
         <input
             name="telefone"
             placeholder="(85) 99999-9999"
         >
 
-        <label>Endereço</label>
+        <label>Instagram</label>
+        <input
+            name="instagram"
+            placeholder="@barbearia"
+        >
 
+        <label>Endereço</label>
         <input
             name="endereco"
             placeholder="Rua, número e bairro"
         >
 
-        <label>Horário de funcionamento</label>
+        <label>Google Maps</label>
+        <input
+            name="maps_url"
+            placeholder="https://maps.google.com/..."
+        >
 
+        <label>Horário de funcionamento</label>
         <input
             name="horario_texto"
             placeholder="Segunda a sábado, das 09h às 18h"
         >
 
-        <label>Usuário do administrador</label>
+        <label>Descrição</label>
+        <textarea
+            name="descricao"
+            rows="4"
+            placeholder="Descrição curta da barbearia"
+        ></textarea>
 
+        <hr>
+
+        <label>Usuário do administrador *</label>
         <input
             name="usuario"
+            placeholder="Ex.: brutos"
             required
         >
 
-        <label>Senha provisória</label>
-
+        <label>Senha provisória *</label>
         <input
             type="password"
             name="senha"
+            placeholder="Crie uma senha provisória"
             required
         >
 
         <button class="btn btn-primary full">
-            Criar barbearia
+            Criar barbearia completa
         </button>
 
     </form>
