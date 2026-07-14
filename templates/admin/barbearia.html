@@ -1,0 +1,108 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Dados da barbearia{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <div>
+        <span>Configuração</span>
+        <h1>Dados da barbearia</h1>
+    </div>
+</header>
+
+<section class="panel narrow-panel">
+
+    <form method="post" enctype="multipart/form-data">
+
+        <div class="logo-upload-area">
+
+            {% if empresa.logo %}
+
+                <img
+                    class="logo-preview"
+                    src="{{ url_for(
+                        'static',
+                        filename='uploads/logos/' + empresa.logo
+                    ) }}"
+                    alt="Logo da barbearia"
+                >
+
+            {% else %}
+
+                <div class="logo-placeholder">
+                    Sem logo
+                </div>
+
+            {% endif %}
+
+            <div class="logo-upload-info">
+                <label for="logo">Logo da barbearia</label>
+
+                <input
+                    id="logo"
+                    name="logo"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp"
+                >
+
+                <small>
+                    Formatos permitidos: PNG, JPG, JPEG e WEBP.
+                    Tamanho máximo: 2 MB.
+                </small>
+            </div>
+
+        </div>
+
+        <label>Nome da barbearia</label>
+        <input
+            name="nome"
+            value="{{ empresa.nome }}"
+            required
+        >
+
+        <label>Telefone</label>
+        <input
+            name="telefone"
+            value="{{ empresa.telefone or '' }}"
+        >
+
+        <label>Instagram</label>
+        <input
+            name="instagram"
+            value="{{ empresa.instagram or '' }}"
+        >
+
+        <label>Endereço</label>
+        <input
+            name="endereco"
+            value="{{ empresa.endereco or '' }}"
+        >
+
+        <label>Link do Google Maps</label>
+        <input
+            name="maps_url"
+            value="{{ empresa.maps_url or '' }}"
+        >
+
+        <label>Horário de funcionamento</label>
+        <input
+            name="horario_texto"
+            value="{{ empresa.horario_texto or '' }}"
+        >
+
+        <label>Descrição</label>
+        <textarea
+            name="descricao"
+            rows="4"
+        >{{ empresa.descricao or '' }}</textarea>
+
+        <button class="btn btn-primary">
+            Salvar dados
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Novo agendamento
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+        <span>Agenda</span>
+        <h1>Novo agendamento</h1>
+    </div>
+
+    <a
+        class="btn btn-secondary"
+        href="{{ url_for('admin_agenda') }}"
+    >
+        Voltar
+    </a>
+
+</header>
+
+<section class="panel narrow-panel">
+
+    <form method="post">
+
+        <label for="cliente_nome">
+            Nome do cliente
+        </label>
+
+        <input
+            id="cliente_nome"
+            name="cliente_nome"
+            type="text"
+            placeholder="Digite o nome do cliente"
+            required
+        >
+
+        <label for="cliente_telefone">
+            WhatsApp
+        </label>
+
+        <input
+            id="cliente_telefone"
+            name="cliente_telefone"
+            type="text"
+            placeholder="(85) 99999-9999"
+            required
+        >
+
+        <label for="servico_id">
+            Serviço
+        </label>
+
+        <select
+            id="servico_id"
+            name="servico_id"
+            required
+        >
+
+            <option value="">
+                Selecione o serviço
+            </option>
+
+            {% for servico in servicos %}
+
+                <option value="{{ servico.id }}">
+                    {{ servico.nome }}
+                    — R$
+                    {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label for="funcionario_id">
+            Barbeiro
+        </label>
+
+        <select
+            id="funcionario_id"
+            name="funcionario_id"
+            required
+        >
+
+            <option value="">
+                Selecione o barbeiro
+            </option>
+
+            {% for funcionario in funcionarios %}
+
+                <option value="{{ funcionario.id }}">
+                    {{ funcionario.nome }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label for="data">
+            Data
+        </label>
+
+        <input
+            id="data"
+            name="data"
+            type="date"
+            min="{{ data_hoje }}"
+            value="{{ data_hoje }}"
+            required
+        >
+
+        <label for="hora">
+            Horário
+        </label>
+
+        <select
+            id="hora"
+            name="hora"
+            required
+        >
+
+            <option value="">
+                Selecione o horário
+            </option>
+
+            {% for horario in horarios %}
+
+                <option value="{{ horario }}">
+                    {{ horario }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <button
+            class="btn btn-primary full"
+            type="submit"
+        >
+            Salvar agendamento
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}

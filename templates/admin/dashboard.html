@@ -1,0 +1,54 @@
+{% extends 'admin/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<header class="page-header">
+    <div><span>Visão geral</span><h1>{{ empresa.nome }}</h1></div>
+    <a class="btn btn-secondary" href="{{ url_for('landing', slug=empresa.slug) }}" target="_blank">Ver página</a>
+</header>
+<div class="page-header-actions">
+
+    <a
+        class="btn btn-primary"
+        href="{{ url_for('novo_agendamento') }}"
+    >
+        + Novo agendamento
+    </a>
+
+    <a
+        class="btn btn-secondary"
+        href="{{ url_for(
+            'landing',
+            slug=empresa.slug
+        ) }}"
+        target="_blank"
+    >
+        Ver página
+    </a>
+
+</div>
+<section class="stats-grid">
+    <article class="stat-card"><span>Agendamentos hoje</span><strong>{{ agendamentos|length }}</strong></article>
+    <article class="stat-card"><span>Total de agendamentos</span><strong>{{ total }}</strong></article>
+    <article class="stat-card"><span>Barbeiros ativos</span><strong>{{ total_funcionarios }}</strong></article>
+</section>
+
+<section class="panel">
+    <div class="panel-header"><div><span>Agenda do dia</span><h2>{{ hoje }}</h2></div></div>
+    {% if agendamentos %}
+        <div class="agenda-list">
+            {% for item in agendamentos %}
+            <article class="agenda-item">
+                <div class="agenda-time">{{ item.hora }}</div>
+                <div class="agenda-data">
+                    <strong>{{ item.cliente_nome }}</strong>
+                    <span>{{ item.servico_nome }} · {{ item.funcionario_nome or 'Sem barbeiro' }} · {{ item.cliente_telefone }}</span>
+                </div>
+                <span class="status {{ item.status }}">{{ item.status }}</span>
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">Nenhum agendamento para hoje.</div>
+    {% endif %}
+</section>
+{% endblock %}

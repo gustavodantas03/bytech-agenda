@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+{% block title %}Editar funcionário{% endblock %}
+{% block content %}
+<header class="page-header"><div><span>Equipe</span><h1>Editar funcionário</h1></div></header>
+<section class="panel narrow-panel">
+    <form method="post">
+        <label>Nome</label><input name="nome" value="{{ funcionario.nome }}" required>
+        <label>Cargo</label><input name="cargo" value="{{ funcionario.cargo }}" required>
+        <button class="btn btn-primary">Salvar alterações</button>
+        <a class="btn btn-secondary" href="{{ url_for('admin_funcionarios') }}">Voltar</a>
+    </form>
+</section>
+{% endblock %}

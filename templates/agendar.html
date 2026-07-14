@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar - {{ empresa.nome }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="chat-page">
+    <main class="chat-shell">
+        <header class="chat-header">
+            <a href="{{ url_for('landing', slug=empresa.slug) }}">←</a>
+            <div>
+                <strong>{{ empresa.nome }}</strong>
+                <span>Agendamento online</span>
+            </div>
+        </header>
+
+        <section id="chat" class="chat-body">
+            <div class="bubble bot">Olá! Vamos agendar seu horário?</div>
+
+            <div class="step active" data-step="nome">
+                <label>Qual é o seu nome?</label>
+                <input id="nome" type="text" placeholder="Digite seu nome">
+                <button class="btn btn-primary full" onclick="avancarNome()">Continuar</button>
+            </div>
+
+            <div class="step" data-step="telefone">
+                <label>Qual é o seu WhatsApp?</label>
+                <input id="telefone" type="text" placeholder="(85) 99999-9999">
+                <button class="btn btn-primary full" onclick="avancarTelefone()">Continuar</button>
+            </div>
+
+            <div class="step" data-step="servico">
+                <label>O que deseja agendar?</label>
+                <div class="options">
+                    {% for servico in servicos %}
+                    <button class="option" data-id="{{ servico.id }}" data-nome="{{ servico.nome }}"
+                            onclick="selecionarServico(this)">
+                        <span>{{ servico.nome }}</span>
+                        <strong>R$ {{ '%.2f'|format(servico.valor)|replace('.', ',') }}</strong>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="step" data-step="funcionario">
+                <label>Escolha o barbeiro:</label>
+                <div class="options">
+                    {% for funcionario in funcionarios %}
+                    <button class="option" data-id="{{ funcionario.id }}" data-nome="{{ funcionario.nome }}"
+                            onclick="selecionarFuncionario(this)">
+                        <span>{{ funcionario.nome }}</span>
+                        <strong>{{ funcionario.cargo }}</strong>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="step" data-step="data">
+                <label>Escolha a data:</label>
+                <div class="options compact">
+                    {% for data in datas %}
+                    <button class="option" data-data="{{ data.valor }}" onclick="selecionarData(this)">
+                        {{ data.texto }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="step" data-step="hora">
+                <label>Horários disponíveis:</label>
+                <div id="horarios" class="options compact"></div>
+            </div>
+
+            <div class="step" data-step="confirmacao">
+                <label>Confira seu agendamento:</label>
+                <div id="resumo" class="summary"></div>
+                <button class="btn btn-primary full" onclick="confirmarAgendamento()">
+                    Confirmar agendamento
+                </button>
+            </div>
+
+            <div class="step" data-step="sucesso">
+                <div class="success-box">
+                    <div class="success-icon">✓</div>
+                    <h2>Horário reservado!</h2>
+                    <p>Seu agendamento foi registrado com sucesso.</p>
+                    <a id="whatsappLink" class="btn btn-primary full" target="_blank">
+                        Confirmar pelo WhatsApp
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        window.APP_CONFIG = {
+            slug: "{{ empresa.slug }}",
+            telefone: "{{ empresa.telefone }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/agendar.js') }}"></script>
+</body>
+</html>

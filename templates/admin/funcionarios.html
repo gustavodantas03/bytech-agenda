@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+{% block title %}Funcionários{% endblock %}
+{% block content %}
+<header class="page-header"><div><span>Equipe</span><h1>Funcionários</h1></div></header>
+
+<section class="admin-grid">
+    <article class="panel">
+        <h2>Novo funcionário</h2>
+        <form method="post">
+            <label>Nome</label><input name="nome" required>
+            <label>Cargo</label><input name="cargo" value="Barbeiro" required>
+            <button class="btn btn-primary full">Cadastrar funcionário</button>
+        </form>
+    </article>
+
+    <article class="panel">
+        <h2>Funcionários cadastrados</h2>
+        <div class="service-admin-list">
+            {% for funcionario in funcionarios %}
+            <div class="service-admin-item">
+                <div>
+                    <strong>{{ funcionario.nome }}</strong>
+                    <span>{{ funcionario.cargo }} · {{ 'Ativo' if funcionario.ativo else 'Inativo' }}</span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-small btn-secondary" href="{{ url_for('editar_funcionario', funcionario_id=funcionario.id) }}">Editar</a>
+                    <form method="post" action="{{ url_for('alternar_funcionario', funcionario_id=funcionario.id) }}">
+                        <button class="btn btn-small {{ 'btn-danger' if funcionario.ativo else 'btn-secondary' }}">
+                            {{ 'Desativar' if funcionario.ativo else 'Ativar' }}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ url_for('excluir_funcionario', funcionario_id=funcionario.id) }}"
+                          onsubmit="return confirm('Deseja realmente excluir este funcionário?');">
+                        <button class="btn btn-small btn-danger">Excluir</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

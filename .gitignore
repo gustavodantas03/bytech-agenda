@@ -1,0 +1,17 @@
+# Ambiente virtual
+venv/
+.env
+
+__pycache__/
+*.py[cod]
+*.pyo
+
+*.db
+*.sqlite3
+
+static/uploads/logos/*
+
+.vscode/
+
+.DS_Store
+Thumbs.db

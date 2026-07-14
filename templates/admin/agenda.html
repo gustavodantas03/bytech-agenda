@@ -1,0 +1,66 @@
+{% extends 'admin/base.html' %}
+{% block title %}Agenda{% endblock %}
+{% block content %}
+<header class="page-header"><div><span>Organização</span><h1>Agenda</h1></div>
+<header class="page-header">
+
+    <div>
+        <span>Organização</span>
+        <h1>Agenda</h1>
+    </div>
+
+    <a
+        class="btn btn-primary"
+        href="{{ url_for('novo_agendamento') }}"
+    >
+        + Novo agendamento
+    </a>
+
+</header>
+</header>
+
+<section class="panel">
+    <form class="filter-form" method="get">
+        <div>
+            <label>Data</label>
+            <input type="date" name="data" value="{{ data_filtro }}">
+        </div>
+        <div>
+            <label>Barbeiro</label>
+            <select name="funcionario_id">
+                <option value="">Todos</option>
+                {% for funcionario in funcionarios %}
+                <option value="{{ funcionario.id }}" {% if funcionario_id == funcionario.id %}selected{% endif %}>
+                    {{ funcionario.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-secondary">Consultar</button>
+    </form>
+</section>
+
+<section class="panel">
+    {% if agendamentos %}
+        <div class="agenda-list">
+            {% for item in agendamentos %}
+            <article class="agenda-item">
+                <div class="agenda-time">{{ item.hora }}</div>
+                <div class="agenda-data">
+                    <strong>{{ item.cliente_nome }}</strong>
+                    <span>{{ item.servico_nome }} · {{ item.funcionario_nome or 'Sem barbeiro' }} · {{ item.cliente_telefone }}</span>
+                </div>
+                <span class="status {{ item.status }}">{{ item.status }}</span>
+                {% if item.status != 'cancelado' %}
+                <form method="post" action="{{ url_for('cancelar_agendamento', agendamento_id=item.id) }}">
+                    <button class="btn btn-small btn-danger">Cancelar</button>
+                </form>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">Nenhum agendamento nesta data.</div>
+    {% endif %}
+</section>
+{% endblock %}
