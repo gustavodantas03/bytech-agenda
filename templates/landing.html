@@ -23,29 +23,32 @@
     {% endif %}
 
     <link
-        rel="stylesheet"
-        href="{{ url_for('static',filename='css/style.css') }}?v=4"
-    >
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}?v=6"
+>
 </head>
 
 <body>
 
     <main class="landing-page">
 
-        <section class="hero ">
+        <section class="hero hero-premium">
 
-            <div class="hero-effects">
-                <span class="orb orb-one"></span>
-                <span class="orb orb-two"></span>
-                <span class="orb orb-three"></span>
-                <span class="hero-grid"></span>
-                <span class="hero-glow"></span>
-            </div>
+    <div class="hero-effects">
+        <span class="orb orb-one"></span>
+        <span class="orb orb-two"></span>
+        <span class="orb orb-three"></span>
+        <span class="hero-grid"></span>
+        <span class="hero-glow"></span>
+    </div>
 
-            <div class="hero-content">
+    <div class="hero-container">
+
+        <div class="hero-main">
+
+            <div class="hero-copy">
 
                 {% if empresa.logo %}
-
                     <img
                         class="landing-logo"
                         src="{{ url_for(
@@ -54,157 +57,154 @@
                         ) }}"
                         alt="Logo da {{ empresa.nome }}"
                     >
-
                 {% else %}
-
-                    <div class="logo-mark">
-                        B
-                    </div>
-
+                    <div class="logo-mark">B</div>
                 {% endif %}
 
-                <span class="tag">
-                    Agendamento online
+                <span class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Agendamento online disponível
                 </span>
 
                 <h1>
-                    {{ empresa.nome }}
+                    Seu próximo corte
+                    <span>começa aqui.</span>
                 </h1>
 
-                <p>
-                    {{ empresa.descricao }}
+                <p class="hero-description">
+                    Agende seu horário com facilidade,
+                    escolha o serviço, o barbeiro e o melhor
+                    momento para você.
                 </p>
 
-                <a
-                    class="btn btn-primary"
-                    href="{{ url_for(
-                        'agendar',
-                        slug=empresa.slug
-                    ) }}"
-                >
-                    Agendar horário
-                </a>
+                <div class="hero-actions">
+
+                    <a
+                        class="btn btn-primary hero-primary"
+                        href="{{ url_for(
+                            'agendar',
+                            slug=empresa.slug
+                        ) }}"
+                    >
+                        Agendar horário
+                        <span>→</span>
+                    </a>
+
+                    {% if empresa.maps_url %}
+                        <a
+                            class="btn hero-secondary"
+                            href="{{ empresa.maps_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Ver localização
+                        </a>
+                    {% endif %}
+
+                </div>
+
+                <div class="hero-meta">
+
+                    <div>
+                        <strong>Rápido</strong>
+                        <span>Agende em poucos cliques</span>
+                    </div>
+
+                    <div>
+                        <strong>Online</strong>
+                        <span>Disponível 24 horas</span>
+                    </div>
+
+                    <div>
+                        <strong>Seguro</strong>
+                        <span>Horários sem conflito</span>
+                    </div>
+
+                </div>
 
             </div>
 
-        </section>
+            <div class="hero-visual">
 
-        <section class="section reveal">
+                <div class="hero-phone">
 
-            <div class="section-title">
+                    <div class="hero-phone-top">
+                        <span></span>
+                    </div>
 
-                <span>Serviços</span>
+                    <div class="hero-phone-content">
 
-                <h2>
-                    Escolha seu atendimento
-                </h2>
+                        <div class="mini-brand">
 
-            </div>
+                            {% if empresa.logo %}
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='uploads/logos/' + empresa.logo
+                                    ) }}"
+                                    alt=""
+                                >
+                            {% else %}
+                                <div>B</div>
+                            {% endif %}
 
-            <div class="services-grid">
-
-                {% for servico in servicos %}
-
-                    <article class="service-card reveal-card">
-
-                        <div>
-
-                            <h3>
-                                {{ servico.nome }}
-                            </h3>
-
-                            <p>
-                                Duração aproximada:
-                                {{ servico.duracao }} minutos
-                            </p>
+                            <span>{{ empresa.nome }}</span>
 
                         </div>
 
-                        <strong>
-                            R$
-                            {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
-                        </strong>
+                        <div class="mini-message">
+                            Olá! Vamos agendar seu horário?
+                        </div>
 
-                    </article>
+                        <div class="mini-option">
+                            <span>✂️ Corte masculino</span>
+                            <strong>R$ 25</strong>
+                        </div>
 
-                {% endfor %}
+                        <div class="mini-option">
+                            <span>💈 Corte + barba</span>
+                            <strong>R$ 35</strong>
+                        </div>
+
+                        <div class="mini-button">
+                            Continuar
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="floating-card floating-card-one">
+                    <span>✓</span>
+                    <div>
+                        <strong>Agendamento confirmado</strong>
+                        <small>Hoje às 14:40</small>
+                    </div>
+                </div>
+
+                <div class="floating-card floating-card-two">
+                    <span>◷</span>
+                    <div>
+                        <strong>Próximo horário</strong>
+                        <small>15:20 disponível</small>
+                    </div>
+                </div>
+
+                <div class="floating-card floating-card-three">
+                    <span>💈</span>
+                    <div>
+                        <strong>Profissionais</strong>
+                        <small>Escolha seu barbeiro</small>
+                    </div>
+                </div>
 
             </div>
 
-        </section>
+        </div>
 
-        <section class="section info-grid reveal">
+    </div>
 
-            <article class="info-card reveal-card">
-
-                <span>Horário</span>
-
-                <h3>
-                    {{ empresa.horario_texto }}
-                </h3>
-
-            </article>
-
-            <article class="info-card reveal-card">
-
-                <span>Localização</span>
-
-                <h3>
-                    {{ empresa.endereco }}
-                </h3>
-
-                {% if empresa.maps_url %}
-
-                    <a
-                        href="{{ empresa.maps_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Abrir no mapa
-                    </a>
-
-                {% endif %}
-
-            </article>
-
-            <article class="info-card reveal-card">
-
-                <span>Contato</span>
-
-                <h3>
-                    {{ empresa.telefone }}
-                </h3>
-
-                <p>
-                    {{ empresa.instagram }}
-                </p>
-
-            </article>
-
-        </section>
-
-        <section class="cta reveal">
-
-            <h2>
-                Seu próximo corte começa aqui.
-            </h2>
-
-            <p>
-                Escolha o serviço, o barbeiro,
-                a data e o horário.
-            </p>
-
-            <a
-                class="btn btn-light"
-                href="{{ url_for(
-                    'agendar',
-                    slug=empresa.slug
-                ) }}"
-            >
-                Agendar agora
-            </a>
-
-        </section>
+</section>
 
         <footer class="landing-footer">
 
