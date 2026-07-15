@@ -668,6 +668,69 @@ def admin_sair():
     return redirect(url_for("admin_login"))
 
 
+@app.route("/admin/api/ultimo-agendamento")
+@login_required
+def admin_ultimo_agendamento():
+    empresa_id = session["empresa_id"]
+
+    conn = get_connection()
+
+    ultimo = conn.execute(
+        """
+        SELECT
+            a.id,
+            a.cliente_nome,
+            a.cliente_telefone,
+            a.data,
+            a.hora,
+            a.status,
+            COALESCE(
+                (
+                    SELECT GROUP_CONCAT(
+                        s2.nome,
+                        ' + '
+                    )
+                    FROM agendamento_servicos ags
+                    JOIN servicos s2
+                        ON s2.id = ags.servico_id
+                    WHERE ags.agendamento_id = a.id
+                ),
+                s.nome
+            ) AS servico_nome,
+            f.nome AS funcionario_nome
+        FROM agendamentos a
+        JOIN servicos s
+            ON s.id = a.servico_id
+        LEFT JOIN funcionarios f
+            ON f.id = a.funcionario_id
+        WHERE a.empresa_id = ?
+        ORDER BY a.id DESC
+        LIMIT 1
+        """,
+        (empresa_id,),
+    ).fetchone()
+
+    conn.close()
+
+    if not ultimo:
+        return jsonify({
+            "id": 0,
+        })
+
+    return jsonify({
+        "id": ultimo["id"],
+        "cliente_nome": ultimo["cliente_nome"],
+        "cliente_telefone": ultimo["cliente_telefone"],
+        "servico_nome": ultimo["servico_nome"],
+        "funcionario_nome": (
+            ultimo["funcionario_nome"]
+            or "Sem profissional"
+        ),
+        "data": ultimo["data"],
+        "hora": ultimo["hora"],
+        "status": ultimo["status"],
+    })
+
 @app.route("/admin")
 @login_required
 def admin_dashboard():
