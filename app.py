@@ -430,9 +430,13 @@ def agendar(slug):
 def horarios_disponiveis(slug):
     data = request.args.get("data")
     funcionario_id = request.args.get("funcionario_id", type=int)
+    duracao_total = request.args.get("duracao_total", default=40, type=int)
 
     if not data or not funcionario_id:
         return jsonify({"erro": "Data ou profissional não informado."}), 400
+
+    if duracao_total < 1 or duracao_total > 480:
+        return jsonify({"erro": "Duração total inválida."}), 400
 
     conn = get_connection()
     empresa = conn.execute(
@@ -452,9 +456,10 @@ def horarios_disponiveis(slug):
         conn.close()
         return jsonify({"erro": "Profissional inválido."}), 400
 
-    ocupados = conn.execute(
+    agendamentos_existentes = conn.execute(
         """
-        SELECT hora FROM agendamentos
+        SELECT hora, COALESCE(duracao_total, 40) AS duracao_total
+        FROM agendamentos
         WHERE empresa_id = ?
           AND funcionario_id = ?
           AND data = ?
@@ -464,8 +469,30 @@ def horarios_disponiveis(slug):
     ).fetchall()
     conn.close()
 
-    ocupados = {item["hora"] for item in ocupados}
-    livres = [hora for hora in gerar_horarios() if hora not in ocupados]
+    abertura = datetime.strptime("09:00", "%H:%M")
+    fechamento = datetime.strptime("18:00", "%H:%M")
+    livres = []
+
+    for hora in gerar_horarios():
+        inicio_candidato = datetime.strptime(hora, "%H:%M")
+        fim_candidato = inicio_candidato + timedelta(minutes=duracao_total)
+
+        if fim_candidato > fechamento:
+            continue
+
+        tem_conflito = False
+        for existente in agendamentos_existentes:
+            inicio_existente = datetime.strptime(existente["hora"], "%H:%M")
+            fim_existente = inicio_existente + timedelta(
+                minutes=existente["duracao_total"] or 40
+            )
+
+            if inicio_candidato < fim_existente and fim_candidato > inicio_existente:
+                tem_conflito = True
+                break
+
+        if not tem_conflito and inicio_candidato >= abertura:
+            livres.append(hora)
 
     return jsonify({"horarios": livres})
 
@@ -473,17 +500,23 @@ def horarios_disponiveis(slug):
 @app.route("/api/<slug>/agendamentos", methods=["POST"])
 def criar_agendamento(slug):
     dados = request.get_json() or {}
+    servico_ids = dados.get("servico_ids") or []
+
     obrigatorios = [
         "cliente_nome",
         "cliente_telefone",
-        "servico_id",
         "funcionario_id",
         "data",
         "hora",
     ]
 
-    if any(not dados.get(campo) for campo in obrigatorios):
-        return jsonify({"erro": "Preencha todos os campos."}), 400
+    if any(not dados.get(campo) for campo in obrigatorios) or not servico_ids:
+        return jsonify({"erro": "Preencha todos os campos e escolha ao menos um serviço."}), 400
+
+    try:
+        servico_ids = list(dict.fromkeys(int(item) for item in servico_ids))
+    except (TypeError, ValueError):
+        return jsonify({"erro": "Lista de serviços inválida."}), 400
 
     conn = get_connection()
     empresa = conn.execute(
@@ -494,122 +527,117 @@ def criar_agendamento(slug):
         conn.close()
         return jsonify({"erro": "Barbearia não encontrada."}), 404
 
-    servico = conn.execute(
-        "SELECT * FROM servicos WHERE id = ? AND empresa_id = ? AND ativo = 1",
-        (dados["servico_id"], empresa["id"]),
-    ).fetchone()
+    placeholders = ",".join("?" for _ in servico_ids)
+    servicos = conn.execute(
+        f"""
+        SELECT *
+        FROM servicos
+        WHERE id IN ({placeholders})
+          AND empresa_id = ?
+          AND ativo = 1
+        ORDER BY nome
+        """,
+        (*servico_ids, empresa["id"]),
+    ).fetchall()
 
     funcionario = conn.execute(
         "SELECT * FROM funcionarios WHERE id = ? AND empresa_id = ? AND ativo = 1",
         (dados["funcionario_id"], empresa["id"]),
     ).fetchone()
 
-    if not servico or not funcionario:
+    if len(servicos) != len(servico_ids) or not funcionario:
         conn.close()
         return jsonify({"erro": "Serviço ou profissional inválido."}), 400
 
-    ocupado = conn.execute(
+    duracao_total = sum(int(servico["duracao"] or 0) for servico in servicos)
+    valor_total = sum(float(servico["valor"] or 0) for servico in servicos)
+
+    inicio_novo = datetime.strptime(dados["hora"], "%H:%M")
+    fim_novo = inicio_novo + timedelta(minutes=duracao_total)
+
+    existentes = conn.execute(
         """
-        SELECT id FROM agendamentos
+        SELECT hora, COALESCE(duracao_total, 40) AS duracao_total
+        FROM agendamentos
         WHERE empresa_id = ?
           AND funcionario_id = ?
           AND data = ?
-          AND hora = ?
           AND status != 'cancelado'
         """,
-        (empresa["id"], funcionario["id"], dados["data"], dados["hora"]),
-    ).fetchone()
+        (empresa["id"], funcionario["id"], dados["data"]),
+    ).fetchall()
 
-    if ocupado:
-        conn.close()
-        return jsonify({"erro": "Este horário acabou de ser ocupado. Escolha outro."}), 409
+    for existente in existentes:
+        inicio_existente = datetime.strptime(existente["hora"], "%H:%M")
+        fim_existente = inicio_existente + timedelta(
+            minutes=existente["duracao_total"] or 40
+        )
+        if inicio_novo < fim_existente and fim_novo > inicio_existente:
+            conn.close()
+            return jsonify({"erro": "Este intervalo de horário acabou de ser ocupado. Escolha outro."}), 409
 
     try:
-        conn.execute(
+        cursor = conn.execute(
             """
             INSERT INTO agendamentos
-            (empresa_id, cliente_nome, cliente_telefone, servico_id, funcionario_id, data, hora)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (
+                empresa_id,
+                cliente_nome,
+                cliente_telefone,
+                servico_id,
+                funcionario_id,
+                data,
+                hora,
+                duracao_total,
+                valor_total
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 empresa["id"],
                 dados["cliente_nome"].strip(),
                 dados["cliente_telefone"].strip(),
-                servico["id"],
+                servico_ids[0],
                 funcionario["id"],
                 dados["data"],
                 dados["hora"],
+                duracao_total,
+                valor_total,
             ),
+        )
+        agendamento_id = cursor.lastrowid
+
+        conn.executemany(
+            """
+            INSERT INTO agendamento_servicos (agendamento_id, servico_id)
+            VALUES (?, ?)
+            """,
+            [(agendamento_id, servico_id) for servico_id in servico_ids],
         )
         conn.commit()
     except sqlite3.IntegrityError:
+        conn.rollback()
         conn.close()
         return jsonify({"erro": "Este horário acabou de ser ocupado. Escolha outro."}), 409
 
+    nomes_servicos = [servico["nome"] for servico in servicos]
     conn.close()
 
     mensagem = (
         f"Olá! Meu nome é {dados['cliente_nome']}. "
-        f"Agendei {servico['nome']} com {funcionario['nome']} "
-        f"para {dados['data']} às {dados['hora']}."
+        f"Agendei os serviços: {', '.join(nomes_servicos)} "
+        f"com {funcionario['nome']} para {dados['data']} às {dados['hora']}. "
+        f"Valor total: R$ {valor_total:.2f}."
     )
 
     return jsonify({
         "sucesso": True,
         "mensagem": "Agendamento realizado com sucesso.",
         "whatsapp": mensagem,
+        "valor_total": valor_total,
+        "duracao_total": duracao_total,
     })
 
-@app.route("/admin/api/ultimo-agendamento")
-@login_required
-def admin_ultimo_agendamento():
-    empresa_id = session["empresa_id"]
-
-    conn = get_connection()
-
-    ultimo = conn.execute(
-        """
-        SELECT
-            a.id,
-            a.cliente_nome,
-            a.cliente_telefone,
-            a.data,
-            a.hora,
-            a.status,
-            s.nome AS servico_nome,
-            f.nome AS funcionario_nome
-        FROM agendamentos a
-        JOIN servicos s
-            ON s.id = a.servico_id
-        LEFT JOIN funcionarios f
-            ON f.id = a.funcionario_id
-        WHERE a.empresa_id = ?
-        ORDER BY a.id DESC
-        LIMIT 1
-        """,
-        (empresa_id,),
-    ).fetchone()
-
-    conn.close()
-
-    if not ultimo:
-        return jsonify({
-            "id": 0,
-            "novo": False,
-        })
-
-    return jsonify({
-        "id": ultimo["id"],
-        "cliente_nome": ultimo["cliente_nome"],
-        "cliente_telefone": ultimo["cliente_telefone"],
-        "servico_nome": ultimo["servico_nome"],
-        "funcionario_nome": (
-            ultimo["funcionario_nome"] or "Sem profissional"
-        ),
-        "data": ultimo["data"],
-        "hora": ultimo["hora"],
-        "status": ultimo["status"],
-    })
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -650,7 +678,18 @@ def admin_dashboard():
     empresa = conn.execute("SELECT * FROM empresas WHERE id = ?", (empresa_id,)).fetchone()
     agendamentos = conn.execute(
         """
-        SELECT a.*, s.nome AS servico_nome, f.nome AS funcionario_nome
+        SELECT
+            a.*,
+            COALESCE(
+                (
+                    SELECT GROUP_CONCAT(s2.nome, ' + ')
+                    FROM agendamento_servicos ags
+                    JOIN servicos s2 ON s2.id = ags.servico_id
+                    WHERE ags.agendamento_id = a.id
+                ),
+                s.nome
+            ) AS servico_nome,
+            f.nome AS funcionario_nome
         FROM agendamentos a
         JOIN servicos s ON s.id = a.servico_id
         LEFT JOIN funcionarios f ON f.id = a.funcionario_id
@@ -768,8 +807,15 @@ def excluir_servico(servico_id):
     empresa_id = session["empresa_id"]
     conn = get_connection()
     possui_agendamento = conn.execute(
-        "SELECT id FROM agendamentos WHERE empresa_id = ? AND servico_id = ? LIMIT 1",
-        (empresa_id, servico_id),
+        """
+        SELECT a.id
+        FROM agendamentos a
+        LEFT JOIN agendamento_servicos ags ON ags.agendamento_id = a.id
+        WHERE a.empresa_id = ?
+          AND (a.servico_id = ? OR ags.servico_id = ?)
+        LIMIT 1
+        """,
+        (empresa_id, servico_id, servico_id),
     ).fetchone()
 
     if possui_agendamento:
@@ -1008,7 +1054,18 @@ def admin_agenda():
     ).fetchall()
 
     sql = """
-        SELECT a.*, s.nome AS servico_nome, f.nome AS funcionario_nome
+        SELECT
+            a.*,
+            COALESCE(
+                (
+                    SELECT GROUP_CONCAT(s2.nome, ' + ')
+                    FROM agendamento_servicos ags
+                    JOIN servicos s2 ON s2.id = ags.servico_id
+                    WHERE ags.agendamento_id = a.id
+                ),
+                s.nome
+            ) AS servico_nome,
+            f.nome AS funcionario_nome
         FROM agendamentos a
         JOIN servicos s ON s.id = a.servico_id
         LEFT JOIN funcionarios f ON f.id = a.funcionario_id
@@ -1201,7 +1258,12 @@ def novo_agendamento():
             )
 
         try:
-            conn.execute(
+            servico_dados = conn.execute(
+                "SELECT valor, duracao FROM servicos WHERE id = ?",
+                (servico_id,),
+            ).fetchone()
+
+            cursor = conn.execute(
                 """
                 INSERT INTO agendamentos (
                     empresa_id,
@@ -1211,9 +1273,11 @@ def novo_agendamento():
                     funcionario_id,
                     data,
                     hora,
-                    status
+                    status,
+                    duracao_total,
+                    valor_total
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     empresa_id,
@@ -1224,7 +1288,17 @@ def novo_agendamento():
                     data,
                     hora,
                     "agendado",
+                    int(servico_dados["duracao"] or 40),
+                    float(servico_dados["valor"] or 0),
                 ),
+            )
+
+            conn.execute(
+                """
+                INSERT INTO agendamento_servicos (agendamento_id, servico_id)
+                VALUES (?, ?)
+                """,
+                (cursor.lastrowid, servico_id),
             )
 
             conn.commit()

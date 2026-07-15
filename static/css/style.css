@@ -2483,3 +2483,75 @@ body.admin-menu-open {
         transform: none;
     }
 }
+
+/* MÚLTIPLOS SERVIÇOS */
+.booking-service-option {
+    position: relative;
+    padding-left: 58px;
+}
+
+.booking-service-check {
+    width: 28px;
+    height: 28px;
+    position: absolute;
+    left: 16px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #d7deea;
+    border-radius: 9px;
+    color: transparent;
+    background: #fff;
+    transition: .2s ease;
+}
+
+.booking-service-option.selected {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(0,102,255,.07), rgba(0,167,255,.04));
+    box-shadow: 0 14px 34px rgba(0,102,255,.12);
+}
+
+.booking-service-option.selected .booking-service-check {
+    color: #fff;
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+.booking-services-summary {
+    margin-top: 18px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    border: 1px solid #e1e6ef;
+    border-radius: 18px;
+    background: #f6f8fc;
+}
+
+.booking-services-summary > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.booking-services-summary span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.booking-services-summary strong {
+    color: var(--text);
+    font-size: 16px;
+}
+
+.booking-primary-button:disabled {
+    cursor: not-allowed;
+    opacity: .48;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    .booking-services-summary {
+        grid-template-columns: 1fr;
+    }
+}

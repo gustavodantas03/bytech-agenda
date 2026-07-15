@@ -22,7 +22,7 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=11"
+    href="{{ url_for('static', filename='css/style.css') }}?v=12"
     >
 </head>
 
@@ -264,51 +264,62 @@
             >
 
                 <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        ✂️
-                    </div>
-
+                    <div class="booking-question-icon">✂️</div>
                     <div>
-                        <label>Escolha o serviço</label>
-
-                        <p>
-                            Selecione o atendimento desejado.
-                        </p>
+                        <label>Escolha um ou mais serviços</label>
+                        <p>Toque nos serviços desejados e depois avance.</p>
                     </div>
-
                 </div>
 
-                <div class="options booking-options">
-
+                <div class="options booking-options booking-multi-services">
                     {% for servico in servicos %}
-
                         <button
-                            class="option booking-option"
+                            class="option booking-option booking-service-option"
                             type="button"
                             data-id="{{ servico.id }}"
                             data-nome="{{ servico.nome }}"
-                            onclick="selecionarServico(this)"
+                            data-valor="{{ servico.valor }}"
+                            data-duracao="{{ servico.duracao }}"
+                            onclick="alternarServico(this)"
+                            aria-pressed="false"
                         >
-
+                            <span class="booking-service-check">✓</span>
                             <div>
                                 <span>{{ servico.nome }}</span>
-
-                                <small>
-                                    {{ servico.duracao }} minutos
-                                </small>
+                                <small>{{ servico.duracao }} minutos</small>
                             </div>
-
                             <strong>
-                                R$
-                                {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
+                                R$ {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
                             </strong>
-
                         </button>
-
                     {% endfor %}
-
                 </div>
+
+                <div id="servicesSelectionSummary" class="booking-services-summary">
+                    <div>
+                        <span>Serviços selecionados</span>
+                        <strong id="selectedServicesCount">0</strong>
+                    </div>
+                    <div>
+                        <span>Tempo estimado</span>
+                        <strong id="selectedServicesDuration">0 min</strong>
+                    </div>
+                    <div>
+                        <span>Valor total</span>
+                        <strong id="selectedServicesTotal">R$ 0,00</strong>
+                    </div>
+                </div>
+
+                <button
+                    id="continueServicesButton"
+                    class="booking-primary-button"
+                    type="button"
+                    onclick="avancarServicos()"
+                    disabled
+                >
+                    Continuar
+                    <strong>→</strong>
+                </button>
 
             </div>
 
@@ -567,7 +578,7 @@
         src="{{ url_for(
             'static',
             filename='js/agendar.js'
-        ) }}?v=5"
+        ) }}?v=6"
     ></script>
 
 </body>

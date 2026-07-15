@@ -81,6 +81,15 @@ CREATE TABLE IF NOT EXISTS usuarios_master (
             FOREIGN KEY (funcionario_id) REFERENCES funcionarios(id)
         );
 
+        CREATE TABLE IF NOT EXISTS agendamento_servicos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            agendamento_id INTEGER NOT NULL,
+            servico_id INTEGER NOT NULL,
+            FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id) ON DELETE CASCADE,
+            FOREIGN KEY (servico_id) REFERENCES servicos(id),
+            UNIQUE (agendamento_id, servico_id)
+        );
+
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             empresa_id INTEGER NOT NULL,
@@ -97,6 +106,42 @@ CREATE TABLE IF NOT EXISTS usuarios_master (
 
     if not _column_exists(conn, "agendamentos", "funcionario_id"):
         conn.execute("ALTER TABLE agendamentos ADD COLUMN funcionario_id INTEGER")
+
+    if not _column_exists(conn, "agendamentos", "duracao_total"):
+        conn.execute(
+            "ALTER TABLE agendamentos ADD COLUMN duracao_total INTEGER NOT NULL DEFAULT 40"
+        )
+
+    if not _column_exists(conn, "agendamentos", "valor_total"):
+        conn.execute(
+            "ALTER TABLE agendamentos ADD COLUMN valor_total REAL NOT NULL DEFAULT 0"
+        )
+
+    # Migra agendamentos antigos para a nova relação de múltiplos serviços.
+    conn.execute(
+        """
+        INSERT OR IGNORE INTO agendamento_servicos (agendamento_id, servico_id)
+        SELECT id, servico_id
+        FROM agendamentos
+        WHERE servico_id IS NOT NULL
+        """
+    )
+
+    # Preenche duração e valor dos registros antigos quando ainda estiverem zerados.
+    conn.execute(
+        """
+        UPDATE agendamentos
+        SET duracao_total = COALESCE(
+                (SELECT duracao FROM servicos WHERE servicos.id = agendamentos.servico_id),
+                40
+            ),
+            valor_total = COALESCE(
+                (SELECT valor FROM servicos WHERE servicos.id = agendamentos.servico_id),
+                0
+            )
+        WHERE valor_total = 0
+        """
+    )
 
     conn.execute(
         """
