@@ -597,7 +597,7 @@ async function carregarHorariosDisponiveis() {
             data: estado.data,
             funcionario_id:
                 String(estado.funcionario_id),
-            duracao:
+            duracao_total:
                 String(
                     estado.duracao_total || 40
                 )
