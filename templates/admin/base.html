@@ -2,38 +2,275 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bytech Agenda{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}Bytech Agenda{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}?v=8"
+    >
 </head>
+
 <body class="admin-page">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="logo-mark small">B</div>
-            <div>
-                <strong>Bytech</strong>
-                <span>Agenda</span>
+
+    <div
+        id="adminOverlay"
+        class="admin-overlay"
+        onclick="fecharMenuAdmin()"
+    ></div>
+
+    <aside
+        id="adminSidebar"
+        class="sidebar admin-sidebar"
+    >
+
+        <div class="admin-sidebar-top">
+
+            <div class="brand admin-brand">
+
+                <div class="admin-brand-logo">
+                    B
+                </div>
+
+                <div class="admin-brand-text">
+                    <strong>Bytech</strong>
+                    <span>Agenda</span>
+                </div>
+
             </div>
+
+            <button
+                class="admin-sidebar-close"
+                type="button"
+                onclick="fecharMenuAdmin()"
+                aria-label="Fechar menu"
+            >
+                ×
+            </button>
+
         </div>
 
-        <nav>
-            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('admin_agenda') }}">Agenda</a>
-            <a href="{{ url_for('admin_funcionarios') }}">Funcionários</a>
-            <a href="{{ url_for('admin_servicos') }}">Serviços</a>
-            <a href="{{ url_for('admin_barbearia') }}">Barbearia</a>
-            <a href="{{ url_for('admin_sair') }}">Sair</a>
+        <div class="admin-sidebar-label">
+            Gerenciamento
+        </div>
+
+        <nav class="admin-nav">
+
+            <a
+                class="admin-nav-link
+                {% if request.endpoint == 'admin_dashboard' %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_dashboard') }}"
+            >
+                <span class="admin-nav-icon">
+                    ◫
+                </span>
+
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                class="admin-nav-link
+                {% if request.endpoint in [
+                    'admin_agenda',
+                    'novo_agendamento'
+                ] %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_agenda') }}"
+            >
+                <span class="admin-nav-icon">
+                    ◷
+                </span>
+
+                <span>Agenda</span>
+            </a>
+
+            <a
+                class="admin-nav-link
+                {% if request.endpoint in [
+                    'admin_funcionarios',
+                    'editar_funcionario'
+                ] %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_funcionarios') }}"
+            >
+                <span class="admin-nav-icon">
+                    ♙
+                </span>
+
+                <span>Funcionários</span>
+            </a>
+
+            <a
+                class="admin-nav-link
+                {% if request.endpoint in [
+                    'admin_servicos',
+                    'editar_servico'
+                ] %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_servicos') }}"
+            >
+                <span class="admin-nav-icon">
+                    ✦
+                </span>
+
+                <span>Serviços</span>
+            </a>
+
+            <a
+                class="admin-nav-link
+                {% if request.endpoint == 'admin_barbearia' %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_barbearia') }}"
+            >
+                <span class="admin-nav-icon">
+                    ◈
+                </span>
+
+                <span>Minha barbearia</span>
+            </a>
+
         </nav>
+
+        <div class="admin-sidebar-bottom">
+
+            <div class="admin-support-card">
+
+                <div class="admin-support-icon">
+                    ?
+                </div>
+
+                <div>
+                    <strong>Precisa de ajuda?</strong>
+
+                    <span>
+                        Entre em contato com a Bytech.
+                    </span>
+                </div>
+
+            </div>
+
+            <a
+                class="admin-logout"
+                href="{{ url_for('admin_sair') }}"
+            >
+                <span>↪</span>
+                Sair do painel
+            </a>
+
+        </div>
+
     </aside>
 
-    <main class="admin-content">
-        {% with mensagens = get_flashed_messages(with_categories=true) %}
-            {% for categoria, mensagem in mensagens %}
-                <div class="alert {{ categoria }}">{{ mensagem }}</div>
-            {% endfor %}
-        {% endwith %}
+    <div class="admin-layout">
 
-        {% block content %}{% endblock %}
-    </main>
+        <header class="admin-mobile-header">
+
+            <button
+                class="admin-menu-button"
+                type="button"
+                onclick="abrirMenuAdmin()"
+                aria-label="Abrir menu"
+            >
+                ☰
+            </button>
+
+            <div class="admin-mobile-brand">
+
+                <div class="admin-mobile-logo">
+                    B
+                </div>
+
+                <div>
+                    <strong>Bytech</strong>
+                    <span>Agenda</span>
+                </div>
+
+            </div>
+
+        </header>
+
+        <main class="admin-content">
+
+            {% with mensagens = get_flashed_messages(
+                with_categories=true
+            ) %}
+
+                {% for categoria, mensagem in mensagens %}
+
+                    <div class="alert {{ categoria }}">
+                        {{ mensagem }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+
+        </main>
+
+    </div>
+
+    <script>
+        function abrirMenuAdmin() {
+            const sidebar = document.getElementById(
+                "adminSidebar"
+            );
+
+            const overlay = document.getElementById(
+                "adminOverlay"
+            );
+
+            sidebar.classList.add("open");
+            overlay.classList.add("show");
+
+            document.body.classList.add(
+                "admin-menu-open"
+            );
+        }
+
+        function fecharMenuAdmin() {
+            const sidebar = document.getElementById(
+                "adminSidebar"
+            );
+
+            const overlay = document.getElementById(
+                "adminOverlay"
+            );
+
+            sidebar.classList.remove("open");
+            overlay.classList.remove("show");
+
+            document.body.classList.remove(
+                "admin-menu-open"
+            );
+        }
+
+        document.addEventListener(
+            "keydown",
+            function(evento) {
+                if (evento.key === "Escape") {
+                    fecharMenuAdmin();
+                }
+            }
+        );
+    </script>
+
 </body>
 </html>
