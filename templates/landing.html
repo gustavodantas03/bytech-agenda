@@ -4,7 +4,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>{{ empresa.nome }}</title>
 
@@ -20,7 +24,10 @@
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
     >
 </head>
 
@@ -30,43 +37,58 @@
 
         <section class="hero">
 
-            <div class="hero-overlay"></div>
+            <div class="hero-effects">
+                <span class="orb orb-one"></span>
+                <span class="orb orb-two"></span>
+                <span class="orb orb-three"></span>
+                <span class="hero-grid"></span>
+                <span class="hero-glow"></span>
+            </div>
 
             <div class="hero-content">
 
-    {% if empresa.logo %}
+                {% if empresa.logo %}
 
-        <img
-            class="landing-logo"
-            src="{{ url_for(
-                'static',
-                filename='uploads/logos/' + empresa.logo
-            ) }}"
-            alt="Logo da {{ empresa.nome }}"
-        >
+                    <img
+                        class="landing-logo"
+                        src="{{ url_for(
+                            'static',
+                            filename='uploads/logos/' + empresa.logo
+                        ) }}"
+                        alt="Logo da {{ empresa.nome }}"
+                    >
 
-    {% else %}
+                {% else %}
 
-        <div class="logo-mark">B</div>
+                    <div class="logo-mark">
+                        B
+                    </div>
 
-    {% endif %}
+                {% endif %}
 
-    <span class="tag">
-        Agendamento online
-    </span>
+                <span class="tag">
+                    Agendamento online
+                </span>
 
-    <h1>{{ empresa.nome }}</h1>
+                <h1>
+                    {{ empresa.nome }}
+                </h1>
 
-    <p>{{ empresa.descricao }}</p>
+                <p>
+                    {{ empresa.descricao }}
+                </p>
 
-    <a
-        class="btn btn-primary"
-        href="{{ url_for('agendar', slug=empresa.slug) }}"
-    >
-        Agendar horário
-    </a>
+                <a
+                    class="btn btn-primary"
+                    href="{{ url_for(
+                        'agendar',
+                        slug=empresa.slug
+                    ) }}"
+                >
+                    Agendar horário
+                </a>
 
-</div>
+            </div>
 
         </section>
 
