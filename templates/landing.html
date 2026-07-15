@@ -30,9 +30,9 @@
 
 <body>
 
-    <main class="landing">
+    <main class="landing-page">
 
-        <section class="hero">
+        <section class="hero ">
 
             <div class="hero-effects">
                 <span class="orb orb-one"></span>
@@ -89,7 +89,7 @@
 
         </section>
 
-        <section class="section">
+        <section class="section reveal">
 
             <div class="section-title">
 
@@ -105,7 +105,7 @@
 
                 {% for servico in servicos %}
 
-                    <article class="service-card">
+                    <article class="service-card reveal-card">
 
                         <div>
 
@@ -133,9 +133,9 @@
 
         </section>
 
-        <section class="section info-grid">
+        <section class="section info-grid reveal">
 
-            <article class="info-card">
+            <article class="info-card reveal-card">
 
                 <span>Horário</span>
 
@@ -145,7 +145,7 @@
 
             </article>
 
-            <article class="info-card">
+            <article class="info-card reveal-card">
 
                 <span>Localização</span>
 
@@ -167,7 +167,7 @@
 
             </article>
 
-            <article class="info-card">
+            <article class="info-card reveal-card">
 
                 <span>Contato</span>
 
@@ -183,7 +183,7 @@
 
         </section>
 
-        <section class="cta">
+        <section class="cta reveal">
 
             <h2>
                 Seu próximo corte começa aqui.
@@ -219,6 +219,9 @@
         </footer>
 
     </main>
+<script
+    src="{{ url_for('static', filename='js/ui.js') }}?v=6"
+></script>
 
 </body>
 </html>
