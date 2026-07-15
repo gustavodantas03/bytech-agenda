@@ -1861,6 +1861,273 @@ body.admin-menu-open {
 }
 
 /* ==================================================
+   ALERTAS DE NOVOS AGENDAMENTOS
+================================================== */
+
+.admin-notification-toggle {
+    width: 100%;
+    padding: 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 17px;
+
+    color: #ffffff;
+    text-align: left;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.admin-notification-toggle:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(0, 132, 255, 0.34);
+    background: rgba(0, 102, 255, 0.1);
+}
+
+.admin-notification-toggle.active {
+    border-color: rgba(56, 217, 150, 0.32);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(22, 163, 74, 0.17),
+            rgba(0, 102, 255, 0.08)
+        );
+}
+
+.admin-notification-icon {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background: rgba(0, 102, 255, 0.2);
+
+    font-size: 18px;
+}
+
+.admin-notification-toggle.active
+.admin-notification-icon {
+    background: rgba(22, 163, 74, 0.2);
+
+    animation:
+        notificationBell 2.6s ease-in-out infinite;
+}
+
+.admin-notification-text {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-notification-text strong {
+    color: #ffffff;
+    font-size: 13px;
+}
+
+.admin-notification-text small {
+    color: rgba(255, 255, 255, 0.48);
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.appointment-toast {
+    width: min(390px, calc(100% - 28px));
+    padding: 16px;
+
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    z-index: 9999;
+
+    display: grid;
+    grid-template-columns:
+        48px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 12px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 20px;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5, 13, 27, 0.97),
+            rgba(9, 29, 57, 0.97)
+        );
+
+    box-shadow:
+        0 24px 65px rgba(2, 6, 23, 0.38);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform:
+        translateX(calc(100% + 50px))
+        scale(0.96);
+
+    transition:
+        opacity 0.35s ease,
+        visibility 0.35s ease,
+        transform 0.35s ease;
+}
+
+.appointment-toast.show {
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateX(0)
+        scale(1);
+}
+
+.appointment-toast-icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0066ff,
+            #00a7ff
+        );
+
+    box-shadow:
+        0 12px 28px rgba(0, 102, 255, 0.3);
+
+    animation:
+        notificationBell 1.4s ease-in-out infinite;
+}
+
+.appointment-toast-content {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.appointment-toast-content > span {
+    color: #66aaff;
+
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.appointment-toast-content strong {
+    overflow: hidden;
+
+    color: #ffffff;
+    font-size: 16px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.appointment-toast-content small {
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, 0.58);
+
+    font-size: 12px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.appointment-toast > button {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 11px;
+
+    color: rgba(255, 255, 255, 0.6);
+
+    background: rgba(255, 255, 255, 0.06);
+
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.appointment-toast > button:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes notificationBell {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+
+    15% {
+        transform: rotate(8deg);
+    }
+
+    30% {
+        transform: rotate(-8deg);
+    }
+
+    45% {
+        transform: rotate(5deg);
+    }
+
+    60% {
+        transform: rotate(-5deg);
+    }
+
+    75% {
+        transform: rotate(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .appointment-toast {
+        top: 12px;
+        right: 14px;
+        left: 14px;
+
+        width: auto;
+    }
+}
+
+/* ==================================================
    ANIMAÇÕES
 ================================================== */
 

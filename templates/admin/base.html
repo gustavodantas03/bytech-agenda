@@ -14,11 +14,42 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=10"
+    href="{{ url_for('static', filename='css/style.css') }}?v=11"
 >
 </head>
 
 <body class="admin-page">
+
+    <div
+    id="newAppointmentToast"
+    class="appointment-toast"
+    role="status"
+    aria-live="polite"
+>
+    <div class="appointment-toast-icon">
+        🔔
+    </div>
+
+    <div class="appointment-toast-content">
+        <span>Novo agendamento</span>
+
+        <strong id="toastClientName">
+            Novo cliente
+        </strong>
+
+        <small id="toastAppointmentDetails">
+            Horário registrado
+        </small>
+    </div>
+
+    <button
+        type="button"
+        aria-label="Fechar notificação"
+        onclick="fecharToastAgendamento()"
+    >
+        ×
+    </button>
+</div>
 
     <div
         id="adminOverlay"
@@ -145,7 +176,19 @@
         </nav>
 
         <div class="admin-sidebar-bottom">
+<button
+    id="notificationToggle"
+    class="admin-notification-toggle"
+    type="button"
+    onclick="ativarNotificacoesAdmin()"
+>
+    <span class="admin-notification-icon">🔔</span>
 
+    <span class="admin-notification-text">
+        <strong>Ativar alertas</strong>
+        <small>Receba avisos de novos horários</small>
+    </span>
+</button>
             <div class="admin-support-card">
 
                 <div class="admin-support-icon">
@@ -268,6 +311,381 @@
             }
         );
     </script>
+<audio id="novoAgendamento">
+    <source src="{{ url_for('static', filename='sounds/new.mp3') }}">
+</audio>
+
+<script>
+
+let ultimoId = 0;
+
+async function verificarNovos(){
+
+    const r = await fetch("/admin/api/ultimo-agendamento");
+
+    const dados = await r.json();
+
+    if(ultimoId===0){
+        ultimoId=dados.id;
+        return;
+    }
+
+    if(dados.id>ultimoId){
+
+        ultimoId=dados.id;
+
+        document
+            .getElementById("novoAgendamento")
+            .play();
+
+        location.reload();
+
+    }
+
+}
+
+setInterval(verificarNovos,5000);
+
+const ADMIN_NOTIFICATION_KEY =
+    "bytech_admin_notifications_enabled";
+
+const ADMIN_LAST_APPOINTMENT_KEY =
+    "bytech_admin_last_appointment_id";
+
+let adminAudioContext = null;
+let adminNotificationTimer = null;
+let toastCloseTimer = null;
+
+function notificacoesAdminAtivas() {
+    return localStorage.getItem(
+        ADMIN_NOTIFICATION_KEY
+    ) === "true";
+}
+
+function atualizarBotaoNotificacao() {
+    const botao = document.getElementById(
+        "notificationToggle"
+    );
+
+    if (!botao) {
+        return;
+    }
+
+    const titulo = botao.querySelector(
+        ".admin-notification-text strong"
+    );
+
+    const descricao = botao.querySelector(
+        ".admin-notification-text small"
+    );
+
+    if (notificacoesAdminAtivas()) {
+        botao.classList.add("active");
+
+        if (titulo) {
+            titulo.textContent = "Alertas ativados";
+        }
+
+        if (descricao) {
+            descricao.textContent =
+                "Você receberá novos agendamentos";
+        }
+
+        return;
+    }
+
+    botao.classList.remove("active");
+
+    if (titulo) {
+        titulo.textContent = "Ativar alertas";
+    }
+
+    if (descricao) {
+        descricao.textContent =
+            "Receba avisos de novos horários";
+    }
+}
+
+async function ativarNotificacoesAdmin() {
+    const ativadas = notificacoesAdminAtivas();
+
+    if (ativadas) {
+        localStorage.setItem(
+            ADMIN_NOTIFICATION_KEY,
+            "false"
+        );
+
+        atualizarBotaoNotificacao();
+        return;
+    }
+
+    try {
+        adminAudioContext =
+            adminAudioContext ||
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+        if (adminAudioContext.state === "suspended") {
+            await adminAudioContext.resume();
+        }
+
+        localStorage.setItem(
+            ADMIN_NOTIFICATION_KEY,
+            "true"
+        );
+
+        tocarSomNovoAgendamento();
+        atualizarBotaoNotificacao();
+    } catch (erro) {
+        console.error(
+            "Não foi possível ativar o áudio:",
+            erro
+        );
+
+        alert(
+            "Não foi possível ativar o som neste navegador."
+        );
+    }
+}
+
+function tocarSomNovoAgendamento() {
+    if (!notificacoesAdminAtivas()) {
+        return;
+    }
+
+    try {
+        adminAudioContext =
+            adminAudioContext ||
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+        const agora = adminAudioContext.currentTime;
+
+        criarNotaAgendamento(
+            659.25,
+            agora,
+            0.18
+        );
+
+        criarNotaAgendamento(
+            783.99,
+            agora + 0.18,
+            0.22
+        );
+
+        criarNotaAgendamento(
+            987.77,
+            agora + 0.40,
+            0.32
+        );
+    } catch (erro) {
+        console.error(
+            "Erro ao reproduzir alerta:",
+            erro
+        );
+    }
+}
+
+function criarNotaAgendamento(
+    frequencia,
+    inicio,
+    duracao
+) {
+    const oscilador =
+        adminAudioContext.createOscillator();
+
+    const volume =
+        adminAudioContext.createGain();
+
+    oscilador.type = "sine";
+    oscilador.frequency.setValueAtTime(
+        frequencia,
+        inicio
+    );
+
+    volume.gain.setValueAtTime(
+        0.0001,
+        inicio
+    );
+
+    volume.gain.exponentialRampToValueAtTime(
+        0.18,
+        inicio + 0.02
+    );
+
+    volume.gain.exponentialRampToValueAtTime(
+        0.0001,
+        inicio + duracao
+    );
+
+    oscilador.connect(volume);
+    volume.connect(adminAudioContext.destination);
+
+    oscilador.start(inicio);
+    oscilador.stop(inicio + duracao);
+}
+
+function formatarDataAgendamento(dataIso) {
+    if (!dataIso) {
+        return "";
+    }
+
+    const partes = dataIso.split("-");
+
+    if (partes.length !== 3) {
+        return dataIso;
+    }
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+function mostrarToastAgendamento(dados) {
+    const toast = document.getElementById(
+        "newAppointmentToast"
+    );
+
+    const nome = document.getElementById(
+        "toastClientName"
+    );
+
+    const detalhes = document.getElementById(
+        "toastAppointmentDetails"
+    );
+
+    if (!toast || !nome || !detalhes) {
+        return;
+    }
+
+    nome.textContent =
+        dados.cliente_nome || "Novo cliente";
+
+    const dataFormatada =
+        formatarDataAgendamento(dados.data);
+
+    detalhes.textContent =
+        `${dados.servico_nome} · ` +
+        `${dataFormatada} às ${dados.hora}`;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastCloseTimer);
+
+    toastCloseTimer = setTimeout(() => {
+        fecharToastAgendamento();
+    }, 9000);
+}
+
+function fecharToastAgendamento() {
+    const toast = document.getElementById(
+        "newAppointmentToast"
+    );
+
+    if (toast) {
+        toast.classList.remove("show");
+    }
+}
+
+async function verificarNovoAgendamento() {
+    if (document.hidden) {
+        return;
+    }
+
+    try {
+        const resposta = await fetch(
+            "{{ url_for('admin_ultimo_agendamento') }}",
+            {
+                headers: {
+                    "Accept": "application/json"
+                },
+                cache: "no-store"
+            }
+        );
+
+        if (!resposta.ok) {
+            return;
+        }
+
+        const dados = await resposta.json();
+
+        const ultimoIdSalvo = Number(
+            localStorage.getItem(
+                ADMIN_LAST_APPOINTMENT_KEY
+            ) || "0"
+        );
+
+        const ultimoIdAtual = Number(
+            dados.id || 0
+        );
+
+        /*
+         * Na primeira consulta, apenas cria
+         * a referência. Não toca o alerta.
+         */
+        if (ultimoIdSalvo === 0) {
+            localStorage.setItem(
+                ADMIN_LAST_APPOINTMENT_KEY,
+                String(ultimoIdAtual)
+            );
+
+            return;
+        }
+
+        if (ultimoIdAtual <= ultimoIdSalvo) {
+            return;
+        }
+
+        localStorage.setItem(
+            ADMIN_LAST_APPOINTMENT_KEY,
+            String(ultimoIdAtual)
+        );
+
+        tocarSomNovoAgendamento();
+        mostrarToastAgendamento(dados);
+
+        document.dispatchEvent(
+            new CustomEvent(
+                "bytech:novo-agendamento",
+                {
+                    detail: dados
+                }
+            )
+        );
+    } catch (erro) {
+        console.error(
+            "Erro ao verificar agendamentos:",
+            erro
+        );
+    }
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        atualizarBotaoNotificacao();
+
+        verificarNovoAgendamento();
+
+        adminNotificationTimer = setInterval(
+            verificarNovoAgendamento,
+            8000
+        );
+    }
+);
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (!document.hidden) {
+            verificarNovoAgendamento();
+        }
+    }
+);
+
+</script>
 
 </body>
 </html>
