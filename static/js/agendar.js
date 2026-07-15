@@ -10,9 +10,76 @@ const estado = {
 };
 
 function mostrarEtapa(nome) {
-    document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
-    document.querySelector(`[data-step="${nome}"]`).classList.add("active");
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    const etapas = {
+        nome: 1,
+        telefone: 2,
+        servico: 3,
+        funcionario: 4,
+        data: 5,
+        hora: 6,
+        confirmacao: 6,
+        sucesso: 6
+    };
+
+    document
+        .querySelectorAll(".step")
+        .forEach((step) => {
+            step.classList.remove("active");
+        });
+
+    const etapaAtual = document.querySelector(
+        `[data-step="${nome}"]`
+    );
+
+    if (etapaAtual) {
+        etapaAtual.classList.add("active");
+    }
+
+    const numeroEtapa = etapas[nome] || 1;
+    const percentual = Math.round(
+        (numeroEtapa / 6) * 100
+    );
+
+    const barra = document.getElementById(
+        "bookingProgressBar"
+    );
+
+    const texto = document.getElementById(
+        "bookingProgressText"
+    );
+
+    const percentualTexto = document.getElementById(
+        "bookingProgressPercent"
+    );
+
+    if (barra) {
+        barra.style.width = `${percentual}%`;
+    }
+
+    if (texto) {
+        texto.textContent =
+            nome === "sucesso"
+                ? "Agendamento concluído"
+                : `Etapa ${numeroEtapa} de 6`;
+    }
+
+    if (percentualTexto) {
+        percentualTexto.textContent =
+            nome === "sucesso"
+                ? "100%"
+                : `${percentual}%`;
+    }
+
+    setTimeout(() => {
+        const card = document.getElementById("chat");
+
+        if (card) {
+            card.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }, 80);
 }
 
 function adicionarBolha(texto, tipo = "user") {

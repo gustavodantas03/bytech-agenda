@@ -1,555 +1,209 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
+{% extends 'admin/base.html' %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+{% block title %}Agenda{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <div>
+        <span>Organização</span>
+        <h1>Agenda</h1>
+        <p class="page-subtitle">
+            Acompanhe os agendamentos por data e barbeiro.
+        </p>
+    </div>
+
+    <a
+        class="btn btn-primary"
+        href="{{ url_for('novo_agendamento') }}"
+    >
+        + Novo agendamento
+    </a>
+</header>
+
+<section class="panel agenda-filter-panel">
+
+    <form
+        method="get"
+        class="agenda-filters"
     >
 
-    <title>Agendar | {{ empresa.nome }}</title>
+        <div class="field-group">
+            <label for="data">
+                Data
+            </label>
 
-    {% if empresa.logo %}
-        <link
-            rel="icon"
-            href="{{ url_for(
-                'static',
-                filename='uploads/logos/' + empresa.logo
-            ) }}"
+            <input
+                id="data"
+                name="data"
+                type="date"
+                value="{{ data_filtro }}"
+            >
+        </div>
+
+        <div class="field-group">
+            <label for="funcionario_id">
+                Barbeiro
+            </label>
+
+            <select
+                id="funcionario_id"
+                name="funcionario_id"
+            >
+                <option value="">
+                    Todos os barbeiros
+                </option>
+
+                {% for funcionario in funcionarios %}
+
+                    <option
+                        value="{{ funcionario.id }}"
+                        {% if funcionario_id == funcionario.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ funcionario.nome }}
+                    </option>
+
+                {% endfor %}
+            </select>
+        </div>
+
+        <button
+            class="btn btn-secondary"
+            type="submit"
         >
-    {% endif %}
+            Filtrar
+        </button>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for(
-            'static',
-            filename='css/style.css'
-        ) }}"
-    >
-</head>
+    </form>
 
-<body class="booking-page">
+</section>
 
-    <main class="booking-shell">
+<section class="agenda-summary-grid">
 
-        <header class="booking-header">
+    <article class="agenda-summary-card">
+        <span>Data selecionada</span>
+        <strong>{{ data_filtro }}</strong>
+    </article>
+
+    <article class="agenda-summary-card">
+        <span>Total de agendamentos</span>
+        <strong>{{ agendamentos|length }}</strong>
+    </article>
+
+    <article class="agenda-summary-card">
+        <span>Profissional</span>
+
+        <strong>
+            {% if funcionario_id %}
+                {% for funcionario in funcionarios %}
+                    {% if funcionario.id == funcionario_id %}
+                        {{ funcionario.nome }}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                Todos
+            {% endif %}
+        </strong>
+    </article>
+
+</section>
+
+<section class="panel agenda-panel">
+
+    {% if agendamentos %}
+
+        <div class="agenda-list">
+
+            {% for item in agendamentos %}
+
+                <article
+                    class="agenda-item
+                    {% if item.status == 'cancelado' %}
+                        agenda-item-cancelado
+                    {% endif %}"
+                >
+
+                    <div class="agenda-time">
+                        {{ item.hora }}
+                    </div>
+
+                    <div class="agenda-data">
+
+                        <strong>
+                            {{ item.cliente_nome }}
+                        </strong>
+
+                        <span>
+                            {{ item.servico_nome }}
+                        </span>
+
+                        <small>
+                            {{ item.funcionario_nome or 'Sem barbeiro' }}
+                            · {{ item.cliente_telefone }}
+                        </small>
+
+                    </div>
+
+                    <span class="status {{ item.status }}">
+                        {{ item.status }}
+                    </span>
+
+                    {% if item.status != 'cancelado' %}
+
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'cancelar_agendamento',
+                                agendamento_id=item.id
+                            ) }}"
+                            onsubmit="return confirm(
+                                'Deseja cancelar este agendamento?'
+                            )"
+                        >
+                            <button
+                                class="btn btn-small btn-danger"
+                                type="submit"
+                            >
+                                Cancelar
+                            </button>
+                        </form>
+
+                    {% endif %}
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state agenda-empty-state">
+
+            <div class="empty-icon">
+                📅
+            </div>
+
+            <h3>Nenhum agendamento encontrado</h3>
+
+            <p>
+                Não existem horários marcados para
+                os filtros selecionados.
+            </p>
 
             <a
-                class="booking-back"
-                href="{{ url_for(
-                    'landing',
-                    slug=empresa.slug
-                ) }}"
-                aria-label="Voltar"
+                class="btn btn-primary"
+                href="{{ url_for('novo_agendamento') }}"
             >
-                ←
+                Criar agendamento
             </a>
 
-            <div class="booking-brand">
+        </div>
 
-                {% if empresa.logo %}
+    {% endif %}
 
-                    <img
-                        class="booking-logo"
-                        src="{{ url_for(
-                            'static',
-                            filename='uploads/logos/' + empresa.logo
-                        ) }}"
-                        alt="Logo da {{ empresa.nome }}"
-                    >
+</section>
 
-                {% else %}
-
-                    <div class="booking-header-mark">
-                        B
-                    </div>
-
-                {% endif %}
-
-                <div>
-                    <strong>{{ empresa.nome }}</strong>
-                    <span>Agendamento online</span>
-                </div>
-
-            </div>
-
-        </header>
-
-        <section class="booking-hero">
-
-            <div class="booking-effects">
-                <span class="booking-orb booking-orb-one"></span>
-                <span class="booking-orb booking-orb-two"></span>
-                <span class="booking-grid"></span>
-                <span class="booking-glow"></span>
-            </div>
-
-            <div class="booking-hero-content">
-
-                {% if empresa.logo %}
-
-                    <img
-                        class="booking-hero-logo"
-                        src="{{ url_for(
-                            'static',
-                            filename='uploads/logos/' + empresa.logo
-                        ) }}"
-                        alt="Logo da {{ empresa.nome }}"
-                    >
-
-                {% else %}
-
-                    <div class="booking-hero-mark">
-                        B
-                    </div>
-
-                {% endif %}
-
-                <span class="booking-tag">
-                    Agendamento simples e rápido
-                </span>
-
-                <h1>Reserve seu horário</h1>
-
-                <p>
-                    Escolha o serviço, o barbeiro,
-                    a data e o melhor horário para você.
-                </p>
-
-            </div>
-
-        </section>
-
-        <section
-            id="chat"
-            class="booking-card"
-        >
-
-            <div class="bubble bot booking-welcome">
-
-                <div class="booking-message-icon">
-                    ✦
-                </div>
-
-                <div>
-                    <strong>
-                        Olá! Vamos agendar seu horário?
-                    </strong>
-
-                    <span>
-                        Leva menos de um minuto.
-                    </span>
-                </div>
-
-            </div>
-
-            <div
-                class="step active booking-step"
-                data-step="nome"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        👤
-                    </div>
-
-                    <div>
-                        <label for="nome">
-                            Qual é o seu nome?
-                        </label>
-
-                        <p>
-                            Para começarmos seu agendamento.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="booking-input-wrap">
-
-                    <span>👤</span>
-
-                    <input
-                        id="nome"
-                        type="text"
-                        placeholder="Digite seu nome"
-                        autocomplete="name"
-                    >
-
-                </div>
-
-                <button
-                    class="booking-primary-button"
-                    type="button"
-                    onclick="avancarNome()"
-                >
-                    Continuar
-                    <strong>→</strong>
-                </button>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="telefone"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        📱
-                    </div>
-
-                    <div>
-                        <label for="telefone">
-                            Qual é o seu WhatsApp?
-                        </label>
-
-                        <p>
-                            Usaremos para identificar sua reserva.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="booking-input-wrap">
-
-                    <span>📱</span>
-
-                    <input
-                        id="telefone"
-                        type="tel"
-                        inputmode="tel"
-                        placeholder="(85) 99999-9999"
-                        autocomplete="tel"
-                    >
-
-                </div>
-
-                <button
-                    class="booking-primary-button"
-                    type="button"
-                    onclick="avancarTelefone()"
-                >
-                    Continuar
-                    <strong>→</strong>
-                </button>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="servico"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        ✂️
-                    </div>
-
-                    <div>
-                        <label>Escolha o serviço</label>
-
-                        <p>
-                            Selecione o atendimento desejado.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="options booking-options">
-
-                    {% for servico in servicos %}
-
-                        <button
-                            class="option booking-option"
-                            type="button"
-                            data-id="{{ servico.id }}"
-                            data-nome="{{ servico.nome }}"
-                            onclick="selecionarServico(this)"
-                        >
-
-                            <div>
-                                <span>{{ servico.nome }}</span>
-
-                                <small>
-                                    {{ servico.duracao }} minutos
-                                </small>
-                            </div>
-
-                            <strong>
-                                R$
-                                {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
-                            </strong>
-
-                        </button>
-
-                    {% endfor %}
-
-                </div>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="funcionario"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        💈
-                    </div>
-
-                    <div>
-                        <label>Escolha o barbeiro</label>
-
-                        <p>
-                            Selecione quem vai atender você.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="options booking-options">
-
-                    {% for funcionario in funcionarios %}
-
-                        <button
-                            class="option booking-option"
-                            type="button"
-                            data-id="{{ funcionario.id }}"
-                            data-nome="{{ funcionario.nome }}"
-                            onclick="selecionarFuncionario(this)"
-                        >
-
-                            <div class="booking-professional">
-
-                                <div class="booking-avatar">
-                                    {{ funcionario.nome[0]|upper }}
-                                </div>
-
-                                <div>
-                                    <span>
-                                        {{ funcionario.nome }}
-                                    </span>
-
-                                    <small>
-                                        {{ funcionario.cargo }}
-                                    </small>
-                                </div>
-
-                            </div>
-
-                            <strong>→</strong>
-
-                        </button>
-
-                    {% endfor %}
-
-                </div>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="data"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        📅
-                    </div>
-
-                    <div>
-                        <label>Escolha a data</label>
-
-                        <p>
-                            Selecione o melhor dia para você.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div class="options compact booking-date-grid">
-
-                    {% for data in datas %}
-
-                        <button
-                            class="option booking-date-option"
-                            type="button"
-                            data-data="{{ data.valor }}"
-                            onclick="selecionarData(this)"
-                        >
-                            {{ data.texto }}
-                        </button>
-
-                    {% endfor %}
-
-                </div>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="hora"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        🕒
-                    </div>
-
-                    <div>
-                        <label>Horários disponíveis</label>
-
-                        <p>
-                            Escolha um horário livre.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div
-                    id="horarios"
-                    class="options compact booking-time-grid"
-                ></div>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="confirmacao"
-            >
-
-                <div class="booking-question">
-
-                    <div class="booking-question-icon">
-                        ✓
-                    </div>
-
-                    <div>
-                        <label>Confira seu agendamento</label>
-
-                        <p>
-                            Revise os dados antes de confirmar.
-                        </p>
-                    </div>
-
-                </div>
-
-                <div
-                    id="resumo"
-                    class="summary booking-summary"
-                ></div>
-
-                <button
-                    class="booking-primary-button"
-                    type="button"
-                    onclick="confirmarAgendamento()"
-                >
-                    Confirmar agendamento
-                    <strong>✓</strong>
-                </button>
-
-            </div>
-
-            <div
-                class="step booking-step"
-                data-step="sucesso"
-            >
-
-                <div class="success-box booking-success">
-
-                    <div class="success-icon">
-                        ✓
-                    </div>
-
-                    <span class="success-label">
-                        Reserva concluída
-                    </span>
-
-                    <h2>Horário reservado!</h2>
-
-                    <p>
-                        Seu agendamento foi registrado com sucesso.
-                    </p>
-
-                    <a
-                        id="whatsappLink"
-                        class="booking-primary-button booking-whatsapp"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Confirmar pelo WhatsApp
-                        <strong>↗</strong>
-                    </a>
-
-                    <a
-                        class="booking-secondary-link"
-                        href="{{ url_for(
-                            'landing',
-                            slug=empresa.slug
-                        ) }}"
-                    >
-                        Voltar para a página inicial
-                    </a>
-
-                </div>
-
-            </div>
-
-            <div class="booking-trust">
-
-                <div>
-                    <strong>✓</strong>
-                    <span>Dados protegidos</span>
-                </div>
-
-                <div>
-                    <strong>◷</strong>
-                    <span>Agendamento rápido</span>
-                </div>
-
-                <div>
-                    <strong>✓</strong>
-                    <span>Confirmação imediata</span>
-                </div>
-
-            </div>
-
-        </section>
-
-        <footer class="booking-help">
-
-            <strong>Precisa de ajuda?</strong>
-
-            <span>
-                Entre em contato diretamente com a barbearia.
-            </span>
-
-        </footer>
-
-    </main>
-
-    <script>
-        window.APP_CONFIG = {
-            slug: "{{ empresa.slug }}",
-            telefone: "{{ empresa.telefone or '' }}"
-        };
-    </script>
-
-    <script
-        src="{{ url_for(
-            'static',
-            filename='js/agendar.js'
-        ) }}"
-    ></script>
-
-</body>
-</html>
+{% endblock %}
