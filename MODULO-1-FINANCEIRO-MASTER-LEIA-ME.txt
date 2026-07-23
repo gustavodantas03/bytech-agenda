@@ -1,0 +1,28 @@
+BYTECH AGENDA — MÓDULO 1: FINANCEIRO MASTER v1.0
+
+Entrega integrada e revisada:
+- Dashboard financeiro com KPIs, histórico de 6 meses, ticket médio, receita por plano,
+  pagamentos recentes e próximos vencimentos.
+- Cobranças/mensalidades com pesquisa e filtros por empresa, plano, competência e status.
+- Registro de pagamento com desconto, acréscimo, valor final, forma, data e observações.
+- Recibo PDF e estorno com motivo e trilha em logs financeiros.
+- Tela de inadimplentes com dias de atraso, valor devido, histórico e bloqueio manual.
+- Configurações financeiras globais: vencimento, tolerância, bloqueio, multa, juros,
+  desconto antecipado, forma de pagamento e mensagem padrão.
+- Banco atualizado por migração automática, sem apagar os dados existentes.
+- Navegação e interface responsiva padronizadas no painel Master.
+
+ROTAS PRINCIPAIS
+/master/financeiro/dashboard
+/master/financeiro
+/master/financeiro/inadimplentes
+/master/financeiro/configuracoes
+
+INSTALAÇÃO
+1. Extraia o ZIP.
+2. Execute INSTALAR-E-EXECUTAR-WINDOWS.bat ou instale requirements.txt.
+3. Inicie com: python app.py
+4. A migração das tabelas acontece automaticamente na inicialização.
+
+RECOMENDAÇÃO
+Faça uma cópia da pasta database antes de substituir uma versão que já esteja em produção.

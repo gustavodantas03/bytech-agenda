@@ -1,0 +1,17 @@
+{% extends 'master/base.html' %}{% block title %}Dashboard Financeiro{% endblock %}{% block content %}
+<div class="finance-head"><div><span>Financeiro Master</span><h1>Visão geral financeira</h1><p>Acompanhe recebimentos, inadimplência e previsão de receita.</p></div><a class="btn" href="{{ url_for('master_financeiro') }}">Ver cobranças</a></div>
+<div class="finance-kpis">
+ <article><span>Recebido no mês</span><strong>R$ {{ '%.2f'|format(kpis.recebido_mes or 0)|replace('.',',') }}</strong><small>Pagamentos confirmados</small></article>
+ <article><span>A receber</span><strong>R$ {{ '%.2f'|format(kpis.a_receber or 0)|replace('.',',') }}</strong><small>Cobranças abertas e vencidas</small></article>
+ <article><span>Valor vencido</span><strong>R$ {{ '%.2f'|format(kpis.vencido or 0)|replace('.',',') }}</strong><small>{{ inad.qtd or 0 }} empresa(s) inadimplente(s)</small></article>
+ <article><span>Ticket médio</span><strong>R$ {{ '%.2f'|format(ticket)|replace('.',',') }}</strong><small>Média por pagamento</small></article>
+</div>
+<div class="finance-grid-2">
+<section class="panel"><div class="panel-header"><div><span>Últimos 6 meses</span><h2>Previsto x recebido</h2></div></div><div class="bar-chart">
+{% set maxv = ([1] + historico|map(attribute='previsto')|list + historico|map(attribute='recebido')|list)|max %}
+{% for m in historico %}<div class="bar-month"><div class="bars"><i style="height:{{ (m.previsto/maxv*150) if maxv else 0 }}px" title="Previsto"></i><b style="height:{{ (m.recebido/maxv*150) if maxv else 0 }}px" title="Recebido"></b></div><small>{{ m.competencia[5:7] }}/{{ m.competencia[2:4] }}</small></div>{% endfor %}</div><div class="chart-legend"><span>■ Previsto</span><span>■ Recebido</span></div></section>
+<section class="panel"><div class="panel-header"><div><span>Planos</span><h2>Receita recorrente</h2></div></div><div class="plan-list">{% for p in por_plano %}<div><span><strong>{{ p.plano }}</strong><small>{{ p.empresas }} empresa(s)</small></span><b>R$ {{ '%.2f'|format(p.receita or 0)|replace('.',',') }}</b></div>{% else %}<p>Sem dados.</p>{% endfor %}</div></section>
+</div>
+<div class="finance-grid-2"><section class="panel"><div class="panel-header"><h2>Pagamentos recentes</h2></div><div class="responsive-table"><table><thead><tr><th>Empresa</th><th>Data</th><th>Valor</th></tr></thead><tbody>{% for p in ultimos %}<tr><td>{{ p.empresa_nome }}</td><td>{{ p.data_pagamento[8:10] }}/{{ p.data_pagamento[5:7] }}/{{ p.data_pagamento[:4] }}</td><td>R$ {{ '%.2f'|format(p.valor_final or p.valor)|replace('.',',') }}</td></tr>{% else %}<tr><td colspan="3">Nenhum pagamento.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="panel"><div class="panel-header"><h2>Próximos vencimentos</h2></div><div class="responsive-table"><table><thead><tr><th>Empresa</th><th>Vencimento</th><th>Valor</th></tr></thead><tbody>{% for c in proximos %}<tr><td>{{ c.empresa_nome }}</td><td>{{ c.vencimento[8:10] }}/{{ c.vencimento[5:7] }}/{{ c.vencimento[:4] }}</td><td>R$ {{ '%.2f'|format(c.valor_final or c.valor)|replace('.',',') }}</td></tr>{% else %}<tr><td colspan="3">Nenhum vencimento.</td></tr>{% endfor %}</tbody></table></div></section></div>
+{% endblock %}

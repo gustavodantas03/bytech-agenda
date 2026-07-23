@@ -24,11 +24,29 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=12"
+    href="{{ url_for('static', filename='css/style.css') }}?v=14"
     >
 </head>
 
-<body>
+{% set mockup = ui.mockup if ui and ui.mockup is defined else {
+    'saudacao': 'Olá! Como podemos cuidar de você hoje?',
+    'servicos': [],
+    'card_confirmacao_titulo': 'Agendamento confirmado',
+    'card_confirmacao_texto': 'Sua reserva fica registrada na hora',
+    'card_horario_titulo': 'Horários disponíveis',
+    'card_horario_texto': 'Escolha o melhor momento para você',
+    'card_profissional_titulo': 'Atendimento especializado',
+    'card_profissional_texto': 'Escolha quem vai atender você'
+} %}
+
+<body
+    style="
+        --accent: {{ empresa.cor_principal or '#0066ff' }};
+        --accent-2: {{ empresa.cor_secundaria or '#00a7ff' }};
+        --empresa-botao: {{ empresa.cor_botao or empresa.cor_principal or '#0066ff' }};
+        --empresa-sidebar: {{ empresa.cor_sidebar or '#07111f' }};
+    "
+>
 
     <main class="landing-page">
 
@@ -66,17 +84,19 @@
                     Agendamento online disponível
                 </span>
 
-                <h1>
-                    Seu próximo corte
-                    <span>começa aqui.</span>
-                </h1>
+     <h1>
+    {{ ui.hero_titulo|default('Agende seu atendimento', true) }}
+    <span>
+        {{ ui.hero_destaque|default('com facilidade.', true) }}
+    </span>
+</h1>
 
-                <p class="hero-description">
-                    Agende seu horário com facilidade,
-                    escolha o serviço, o barbeiro e o melhor
-                    momento para você.
-                </p>
-
+<p class="hero-description">
+    {{ ui.hero_descricao|default(
+        'Escolha o serviço, o profissional e o melhor horário para você.',
+        true
+    ) }}
+</p>
                 <div class="hero-actions">
 
                     <a
@@ -153,18 +173,30 @@
                         </div>
 
                         <div class="mini-message">
-                            Olá! Vamos agendar seu horário?
+                            {{ mockup.saudacao }}
                         </div>
 
-                        <div class="mini-option">
-                            <span>✂️ Corte masculino</span>
-                            <strong>R$ 25</strong>
-                        </div>
+                        {% for item in mockup.servicos %}
+                            <div class="mini-option">
+                                <span>
+                                    {{ item.icone }}
+                                    {{ item.nome }}
+                                </span>
 
-                        <div class="mini-option">
-                            <span>💈 Corte + barba</span>
-                            <strong>R$ 35</strong>
-                        </div>
+                                <strong>
+                                    R$
+                                    {{ item.valor }}
+                                </strong>
+                            </div>
+                        {% else %}
+                            <div class="mini-option">
+                                <span>
+                                    {{ ui.icone if ui else '✦' }}
+                                    Atendimento personalizado
+                                </span>
+                                <strong>Online</strong>
+                            </div>
+                        {% endfor %}
 
                         <div class="mini-button">
                             Continuar
@@ -175,28 +207,46 @@
                 </div>
 
                 <div class="floating-card floating-card-one">
-                    <span>✓</span>
-                    <div>
-                        <strong>Agendamento confirmado</strong>
-                        <small>Hoje às 14:40</small>
-                    </div>
-                </div>
+    <span>✓</span>
+
+    <div>
+        <strong>
+            {{ mockup.card_confirmacao_titulo }}
+        </strong>
+
+        <small>
+            {{ mockup.card_confirmacao_texto }}
+        </small>
+    </div>
+</div>
 
                 <div class="floating-card floating-card-two">
-                    <span>◷</span>
-                    <div>
-                        <strong>Próximo horário</strong>
-                        <small>15:20 disponível</small>
-                    </div>
-                </div>
+    <span>◷</span>
+
+    <div>
+        <strong>
+            {{ mockup.card_horario_titulo }}
+        </strong>
+
+        <small>
+            {{ mockup.card_horario_texto }}
+        </small>
+    </div>
+</div>
 
                 <div class="floating-card floating-card-three">
-                    <span>💈</span>
-                    <div>
-                        <strong>Profissionais</strong>
-                        <small>Escolha seu barbeiro</small>
-                    </div>
-                </div>
+    <span>{{ ui.icone }}</span>
+
+    <div>
+        <strong>
+            {{ mockup.card_profissional_titulo }}
+        </strong>
+
+        <small>
+            {{ mockup.card_profissional_texto }}
+        </small>
+    </div>
+</div>
 
             </div>
 
@@ -219,9 +269,6 @@
         </footer>
 
     </main>
-<script
-    src="{{ url_for('static', filename='js/ui.js') }}?v=6"
-></script>
 
 </body>
 </html>

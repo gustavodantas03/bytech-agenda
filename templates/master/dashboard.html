@@ -1,98 +1,36 @@
 {% extends 'master/base.html' %}
-
-{% block title %}
-Barbearias
-{% endblock %}
-
+{% block title %}Dashboard | Bytech Master{% endblock %}
 {% block content %}
-
-<header class="page-header">
-
-    <div>
-        <span>Bytech Agenda</span>
-        <h1>Barbearias cadastradas</h1>
-    </div>
-
-    <a
-        class="btn btn-primary"
-        href="{{ url_for('master_nova_empresa') }}"
-    >
-        + Nova barbearia
-    </a>
-
+<header class="master-page-header">
+  <div><span>Bytech Agenda SaaS</span><h1>Dashboard executivo</h1><p>Uma visão rápida da operação, receita e saúde da sua carteira.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('master_nova_empresa') }}">+ Nova empresa</a>
 </header>
-
-<section class="panel">
-
-    {% if empresas %}
-
-        <div class="service-admin-list">
-
-            {% for empresa in empresas %}
-
-                <div class="service-admin-item">
-
-                    <div>
-
-                        <strong>
-                            {{ empresa.nome }}
-                        </strong>
-
-                        <span>
-                            /{{ empresa.slug }}
-                            · Usuário: {{ empresa.usuario or 'Não criado' }}
-                            · {{ empresa.total_funcionarios }} funcionários
-                            · {{ empresa.total_servicos }} serviços
-                        </span>
-
-                    </div>
-
-                    <div class="actions">
-
-                        <a
-                            class="btn btn-small btn-secondary"
-                            href="{{ url_for(
-                                'landing',
-                                slug=empresa.slug
-                            ) }}"
-                            target="_blank"
-                        >
-                            Abrir página
-                        </a>
-
-                        <form
-                            method="post"
-                            action="{{ url_for(
-                                'master_alternar_empresa',
-                                empresa_id=empresa.id
-                            ) }}"
-                        >
-
-                            <button
-                                class="btn btn-small
-                                {{ 'btn-danger' if empresa.ativo else 'btn-secondary' }}"
-                            >
-                                {{ 'Bloquear' if empresa.ativo else 'Ativar' }}
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-
-        <div class="empty-state">
-            Nenhuma barbearia cadastrada.
-        </div>
-
-    {% endif %}
-
+<section class="master-stats-grid master-financial-stats">
+  <article><div>🏢</div><span>Empresas</span><strong>{{ resumo.total or 0 }}</strong><small>{{ resumo.ativas or 0 }} ativas</small></article>
+  <article><div>🔴</div><span>Inadimplentes</span><strong>{{ resumo.inadimplentes or 0 }}</strong><small>{{ resumo.bloqueadas or 0 }} bloqueadas</small></article>
+  <article><div>📈</div><span>Receita prevista</span><strong>R$ {{ '%.2f'|format(resumo.receita_prevista or 0)|replace('.', ',') }}</strong><small>Mensal recorrente</small></article>
+  <article><div>💳</div><span>Recebido no mês</span><strong>R$ {{ '%.2f'|format(recebido_mes or 0)|replace('.', ',') }}</strong><small>Pagamentos registrados</small></article>
 </section>
-
+<section class="master-chart-grid">
+  <article class="panel master-chart-card">
+    <div class="panel-header"><div><span>Fluxo mensal</span><h2>Previsto x recebido</h2></div></div>
+    {% set maior = ([1] + historico|map(attribute='previsto')|list + historico|map(attribute='recebido')|list)|max %}
+    <div class="finance-bars">{% for mes in historico %}<div class="finance-bar-group"><div class="finance-bar-area"><span class="finance-bar previsto" style="height: {{ ((mes.previsto or 0) / maior * 100)|round }}%"></span><span class="finance-bar recebido" style="height: {{ ((mes.recebido or 0) / maior * 100)|round }}%"></span></div><small>{{ mes.competencia[5:7] }}/{{ mes.competencia[2:4] }}</small></div>{% endfor %}</div>
+    <div class="finance-legend"><span><i class="legend-previsto"></i> Previsto</span><span><i class="legend-recebido"></i> Recebido</span></div>
+  </article>
+  <article class="panel master-chart-card">
+    <div class="panel-header"><div><span>Carteira</span><h2>Situação financeira</h2></div></div>
+    {% set total_status = resumo.total or 1 %}{% set pct_em_dia = ((resumo.em_dia or 0) / total_status * 100) %}{% set pct_pendente = ((resumo.pendentes or 0) / total_status * 100) %}
+    <div class="finance-donut" style="--ok: {{ pct_em_dia }}%; --pending: {{ pct_pendente }}%;"><div><strong>{{ resumo.total or 0 }}</strong><span>empresas</span></div></div>
+    <div class="finance-status-list"><span><i class="dot ok"></i> Em dia <strong>{{ resumo.em_dia or 0 }}</strong></span><span><i class="dot pending"></i> Pendentes <strong>{{ resumo.pendentes or 0 }}</strong></span><span><i class="dot late"></i> Inadimplentes <strong>{{ resumo.inadimplentes or 0 }}</strong></span></div>
+  </article>
+</section>
+<section class="master-overview-grid">
+  <article class="panel"><div class="panel-header"><div><span>Novos clientes</span><h2>Empresas recentes</h2></div><a href="{{ url_for('master_empresas') }}">Ver todas</a></div>
+    <div class="master-simple-list">{% for empresa in empresas_recentes %}<a href="{{ url_for('master_editar_empresa', empresa_id=empresa.id) }}"><span><strong>{{ empresa.nome }}</strong><small>{{ empresa.segmento|capitalize }} · {{ empresa.plano or 'Essencial' }}</small></span><b class="master-payment-badge {{ empresa.status_pagamento or 'em_dia' }}">{{ (empresa.status_pagamento or 'em_dia')|replace('_',' ')|title }}</b></a>{% else %}<p>Nenhuma empresa cadastrada.</p>{% endfor %}</div>
+  </article>
+  <article class="panel"><div class="panel-header"><div><span>Últimas entradas</span><h2>Pagamentos recentes</h2></div><a href="{{ url_for('master_financeiro') }}">Ver financeiro</a></div>
+    <div class="master-simple-list">{% for item in pagamentos_recentes %}<div><span><strong>{{ item.empresa_nome }}</strong><small>{{ item.data_pagamento }} · {{ item.forma_pagamento }}</small></span><b>R$ {{ '%.2f'|format(item.valor or 0)|replace('.', ',') }}</b></div>{% else %}<p>Nenhum pagamento registrado.</p>{% endfor %}</div>
+  </article>
+</section>
 {% endblock %}

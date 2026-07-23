@@ -1,0 +1,27 @@
+BYTECH AGENDA — SPRINT 2.3.1 — RECIBO PDF
+
+O QUE FOI ENTREGUE
+- Recibo de pagamento em PDF usando ReportLab.
+- Numeração automática do recibo.
+- Download automático após registrar um pagamento.
+- Botão "Baixar recibo PDF" na tela Master > Financeiro > Pagamentos.
+- Botão "Baixar PDF" no histórico financeiro individual da empresa.
+- O recibo contém empresa, competência, vencimento, data do pagamento, forma, valor e observações.
+- Pagamentos estornados aparecem identificados no recibo.
+
+COMO USAR
+1. No PowerShell, dentro da pasta do projeto, execute:
+   py -m pip install -r requirements.txt
+2. Inicie:
+   py app.py
+3. Entre no Painel Master.
+4. Abra Financeiro.
+5. Registre o pagamento de uma cobrança.
+6. O PDF será baixado automaticamente.
+7. Para baixar novamente, use o botão na tabela de Pagamentos.
+
+DEPENDÊNCIA
+reportlab==4.2.5 já está no requirements.txt.
+
+IMPORTANTE
+O PDF não fica salvo em uma pasta do projeto. Ele é gerado sob demanda e enviado para a pasta Downloads do navegador. Isso evita acumular arquivos duplicados no servidor.

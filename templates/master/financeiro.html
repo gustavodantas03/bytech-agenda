@@ -1,0 +1,320 @@
+{% extends 'master/base.html' %}
+{% block title %}Mensalidades | Bytech Master{% endblock %}
+{% block content %}
+<header class="master-page-header finance-page-heading">
+    <div>
+        <span>Centro Financeiro</span>
+        <h1>Mensalidades</h1>
+        <p>Consulte todas as mensalidades, acompanhe os status e encontre cobranças por empresa, plano ou competência.</p>
+    </div>
+</header>
+
+<section class="finance-kpis finance-kpis-five">
+    <article>
+        <span>Total de mensalidades</span>
+        <strong>{{ resumo.total or 0 }}</strong>
+        <small>Resultado dos filtros aplicados</small>
+    </article>
+    <article>
+        <span>Em aberto</span>
+        <strong>{{ resumo.abertas or 0 }}</strong>
+        <small>R$ {{ '%.2f'|format(resumo.valor_pendente or 0)|replace('.', ',') }} pendentes</small>
+    </article>
+    <article>
+        <span>Pagas</span>
+        <strong>{{ resumo.pagas or 0 }}</strong>
+        <small>R$ {{ '%.2f'|format(resumo.valor_pago or 0)|replace('.', ',') }} recebidos</small>
+    </article>
+    <article>
+        <span>Vencidas</span>
+        <strong>{{ resumo.vencidas or 0 }}</strong>
+        <small>Exigem acompanhamento</small>
+    </article>
+    <article>
+        <span>Valor total</span>
+        <strong>R$ {{ '%.2f'|format(resumo.valor_total or 0)|replace('.', ',') }}</strong>
+        <small>Desconsidera cobranças canceladas</small>
+    </article>
+</section>
+
+<section class="panel finance-filter-panel">
+    <form class="finance-filters finance-filters-complete" method="get">
+        <label class="finance-search-field">
+            Buscar empresa
+            <input type="search" name="q" value="{{ busca }}" placeholder="Nome ou identificador da empresa">
+        </label>
+        <label>
+            Empresa
+            <select name="empresa_id">
+                <option value="">Todas</option>
+                {% for e in empresas %}
+                <option value="{{ e.id }}" {% if empresa_filtro|string == e.id|string %}selected{% endif %}>{{ e.nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Plano
+            <select name="plano_id">
+                <option value="">Todos</option>
+                {% for plano in planos %}
+                <option value="{{ plano.id }}" {% if plano_filtro|string == plano.id|string %}selected{% endif %}>{{ plano.nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Competência
+            <input type="month" name="competencia" value="{{ competencia_filtro }}">
+        </label>
+        <label>
+            Status
+            <select name="status">
+                <option value="">Todos</option>
+                {% for value,label in [('aberta','Aberta'),('vencida','Vencida'),('paga','Paga'),('cancelada','Cancelada')] %}
+                <option value="{{ value }}" {% if status_filtro == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="finance-filter-actions">
+            <button class="btn" type="submit">Aplicar filtros</button>
+            <a class="btn btn-secondary" href="{{ url_for('master_financeiro') }}">Limpar</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel financial-table-panel">
+    <div class="panel-header finance-table-header">
+        <div>
+            <span>Controle mensal</span>
+            <h2>Lista de mensalidades</h2>
+            <p>{{ resumo.total or 0 }} registro(s) encontrado(s)</p>
+        </div>
+    </div>
+
+    {% if cobrancas %}
+    <div class="responsive-table">
+        <table class="master-finance-table monthly-table">
+            <thead>
+                <tr>
+                    <th>Empresa</th>
+                    <th>Plano</th>
+                    <th>Competência</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in cobrancas %}
+                <tr>
+                    <td>
+                        <strong>{{ c.empresa_nome }}</strong>
+                        <small>/{{ c.slug }}</small>
+                    </td>
+                    <td><span class="finance-plan-badge">{{ c.plano_nome }}</span></td>
+                    <td><strong>{{ c.competencia[5:7] }}/{{ c.competencia[0:4] }}</strong></td>
+                    <td>{{ c.vencimento[8:10] }}/{{ c.vencimento[5:7] }}/{{ c.vencimento[0:4] }}</td>
+                    <td><strong>R$ {{ '%.2f'|format(c.valor_final or c.valor)|replace('.', ',') }}</strong></td>
+                    <td>
+                        <span class="charge-status {{ c.status }}">
+                            {% if c.status == 'aberta' %}Aberta
+                            {% elif c.status == 'vencida' %}Vencida
+                            {% elif c.status == 'paga' %}Paga
+                            {% elif c.status == 'cancelada' %}Cancelada
+                            {% else %}{{ c.status|capitalize }}{% endif %}
+                        </span>
+                        {% if c.status == 'vencida' and c.dias_atraso %}
+                        <small>{{ c.dias_atraso }} dia(s) de atraso</small>
+                        {% endif %}
+                    </td>
+                    <td class="finance-actions">
+                        <a class="btn btn-small btn-secondary" href="{{ url_for('master_empresa_financeiro', empresa_id=c.empresa_id) }}">Visualizar</a>
+                        {% if c.status not in ['paga', 'cancelada'] %}
+                        <button type="button" class="btn btn-small master-pay-button" onclick='abrirPagamento({{ c.id }}, {{ (c.valor_final or c.valor)|float }}, {{ c.empresa_nome|tojson }}, {{ c.competencia|tojson }})'>Registrar pagamento</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4"><strong>Total da listagem filtrada</strong><small>{{ resumo.total or 0 }} mensalidade(s)</small></td>
+                    <td><strong>R$ {{ '%.2f'|format(resumo.valor_total or 0)|replace('.', ',') }}</strong></td>
+                    <td colspan="2"><small>Pago: R$ {{ '%.2f'|format(resumo.valor_pago or 0)|replace('.', ',') }} · Pendente: R$ {{ '%.2f'|format(resumo.valor_pendente or 0)|replace('.', ',') }}</small></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    {% else %}
+    <div class="finance-empty-state">
+        <div>▤</div>
+        <h3>Nenhuma mensalidade encontrada</h3>
+        <p>Não existem mensalidades que correspondam aos filtros selecionados.</p>
+        <a class="btn btn-secondary" href="{{ url_for('master_financeiro') }}">Limpar filtros</a>
+    </div>
+    {% endif %}
+</section>
+
+<section class="panel financial-table-panel">
+    <div class="panel-header">
+        <div><span>Auditoria</span><h2>Pagamentos registrados</h2></div>
+    </div>
+    <div class="responsive-table">
+        <table class="master-finance-table">
+            <thead><tr><th>Data</th><th>Empresa</th><th>Competência</th><th>Forma</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead>
+            <tbody>
+                {% for p in pagamentos %}
+                <tr>
+                    <td>{{ p.data_pagamento[8:10] }}/{{ p.data_pagamento[5:7] }}/{{ p.data_pagamento[0:4] }}</td>
+                    <td>{{ p.empresa_nome }}</td>
+                    <td>{{ p.competencia[5:7] }}/{{ p.competencia[0:4] }}</td>
+                    <td>{{ p.forma_pagamento }}</td>
+                    <td>R$ {{ '%.2f'|format(p.valor)|replace('.', ',') }}</td>
+                    <td>{% if p.estornado %}<span class="charge-status cancelada">Estornado</span>{% else %}<span class="charge-status paga">Confirmado</span>{% endif %}</td>
+                    <td class="finance-actions">
+                        <a class="btn btn-small btn-secondary" href="{{ url_for('master_recibo', pagamento_id=p.id) }}">Recibo PDF</a>
+                        {% if not p.estornado %}
+                        <form method="post" action="{{ url_for('master_estornar_pagamento', pagamento_id=p.id) }}" onsubmit="return confirmarEstorno(this)">
+                            <input type="hidden" name="motivo">
+                            <button class="btn btn-small btn-danger">Estornar</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">Nenhum pagamento registrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div id="paymentModal" class="finance-modal" hidden>
+    <div class="finance-modal-card payment-modal-card" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+        <button class="modal-close" type="button" onclick="fecharPagamento()" aria-label="Fechar">×</button>
+        <span>Registrar pagamento</span>
+        <h2 id="paymentTitle">Pagamento</h2>
+        <p class="payment-modal-subtitle">Confira os valores antes de confirmar. O recibo em PDF será gerado após o registro.</p>
+
+        <form id="paymentForm" method="post">
+            <div class="payment-summary-box">
+                <div><span>Valor original</span><strong id="paymentOriginalText">R$ 0,00</strong></div>
+                <div><span>Valor final</span><strong id="paymentFinalText">R$ 0,00</strong></div>
+            </div>
+
+            <input id="paymentOriginal" type="hidden">
+            <input id="paymentFinal" name="valor_final" type="hidden">
+
+            <div class="payment-form-grid">
+                <label>Desconto (R$)
+                    <input id="paymentDiscount" name="desconto" type="number" min="0" step="0.01" value="0.00" inputmode="decimal">
+                </label>
+                <label>Acréscimo (R$)
+                    <input id="paymentSurcharge" name="acrescimo" type="number" min="0" step="0.01" value="0.00" inputmode="decimal">
+                </label>
+                <label>Data do pagamento
+                    <input name="data_pagamento" type="date" required>
+                </label>
+                <label>Forma de pagamento
+                    <select name="forma_pagamento" required>
+                        <option>Pix</option>
+                        <option>Cartão</option>
+                        <option>Dinheiro</option>
+                        <option>Transferência</option>
+                        <option>Boleto</option>
+                    </select>
+                </label>
+            </div>
+
+            <label>Observações
+                <textarea name="observacoes" rows="3" maxlength="500" placeholder="Informações adicionais sobre o recebimento"></textarea>
+            </label>
+
+            <div id="paymentValidation" class="payment-validation" hidden></div>
+            <div class="payment-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharPagamento()">Cancelar</button>
+                <button id="paymentSubmit" class="btn master-pay-button" type="submit">Confirmar pagamento</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const paymentModal = document.getElementById('paymentModal');
+const paymentForm = document.getElementById('paymentForm');
+const paymentOriginal = document.getElementById('paymentOriginal');
+const paymentFinal = document.getElementById('paymentFinal');
+const paymentDiscount = document.getElementById('paymentDiscount');
+const paymentSurcharge = document.getElementById('paymentSurcharge');
+const paymentValidation = document.getElementById('paymentValidation');
+const paymentSubmit = document.getElementById('paymentSubmit');
+
+function moedaBR(valor) {
+    return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function numeroSeguro(campo) {
+    const valor = Number.parseFloat(campo.value);
+    return Number.isFinite(valor) && valor >= 0 ? valor : 0;
+}
+
+function recalcularPagamento() {
+    const original = Number.parseFloat(paymentOriginal.value) || 0;
+    const desconto = numeroSeguro(paymentDiscount);
+    const acrescimo = numeroSeguro(paymentSurcharge);
+    const final = Math.round((original - desconto + acrescimo) * 100) / 100;
+
+    document.getElementById('paymentOriginalText').textContent = moedaBR(original);
+    document.getElementById('paymentFinalText').textContent = moedaBR(Math.max(final, 0));
+    paymentFinal.value = final.toFixed(2);
+
+    let mensagem = '';
+    if (desconto > original + acrescimo) mensagem = 'O desconto não pode ser maior que o valor disponível.';
+    else if (final <= 0) mensagem = 'O valor final precisa ser maior que zero.';
+
+    paymentValidation.textContent = mensagem;
+    paymentValidation.hidden = !mensagem;
+    paymentSubmit.disabled = Boolean(mensagem);
+}
+
+function abrirPagamento(id, valor, empresa, competencia) {
+    paymentForm.action = `{{ url_for('master_financeiro') }}`.replace('/master/financeiro', `/master/cobrancas/${id}/pagar`);
+    paymentOriginal.value = Number(valor).toFixed(2);
+    paymentDiscount.value = '0.00';
+    paymentSurcharge.value = '0.00';
+    document.getElementById('paymentTitle').textContent = `${empresa} — ${competencia.slice(5, 7)}/${competencia.slice(0, 4)}`;
+    const data = paymentModal.querySelector('input[name="data_pagamento"]');
+    data.value = new Date().toISOString().slice(0, 10);
+    paymentModal.hidden = false;
+    document.body.classList.add('modal-open');
+    recalcularPagamento();
+    paymentDiscount.focus();
+}
+
+function fecharPagamento() {
+    paymentModal.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+paymentDiscount.addEventListener('input', recalcularPagamento);
+paymentSurcharge.addEventListener('input', recalcularPagamento);
+paymentForm.addEventListener('submit', event => {
+    recalcularPagamento();
+    if (paymentSubmit.disabled) event.preventDefault();
+    else paymentSubmit.disabled = true;
+});
+
+function confirmarEstorno(form) {
+    const motivo = prompt('Informe o motivo do estorno:');
+    if (!motivo) return false;
+    form.querySelector('[name="motivo"]').value = motivo;
+    return confirm('Confirma o estorno deste pagamento?');
+}
+paymentModal.addEventListener('click', event => {
+    if (event.target.id === 'paymentModal') fecharPagamento();
+});
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !paymentModal.hidden) fecharPagamento();
+});
+</script>
+{% endblock %}

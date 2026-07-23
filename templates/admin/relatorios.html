@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% block title %}Relatórios | Bytech Agenda{% endblock %}
+{% block content %}
+<section class="reports-page">
+    <header class="page-header reports-header">
+        <div>
+            <span>Gestão e análise</span>
+            <h1>Central de Relatórios</h1>
+            <p>Acompanhe agendamentos, clientes e faturamento no período selecionado.</p>
+        </div>
+        <div class="reports-actions no-print">
+            <a class="btn btn-light" href="{{ url_for('admin_relatorios_excel', **request.args) }}">Exportar Excel</a>
+            <a class="btn btn-light" href="{{ url_for('admin_relatorios_pdf', **request.args) }}">Exportar PDF</a>
+            <button class="btn btn-primary" type="button" onclick="window.print()">Imprimir</button>
+        </div>
+    </header>
+
+    <form class="panel-card reports-filters no-print" method="get">
+        <label>Data inicial<input type="date" name="inicio" value="{{ filtros.inicio }}"></label>
+        <label>Data final<input type="date" name="fim" value="{{ filtros.fim }}"></label>
+        <label>Status
+            <select name="status">
+                {% for valor, nome in [('todos','Todos'),('agendado','Agendado'),('confirmado','Confirmado'),('concluido','Concluído'),('finalizado','Finalizado'),('cancelado','Cancelado')] %}
+                <option value="{{ valor }}" {% if filtros.status == valor %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Serviço
+            <select name="servico_id"><option value="">Todos</option>{% for item in servicos %}<option value="{{ item.id }}" {% if filtros.servico_id == item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select>
+        </label>
+        <label>Profissional
+            <select name="funcionario_id"><option value="">Todos</option>{% for item in funcionarios %}<option value="{{ item.id }}" {% if filtros.funcionario_id == item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select>
+        </label>
+        <div class="reports-filter-actions"><button class="btn btn-primary" type="submit">Aplicar filtros</button><a class="btn btn-light" href="{{ url_for('admin_relatorios') }}">Limpar</a></div>
+    </form>
+
+    <div class="reports-kpis">
+        <article><span>Agendamentos</span><strong>{{ resumo.agendamentos }}</strong><small>No período</small></article>
+        <article><span>Concluídos</span><strong>{{ resumo.concluidos }}</strong><small>Atendimentos realizados</small></article>
+        <article><span>Faturamento</span><strong>R$ {{ '%.2f'|format(resumo.faturamento)|replace('.', ',') }}</strong><small>Sem cancelados</small></article>
+        <article><span>Ticket médio</span><strong>R$ {{ '%.2f'|format(resumo.ticket_medio)|replace('.', ',') }}</strong><small>Por atendimento concluído</small></article>
+        <article><span>Novos clientes</span><strong>{{ resumo.clientes_novos }}</strong><small>Cadastrados no período</small></article>
+        <article><span>Cancelamentos</span><strong>{{ resumo.cancelados }}</strong><small>Agendamentos cancelados</small></article>
+    </div>
+
+    <section class="panel-card reports-table-card">
+        <div class="panel-title"><div><h2>Agendamentos</h2><p>{{ filtros.inicio }} até {{ filtros.fim }}</p></div><span>{{ agendamentos|length }} registro(s)</span></div>
+        <div class="responsive-table">
+            <table class="reports-table">
+                <thead><tr><th>Data e hora</th><th>Cliente</th><th>Serviço</th><th>Profissional</th><th>Status</th><th>Valor</th></tr></thead>
+                <tbody>
+                {% for item in agendamentos %}
+                    <tr><td><strong>{{ item.data }}</strong><small>{{ item.hora }}</small></td><td><strong>{{ item.cliente_nome }}</strong><small>{{ item.cliente_telefone }}</small></td><td>{{ item.servico_nome }}</td><td>{{ item.funcionario_nome }}</td><td><span class="crm-status crm-status-{{ item.status }}">{{ item.status|capitalize }}</span></td><td><strong>R$ {{ '%.2f'|format(item.valor_total)|replace('.', ',') }}</strong></td></tr>
+                {% else %}
+                    <tr><td colspan="6"><div class="empty-state"><strong>Nenhum registro encontrado</strong><p>Altere os filtros para consultar outro período.</p></div></td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}

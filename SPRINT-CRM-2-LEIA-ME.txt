@@ -1,0 +1,21 @@
+BYTECH AGENDA — CRM PREMIUM — SPRINT 2
+
+Implementado:
+- Perfil 360º do cliente.
+- Indicadores de atendimentos, total gasto, ticket médio e frequência.
+- Última visita e próximo agendamento.
+- Serviço e profissional favoritos.
+- Classificação automática: novo, recorrente, VIP ou inativo.
+- Timeline completa de agendamentos e atendimentos.
+- Filtros por status, serviço, profissional e período.
+- Evolução financeira dos últimos 12 meses.
+- Observações internas editáveis diretamente no perfil.
+- Integração da listagem de clientes com o novo perfil.
+- Layout responsivo para desktop, tablet e celular.
+
+Regras preservadas:
+- Nome e WhatsApp obrigatórios.
+- E-mail, nascimento, Instagram e observações opcionais.
+- Nenhuma foto ou dado pessoal excessivo foi adicionado.
+
+Antes de atualizar uma instalação existente, faça backup do banco SQLite.

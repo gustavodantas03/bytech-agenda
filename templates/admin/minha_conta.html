@@ -1,0 +1,199 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+Minha conta | Bytech Agenda
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+
+        <span>
+            Segurança
+        </span>
+
+        <h1>
+            Minha conta
+        </h1>
+
+        <p class="page-subtitle">
+            Altere sua senha de acesso ao painel administrativo.
+        </p>
+
+    </div>
+
+</header>
+
+<section class="panel narrow-panel">
+
+    <div class="account-user-card">
+
+        <div class="account-user-icon">
+            👤
+        </div>
+
+        <div>
+            <span>Usuário de acesso</span>
+
+            <strong>
+                {{ conta.usuario }}
+            </strong>
+        </div>
+
+    </div>
+
+    <form
+        method="POST"
+        class="account-password-form"
+    >
+
+        <div class="field-group">
+
+            <label for="senha_atual">
+                Senha atual
+            </label>
+
+            <div class="password-field">
+
+                <input
+                    id="senha_atual"
+                    name="senha_atual"
+                    type="password"
+                    required
+                    autocomplete="current-password"
+                    placeholder="Digite sua senha atual"
+                >
+
+                <button
+                    type="button"
+                    class="password-toggle"
+                    onclick="alternarSenha(
+                        'senha_atual',
+                        this
+                    )"
+                    aria-label="Mostrar senha atual"
+                >
+                    👁
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="field-group">
+
+            <label for="nova_senha">
+                Nova senha
+            </label>
+
+            <div class="password-field">
+
+                <input
+                    id="nova_senha"
+                    name="nova_senha"
+                    type="password"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Mínimo de 6 caracteres"
+                >
+
+                <button
+                    type="button"
+                    class="password-toggle"
+                    onclick="alternarSenha(
+                        'nova_senha',
+                        this
+                    )"
+                    aria-label="Mostrar nova senha"
+                >
+                    👁
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="field-group">
+
+            <label for="confirmar_senha">
+                Confirmar nova senha
+            </label>
+
+            <div class="password-field">
+
+                <input
+                    id="confirmar_senha"
+                    name="confirmar_senha"
+                    type="password"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Digite novamente"
+                >
+
+                <button
+                    type="button"
+                    class="password-toggle"
+                    onclick="alternarSenha(
+                        'confirmar_senha',
+                        this
+                    )"
+                    aria-label="Mostrar confirmação da senha"
+                >
+                    👁
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="account-security-tip">
+
+            <strong>🔒 Dica de segurança</strong>
+
+            <span>
+                Utilize uma senha com letras, números e símbolos.
+            </span>
+
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Alterar senha
+        </button>
+
+    </form>
+
+</section>
+
+<script>
+    function alternarSenha(campoId, botao) {
+        const campo = document.getElementById(
+            campoId
+        );
+
+        if (!campo) {
+            return;
+        }
+
+        const mostrar =
+            campo.type === "password";
+
+        campo.type =
+            mostrar
+                ? "text"
+                : "password";
+
+        botao.textContent =
+            mostrar
+                ? "🙈"
+                : "👁";
+    }
+</script>
+
+{% endblock %}

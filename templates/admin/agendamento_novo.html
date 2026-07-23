@@ -77,8 +77,8 @@ Novo agendamento
         </select>
 
         <label for="funcionario_id">
-            Barbeiro
-        </label>
+    {{ ui.profissional_singular|capitalize if ui else 'Profissional' }}
+</label>
 
         <select
             id="funcionario_id"
@@ -86,9 +86,9 @@ Novo agendamento
             required
         >
 
-            <option value="">
-                Selecione o barbeiro
-            </option>
+           <option value="">
+    Selecione {{ ui.profissional_singular if ui else 'o profissional' }}
+</option>
 
             {% for funcionario in funcionarios %}
 

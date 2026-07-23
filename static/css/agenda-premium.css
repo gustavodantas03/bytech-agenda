@@ -1,0 +1,654 @@
+/* ==================================================
+   AGENDA PREMIUM - ETAPA 1
+================================================== */
+
+.agenda-premium-header {
+    align-items: center;
+}
+
+.agenda-toolbar {
+    margin-bottom: 22px;
+    padding: 18px;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    border: 1px solid rgba(17, 24, 39, .07);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 12px 34px rgba(17, 24, 39, .06);
+}
+
+.agenda-date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.agenda-nav-button,
+.agenda-quick-date {
+    min-height: 44px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    color: var(--text);
+    background: #fff;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.agenda-nav-button {
+    width: 44px;
+    padding: 0;
+    font-size: 25px;
+}
+
+.agenda-nav-button:hover,
+.agenda-quick-date:hover,
+.agenda-quick-date.active {
+    color: #fff;
+    border-color: var(--empresa-cor-botao, var(--accent));
+    background: var(--empresa-cor-botao, var(--accent));
+    transform: translateY(-1px);
+}
+
+.agenda-premium-filters {
+    display: grid;
+    grid-template-columns: minmax(160px, 190px) minmax(200px, 250px) auto;
+    align-items: end;
+    gap: 10px;
+}
+
+.agenda-filter-field label {
+    margin-bottom: 7px;
+    font-size: 13px;
+}
+
+.agenda-filter-field input,
+.agenda-filter-field select {
+    min-height: 46px;
+    padding: 11px 13px;
+}
+
+.agenda-kpis {
+    margin-bottom: 22px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(145px, 1fr));
+    gap: 12px;
+}
+
+.agenda-kpi {
+    min-height: 112px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(17, 24, 39, .05);
+}
+
+.agenda-kpi-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 14px;
+    font-weight: 900;
+    background: #f3f4f6;
+}
+
+.agenda-kpi div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.agenda-kpi span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.agenda-kpi strong {
+    font-size: 24px;
+    letter-spacing: -.03em;
+}
+
+.agenda-kpi-success .agenda-kpi-icon {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.agenda-kpi-info .agenda-kpi-icon {
+    color: #075985;
+    background: #e0f2fe;
+}
+
+.agenda-kpi-purple .agenda-kpi-icon {
+    color: #6b21a8;
+    background: #f3e8ff;
+}
+
+.agenda-kpi-danger .agenda-kpi-icon {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.agenda-kpi-money .agenda-kpi-icon {
+    color: #166534;
+    background: #dcfce7;
+    font-size: 12px;
+}
+
+.agenda-premium-panel {
+    padding: 0;
+    overflow: hidden;
+}
+
+.agenda-list-header {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.agenda-section-label {
+    color: var(--empresa-cor-principal, var(--accent));
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.agenda-list-header h2 {
+    margin: 5px 0 4px;
+}
+
+.agenda-list-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.agenda-search-wrap {
+    width: min(360px, 100%);
+    min-height: 48px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: #f9fafb;
+}
+
+.agenda-search-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 102, 255, .08);
+}
+
+.agenda-search-wrap input {
+    min-height: 46px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.agenda-premium-list {
+    padding: 16px;
+    display: grid;
+    gap: 11px;
+}
+
+.agenda-premium-item {
+    min-height: 116px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 78px 48px minmax(240px, 1fr) minmax(230px, auto);
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    border: 1px solid var(--border);
+    border-left: 5px solid #94a3b8;
+    border-radius: 18px;
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+
+.agenda-premium-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(17, 24, 39, .08);
+}
+
+.agenda-premium-item.is-updating {
+    opacity: .58;
+    pointer-events: none;
+}
+
+.status-border-confirmado {
+    border-left-color: #22c55e;
+}
+
+.status-border-em_atendimento {
+    border-left-color: #0ea5e9;
+}
+
+.status-border-finalizado {
+    border-left-color: #a855f7;
+}
+
+.status-border-cancelado {
+    border-left-color: #ef4444;
+    background: #f9fafb;
+    opacity: .74;
+}
+
+.status-border-faltou {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.agenda-premium-time {
+    min-height: 68px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 15px;
+    color: #fff;
+    background: linear-gradient(
+        135deg,
+        var(--empresa-cor-botao, var(--accent)),
+        var(--accent-2)
+    );
+}
+
+.agenda-premium-time strong {
+    font-size: 20px;
+}
+
+.agenda-premium-time span {
+    color: rgba(255, 255, 255, .72);
+    font-size: 11px;
+}
+
+.agenda-client-avatar {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    color: var(--empresa-cor-principal, var(--accent));
+    background: color-mix(
+        in srgb,
+        var(--empresa-cor-principal, var(--accent)) 12%,
+        white
+    );
+    font-weight: 900;
+}
+
+.agenda-premium-data {
+    min-width: 0;
+}
+
+.agenda-client-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.agenda-client-line > strong {
+    font-size: 17px;
+}
+
+.agenda-premium-data p {
+    margin: 7px 0;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.agenda-meta {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.status-agendado {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+.status-confirmado {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.status-em_atendimento {
+    color: #075985;
+    background: #e0f2fe;
+}
+
+.status-finalizado {
+    color: #6b21a8;
+    background: #f3e8ff;
+}
+
+.status-cancelado {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.status-faltou {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.agenda-quick-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.agenda-action {
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #f3f4f6;
+    font-size: 11px;
+    font-weight: 900;
+    transition: .2s ease;
+}
+
+.agenda-action:hover {
+    transform: translateY(-1px);
+    filter: brightness(.97);
+}
+
+.agenda-action:disabled {
+    cursor: wait;
+}
+
+.agenda-action-confirm {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.agenda-action-start {
+    color: #075985;
+    background: #e0f2fe;
+}
+
+.agenda-action-finish {
+    color: #6b21a8;
+    background: #f3e8ff;
+}
+
+.agenda-action-missed {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.agenda-action-cancel {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.agenda-feedback {
+    display: none;
+    margin: 14px 16px 0;
+    padding: 12px 15px;
+    border-radius: 13px;
+    font-weight: 800;
+}
+
+.agenda-feedback.show {
+    display: block;
+}
+
+.agenda-feedback.sucesso {
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+}
+
+.agenda-feedback.erro {
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+}
+
+.agenda-search-empty,
+.agenda-premium-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.agenda-premium-empty > div {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 15px;
+    display: grid;
+    place-items: center;
+    border-radius: 22px;
+    color: var(--accent);
+    background: #e0f2fe;
+    font-size: 28px;
+}
+
+.agenda-premium-empty h3 {
+    margin: 0 0 8px;
+    color: var(--text);
+}
+
+.agenda-premium-empty p {
+    margin: 0 0 20px;
+}
+
+@media (max-width: 1280px) {
+    .agenda-kpis {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+    }
+
+    .agenda-premium-item {
+        grid-template-columns: 72px 44px minmax(220px, 1fr);
+    }
+
+    .agenda-quick-actions {
+        grid-column: 3 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 900px) {
+    .agenda-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .agenda-premium-filters {
+        grid-template-columns: 1fr 1fr auto;
+    }
+
+    .agenda-list-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .agenda-search-wrap {
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .agenda-premium-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .agenda-premium-header .btn {
+        width: 100%;
+    }
+
+    .agenda-date-navigation {
+        display: grid;
+        grid-template-columns: 44px 1fr 1fr 44px;
+    }
+
+    .agenda-premium-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .agenda-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agenda-kpi {
+        min-height: 96px;
+        padding: 14px;
+    }
+
+    .agenda-premium-item {
+        grid-template-columns: 68px minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .agenda-client-avatar {
+        display: none;
+    }
+
+    .agenda-premium-data {
+        padding-top: 2px;
+    }
+
+    .agenda-quick-actions {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+    }
+
+    .agenda-action {
+        flex: 1;
+    }
+}
+
+@media (max-width: 460px) {
+    .agenda-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .agenda-kpi {
+        min-height: 82px;
+    }
+
+    .agenda-premium-list {
+        padding: 10px;
+    }
+
+    .agenda-premium-item {
+        padding: 12px;
+        gap: 11px;
+    }
+
+    .agenda-meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
+
+/* ==================================================
+   PAINEL LATERAL DO CLIENTE - ETAPA 2
+================================================== */
+.agenda-premium-data[data-open-client] { cursor: pointer; }
+.agenda-premium-data[data-open-client]:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    outline-offset: 5px;
+    border-radius: 10px;
+}
+.agenda-action-client { color: #334155; background: #e2e8f0; }
+.client-drawer-backdrop {
+    position: fixed; inset: 0; z-index: 1090;
+    background: rgba(15, 23, 42, .48); backdrop-filter: blur(3px);
+}
+.client-drawer {
+    width: min(510px, 100%); height: 100vh; padding: 0;
+    position: fixed; top: 0; right: 0; z-index: 1100;
+    overflow-y: auto; background: #f8fafc;
+    box-shadow: -24px 0 60px rgba(15, 23, 42, .22);
+    transform: translateX(105%); transition: transform .28s ease;
+}
+.client-drawer.open { transform: translateX(0); }
+body.client-drawer-open { overflow: hidden; }
+.client-drawer-loading { min-height: 100%; display: grid; place-content: center; gap: 14px; text-align: center; color: #64748b; font-weight: 800; }
+.client-drawer-spinner { width: 42px; height: 42px; margin: auto; border: 4px solid #e2e8f0; border-top-color: var(--accent); border-radius: 50%; animation: clientDrawerSpin .8s linear infinite; }
+@keyframes clientDrawerSpin { to { transform: rotate(360deg); } }
+.client-drawer-header { padding: 26px; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; color: #fff; background: linear-gradient(135deg, var(--empresa-cor-sidebar, #0f172a), #1e293b); }
+.client-drawer-profile { display: flex; align-items: center; gap: 15px; }
+.client-drawer-avatar { width: 62px; height: 62px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(255,255,255,.18); border-radius: 20px; background: rgba(255,255,255,.12); font-size: 25px; font-weight: 900; }
+.client-drawer-profile span { color: rgba(255,255,255,.65); font-size: 11px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.client-drawer-profile h2 { margin: 5px 0 3px; color: #fff; font-size: 23px; }
+.client-drawer-profile p { margin: 0; color: rgba(255,255,255,.7); font-size: 12px; }
+.client-drawer-close { width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.18); border-radius: 13px; cursor: pointer; color: #fff; background: rgba(255,255,255,.1); font-size: 25px; }
+.client-drawer-body { padding: 20px; display: grid; gap: 16px; }
+.client-drawer-contact, .client-drawer-favorites { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.client-drawer-contact > *, .client-drawer-favorites > div { min-width: 0; padding: 14px; display: flex; flex-direction: column; gap: 5px; border: 1px solid #e2e8f0; border-radius: 15px; color: #0f172a; background: #fff; text-decoration: none; }
+.client-drawer-contact span, .client-drawer-favorites span, .client-drawer-stats span { color: #64748b; font-size: 11px; font-weight: 800; }
+.client-drawer-contact strong, .client-drawer-favorites strong { overflow-wrap: anywhere; font-size: 13px; }
+.client-drawer-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.client-drawer-stats article { padding: 14px 9px; display: flex; flex-direction: column; gap: 6px; border-radius: 15px; text-align: center; background: #fff; border: 1px solid #e2e8f0; }
+.client-drawer-stats strong { font-size: 17px; }
+.client-drawer-section { padding: 17px; border: 1px solid #e2e8f0; border-radius: 18px; background: #fff; }
+.client-drawer-section-title span { color: var(--accent); font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.client-drawer-section-title h3 { margin: 4px 0 14px; font-size: 17px; }
+.client-history-list { display: grid; gap: 9px; }
+.client-history-item { padding: 12px; display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 11px; border-radius: 13px; background: #f8fafc; }
+.client-history-date, .client-history-data, .client-history-value { display: flex; flex-direction: column; gap: 4px; }
+.client-history-date span, .client-history-data span { color: #64748b; font-size: 11px; }
+.client-history-data strong { font-size: 13px; }
+.client-history-value { align-items: flex-end; }
+.client-history-value .status { font-size: 9px; }
+.client-history-empty { padding: 22px; border-radius: 13px; color: #64748b; text-align: center; background: #f8fafc; }
+.client-drawer-notes { margin: 0; color: #475569; line-height: 1.6; white-space: pre-wrap; }
+.client-drawer-footer { padding: 16px 20px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: sticky; bottom: 0; border-top: 1px solid #e2e8f0; background: rgba(248,250,252,.95); backdrop-filter: blur(10px); }
+.client-drawer-footer .btn { justify-content: center; text-align: center; }
+@media (max-width: 560px) {
+    .client-drawer-contact, .client-drawer-favorites { grid-template-columns: 1fr; }
+    .client-drawer-stats { grid-template-columns: 1fr 1fr; }
+    .client-history-item { grid-template-columns: 68px 1fr; }
+    .client-history-value { grid-column: 2; align-items: flex-start; }
+    .client-drawer-footer { grid-template-columns: 1fr; }
+}
+
+/* Garante que o atributo hidden prevaleça sobre as regras de layout do drawer. */
+.client-drawer-loading[hidden],
+#clientDrawerContent[hidden],
+.client-drawer-backdrop[hidden] {
+    display: none !important;
+}

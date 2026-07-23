@@ -1,0 +1,17 @@
+BYTECH AGENDA — MÓDULO 4 / RELATÓRIOS PREMIUM — SPRINT 1
+
+Implementado:
+- Central de Relatórios no painel da empresa.
+- Filtros por período, status, serviço e profissional.
+- Indicadores de agendamentos, concluídos, cancelamentos, faturamento, ticket médio e novos clientes.
+- Listagem detalhada de agendamentos sem misturar dados entre empresas.
+- Exportação real em Excel (.xlsx) usando openpyxl.
+- Exportação real em PDF usando reportlab.
+- Impressão otimizada pelo navegador.
+- Menu Relatórios e layout responsivo.
+
+Dependências novas:
+- openpyxl
+- reportlab
+
+Antes de atualizar, faça backup da pasta database.

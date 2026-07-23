@@ -1,7 +1,7 @@
 {% extends 'master/base.html' %}
 
 {% block title %}
-Nova barbearia
+Nova empresa
 {% endblock %}
 
 {% block content %}
@@ -9,7 +9,7 @@ Nova barbearia
 <header class="page-header">
     <div>
         <span>Implantação</span>
-        <h1>Nova barbearia</h1>
+        <h1>Nova empresa</h1>
     </div>
 
     <a
@@ -24,80 +24,207 @@ Nova barbearia
 
     <form method="post">
 
-        <label>Nome da barbearia *</label>
+        <label for="segmento">Segmento *</label>
+        <select
+            id="segmento"
+            name="segmento"
+            required
+        >
+            {% for chave, item in segmentos.items() %}
+                <option
+                    value="{{ chave }}"
+                    {% if chave == 'barbearia' %}selected{% endif %}
+                >
+                    {{ item.icone }} {{ item.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label id="label-nome" for="nome">Nome da empresa *</label>
         <input
+            id="nome"
             name="nome"
             placeholder="Ex.: Bruto's Barbearia"
             required
         >
 
-        <label>Link personalizado *</label>
+        <label for="slug">Link personalizado *</label>
         <input
+            id="slug"
             name="slug"
             placeholder="Ex.: brutos-barbearia"
             required
         >
 
-        <label>Telefone</label>
+        <label for="telefone">Telefone</label>
         <input
+            id="telefone"
             name="telefone"
             placeholder="(85) 99999-9999"
         >
 
-        <label>Instagram</label>
+        <label for="instagram">Instagram</label>
         <input
+            id="instagram"
             name="instagram"
-            placeholder="@barbearia"
+            placeholder="@empresa"
         >
 
-        <label>Endereço</label>
+        <label for="endereco">Endereço</label>
         <input
+            id="endereco"
             name="endereco"
             placeholder="Rua, número e bairro"
         >
 
-        <label>Google Maps</label>
+        <label for="maps_url">Google Maps</label>
         <input
+            id="maps_url"
             name="maps_url"
             placeholder="https://maps.google.com/..."
         >
 
-        <label>Horário de funcionamento</label>
+        <label for="horario_texto">Horário de funcionamento</label>
         <input
+            id="horario_texto"
             name="horario_texto"
             placeholder="Segunda a sábado, das 09h às 18h"
         >
 
-        <label>Descrição</label>
+        <label id="label-descricao" for="descricao">Descrição</label>
         <textarea
+            id="descricao"
             name="descricao"
             rows="4"
-            placeholder="Descrição curta da barbearia"
+            placeholder="Descrição curta da empresa"
         ></textarea>
 
         <hr>
 
-        <label>Usuário do administrador *</label>
+        <h3>Plano e cobrança</h3>
+        <label for="plano_id">Plano</label>
+        <select id="plano_id" name="plano_id" required>
+            {% for plano in planos %}
+                <option value="{{ plano.id }}" data-valor="{{ plano.valor }}">{{ plano.nome }} — R$ {{ '%.2f'|format(plano.valor or 0)|replace('.', ',') }}</option>
+            {% endfor %}
+        </select>
+        <label for="mensalidade">Mensalidade (R$)</label>
+        <input id="mensalidade" name="mensalidade" type="number" min="0" step="0.01" value="0.00">
+        <label for="dia_vencimento">Dia do vencimento</label>
+        <input id="dia_vencimento" name="dia_vencimento" type="number" min="1" max="31" value="10">
+        <label for="tolerancia_dias">Dias de tolerância</label>
+        <input id="tolerancia_dias" name="tolerancia_dias" type="number" min="0" value="5">
+        <label for="bloquear_apos_dias">Bloquear automaticamente após</label>
+        <input id="bloquear_apos_dias" name="bloquear_apos_dias" type="number" min="1" value="15">
+        <p class="form-help">A situação financeira será calculada automaticamente conforme o vencimento.</p>
+
+        <hr>
+
+        <label for="usuario">Usuário do administrador *</label>
         <input
+            id="usuario"
             name="usuario"
             placeholder="Ex.: brutos"
             required
         >
 
-        <label>Senha provisória *</label>
+        <label for="senha">Senha provisória *</label>
         <input
+            id="senha"
             type="password"
             name="senha"
             placeholder="Crie uma senha provisória"
             required
         >
 
-        <button class="btn btn-primary full">
-            Criar barbearia completa
+        <button
+            id="botao-criar"
+            class="btn btn-primary full"
+            type="submit"
+        >
+            Criar empresa completa
         </button>
 
     </form>
 
 </section>
+
+<script>
+    const segmentoSelect = document.getElementById("segmento");
+    const nomeInput = document.getElementById("nome");
+    const slugInput = document.getElementById("slug");
+    const instagramInput = document.getElementById("instagram");
+    const descricaoInput = document.getElementById("descricao");
+    const labelNome = document.getElementById("label-nome");
+    const botaoCriar = document.getElementById("botao-criar");
+
+    const configuracoes = {
+        barbearia: {
+            nome: "barbearia",
+            exemploNome: "Ex.: Bruto's Barbearia",
+            exemploSlug: "Ex.: brutos-barbearia",
+            exemploInstagram: "@barbearia",
+            descricao: "Descrição curta da barbearia"
+        },
+        manicure: {
+            nome: "espaço de manicure",
+            exemploNome: "Ex.: Studio Bella Nails",
+            exemploSlug: "Ex.: bella-nails",
+            exemploInstagram: "@bellanails",
+            descricao: "Descrição curta do espaço de manicure"
+        },
+        depilacao: {
+            nome: "espaço de depilação",
+            exemploNome: "Ex.: Espaço Pele Lisa",
+            exemploSlug: "Ex.: pele-lisa",
+            exemploInstagram: "@espacopelalisa",
+            descricao: "Descrição curta do espaço de depilação"
+        },
+        sobrancelhas: {
+            nome: "studio de sobrancelhas",
+            exemploNome: "Ex.: Studio Olhar Perfeito",
+            exemploSlug: "Ex.: olhar-perfeito",
+            exemploInstagram: "@olharperfeito",
+            descricao: "Descrição curta do studio de sobrancelhas"
+        }
+    };
+
+    function atualizarFormulario() {
+        const segmento = segmentoSelect.value;
+        const config = configuracoes[segmento] || {
+            nome: "empresa",
+            exemploNome: "Ex.: Nome da empresa",
+            exemploSlug: "Ex.: nome-da-empresa",
+            exemploInstagram: "@empresa",
+            descricao: "Descrição curta da empresa"
+        };
+
+        labelNome.textContent =
+            `Nome da ${config.nome} *`;
+
+        nomeInput.placeholder = config.exemploNome;
+        slugInput.placeholder = config.exemploSlug;
+        instagramInput.placeholder = config.exemploInstagram;
+        descricaoInput.placeholder = config.descricao;
+
+        botaoCriar.textContent =
+            `Criar ${config.nome} completa`;
+    }
+
+    segmentoSelect.addEventListener(
+        "change",
+        atualizarFormulario
+    );
+
+    atualizarFormulario();
+
+    const planoSelect = document.getElementById("plano_id");
+    const mensalidadeInput = document.getElementById("mensalidade");
+    planoSelect?.addEventListener("change", () => {
+        const valor = planoSelect.options[planoSelect.selectedIndex]?.dataset.valor;
+        if (valor !== undefined) mensalidadeInput.value = Number(valor).toFixed(2);
+    });
+    planoSelect?.dispatchEvent(new Event("change"));
+</script>
 
 {% endblock %}

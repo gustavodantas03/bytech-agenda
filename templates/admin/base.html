@@ -14,11 +14,71 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=12"
+    href="{{ url_for('static', filename='css/style.css') }}?v=20"
 >
+
+    <style>
+        .admin-sidebar {
+            background: var(--empresa-cor-sidebar);
+        }
+
+        .admin-nav-link.active,
+        .btn.btn-primary {
+            background: var(--empresa-cor-botao);
+        }
+
+        .admin-nav-link.active,
+        .btn.btn-primary {
+            border-color: var(--empresa-cor-botao);
+        }
+
+        .page-header span,
+        .panel-header span,
+        .stat-card span {
+            color: var(--empresa-cor-principal);
+        }
+
+
+        .admin-nav-link-locked {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .admin-nav-link-locked small {
+            margin-left: auto;
+        }
+
+        .admin-plan-card {
+            margin: 0 12px 14px;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 14px;
+            background: rgba(255,255,255,.07);
+            display: grid;
+            gap: 4px;
+        }
+
+        .admin-plan-card span,
+        .admin-plan-card small {
+            color: rgba(255,255,255,.72);
+        }
+
+        .admin-plan-card strong {
+            color: #fff;
+        }
+    </style>
+
 </head>
 
-<body class="admin-page">
+<body
+    class="admin-page"
+    style="
+        --empresa-cor-principal: {{ empresa_admin.cor_principal if empresa_admin else '#111827' }};
+        --empresa-cor-secundaria: {{ empresa_admin.cor_secundaria if empresa_admin else '#d4af37' }};
+        --empresa-cor-botao: {{ empresa_admin.cor_botao if empresa_admin else '#d4af37' }};
+        --empresa-cor-sidebar: {{ empresa_admin.cor_sidebar if empresa_admin else '#0f172a' }};
+    "
+>
 
     <div
     id="newAppointmentToast"
@@ -139,9 +199,30 @@
                     ♙
                 </span>
 
-                <span>Funcionários</span>
+                <span>{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}</span>
             </a>
 
+            {% if tem_recurso and tem_recurso('crm') %}
+            <a
+                class="admin-nav-link
+                {% if request.endpoint in ['admin_crm_dashboard', 'admin_clientes', 'admin_novo_cliente', 'admin_editar_cliente'] %}
+                    active
+                {% endif %}"
+                href="{{ url_for('admin_crm_dashboard') }}"
+            >
+                <span class="admin-nav-icon">♟</span>
+                <span>CRM</span>
+            </a>
+            <a class="admin-nav-link {% if request.endpoint and 'fidelidade' in request.endpoint %}active{% endif %}" href="{{ url_for('admin_fidelidade') }}">
+                <span class="admin-nav-icon">★</span><span>Fidelidade</span>
+            </a>
+            {% else %}
+            <div class="admin-nav-link admin-nav-link-locked" title="Disponível em outro plano">
+                <span class="admin-nav-icon">♟</span>
+                <span>Clientes</span>
+                <small>🔒</small>
+            </div>
+            {% endif %}
             <a
                 class="admin-nav-link
                 {% if request.endpoint in [
@@ -160,22 +241,63 @@
             </a>
 
             <a
+                class="admin-nav-link {% if request.endpoint and request.endpoint.startswith('admin_relatorios') %}active{% endif %}"
+                href="{{ url_for('admin_relatorios') }}"
+            >
+                <span class="admin-nav-icon">▤</span>
+                <span>Relatórios</span>
+            </a>
+
+            <a
                 class="admin-nav-link
-                {% if request.endpoint == 'admin_barbearia' %}
+                {% if request.endpoint == 'admin_meu_espaco' %}
                     active
                 {% endif %}"
-                href="{{ url_for('admin_barbearia') }}"
+                href="{{ url_for('admin_meu_espaco') }}"
             >
                 <span class="admin-nav-icon">
                     ◈
                 </span>
 
-                <span>Minha barbearia</span>
+                <span>{{ ui.menu_empresa if ui else 'Minha empresa' }}</span>
             </a>
+
+<a
+    class="admin-nav-link
+    {% if request.endpoint == 'admin_minha_conta' %}
+        active
+    {% endif %}"
+    href="{{ url_for('admin_minha_conta') }}"
+>
+
+    <span class="admin-nav-icon">
+        🔒
+    </span>
+
+    <span>
+        Minha conta
+    </span>
+
+</a>
 
         </nav>
 
         <div class="admin-sidebar-bottom">
+            {% if empresa_admin %}
+            <div class="admin-plan-card">
+                <span>Plano atual</span>
+                <strong>{{ empresa_admin.plano or 'Essencial' }}</strong>
+                {% if uso_plano and uso_plano.plano %}
+                <small>
+                    {{ uso_plano.agendamentos_mes }}
+                    {% if uso_plano.plano.limite_agendamentos is not none %}
+                        / {{ uso_plano.plano.limite_agendamentos }}
+                    {% endif %}
+                    agendamentos neste mês
+                </small>
+                {% endif %}
+            </div>
+            {% endif %}
 <button
     id="notificationToggle"
     class="admin-notification-toggle"
@@ -311,40 +433,15 @@
             }
         );
     </script>
-<audio id="novoAgendamento">
-    <source src="{{ url_for('static', filename='sounds/new.mp3') }}">
+<audio
+    id="novoAgendamento"
+    preload="auto"
+    src="{{ url_for('static', filename='sounds/notification_message-nada-9-326002.mp3') }}?v=20">
 </audio>
 
 <script>
 
-let ultimoId = 0;
 
-async function verificarNovos(){
-
-    const r = await fetch("/admin/api/ultimo-agendamento");
-
-    const dados = await r.json();
-
-    if(ultimoId===0){
-        ultimoId=dados.id;
-        return;
-    }
-
-    if(dados.id>ultimoId){
-
-        ultimoId=dados.id;
-
-        document
-            .getElementById("novoAgendamento")
-            .play();
-
-        location.reload();
-
-    }
-
-}
-
-setInterval(verificarNovos,5000);
 
 const ADMIN_NOTIFICATION_KEY =
     "bytech_admin_notifications_enabled";
@@ -451,84 +548,26 @@ async function ativarNotificacoesAdmin() {
 }
 
 function tocarSomNovoAgendamento() {
+
     if (!notificacoesAdminAtivas()) {
         return;
     }
 
-    try {
-        adminAudioContext =
-            adminAudioContext ||
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+    const audio = document.getElementById("novoAgendamento");
 
-        const agora = adminAudioContext.currentTime;
-
-        criarNotaAgendamento(
-            659.25,
-            agora,
-            0.18
-        );
-
-        criarNotaAgendamento(
-            783.99,
-            agora + 0.18,
-            0.22
-        );
-
-        criarNotaAgendamento(
-            987.77,
-            agora + 0.40,
-            0.32
-        );
-    } catch (erro) {
-        console.error(
-            "Erro ao reproduzir alerta:",
-            erro
-        );
+    if (!audio) {
+        return;
     }
+
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 1.0;
+
+    audio.play().catch((erro) => {
+        console.log(erro);
+    });
+
 }
-
-function criarNotaAgendamento(
-    frequencia,
-    inicio,
-    duracao
-) {
-    const oscilador =
-        adminAudioContext.createOscillator();
-
-    const volume =
-        adminAudioContext.createGain();
-
-    oscilador.type = "sine";
-    oscilador.frequency.setValueAtTime(
-        frequencia,
-        inicio
-    );
-
-    volume.gain.setValueAtTime(
-        0.0001,
-        inicio
-    );
-
-    volume.gain.exponentialRampToValueAtTime(
-        0.18,
-        inicio + 0.02
-    );
-
-    volume.gain.exponentialRampToValueAtTime(
-        0.0001,
-        inicio + duracao
-    );
-
-    oscilador.connect(volume);
-    volume.connect(adminAudioContext.destination);
-
-    oscilador.start(inicio);
-    oscilador.stop(inicio + duracao);
-}
-
 function formatarDataAgendamento(dataIso) {
     if (!dataIso) {
         return "";

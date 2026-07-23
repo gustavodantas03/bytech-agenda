@@ -1,0 +1,29 @@
+BYTECH AGENDA — SPRINT 0 DE ESTABILIZAÇÃO
+
+O que foi ajustado
+- Instalação isolada em ambiente virtual (.venv), evitando conflito com outros projetos.
+- Instalação automática de Flask, Werkzeug, openpyxl e reportlab.
+- requirements.txt com versões fixadas.
+- Diagnóstico amigável de dependências, estrutura, banco, arquivos estáticos e rotas Flask.
+- Scripts separados para instalar/executar, verificar e atualizar dependências.
+- Modo debug desativado por padrão. Para ativar temporariamente no Windows:
+  set BYTECH_DEBUG=1
+  .venv\Scripts\python.exe app.py
+
+Primeira execução no Windows
+1. Extraia todo o ZIP.
+2. Abra a pasta extraída.
+3. Clique duas vezes em INSTALAR-E-EXECUTAR-WINDOWS.bat.
+4. Aguarde a instalação.
+5. Acesse http://127.0.0.1:5000.
+
+Quando surgir "No module named openpyxl"
+Não instale bibliotecas manualmente em outro Python. Execute novamente:
+INSTALAR-E-EXECUTAR-WINDOWS.bat
+
+Verificação rápida
+Execute VERIFICAR-SISTEMA-WINDOWS.bat.
+
+Importante
+Faça backup da pasta database antes de substituir uma versão já utilizada.
+Nunca publique em produção com a chave padrão. Configure BYTECH_SECRET_KEY no servidor.

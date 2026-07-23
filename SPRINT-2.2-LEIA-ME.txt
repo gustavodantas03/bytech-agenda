@@ -1,0 +1,22 @@
+BYTECH AGENDA — SPRINT 2.2
+
+ENTREGUE NESTA VERSÃO
+- Motor central de recursos por plano em services/recursos.py.
+- Proteção de rotas por recurso contratado.
+- CRM liberado ou bloqueado conforme o plano.
+- Limite de profissionais ativos conforme o plano.
+- Limite mensal de agendamentos no painel e no agendamento público.
+- Contexto do plano disponível em todas as telas administrativas.
+- Cartão do plano atual na barra lateral do painel.
+- Indicador de uso mensal de agendamentos.
+
+REGRAS
+- Limites com valor vazio significam ilimitado.
+- Agendamentos cancelados não entram no consumo mensal.
+- O plano Essencial mantém Agenda e CRM.
+- O plano Profissional libera Agenda, CRM, Financeiro, Fidelidade, Relatórios e WhatsApp.
+- O plano Premium também libera API.
+
+EXECUÇÃO
+py -m pip install -r requirements.txt
+py app.py

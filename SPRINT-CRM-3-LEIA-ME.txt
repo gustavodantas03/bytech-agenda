@@ -1,0 +1,17 @@
+BYTECH AGENDA — CRM PREMIUM — SPRINT 3
+
+IMPLEMENTADO
+- Dashboard de fidelidade com indicadores.
+- Configurações por empresa: programa ativo, pontuação por valor ou atendimento, validade e ajuste manual.
+- Cadastro e ativação/desativação de recompensas.
+- Ranking de clientes por pontos.
+- Histórico de movimentações.
+- Ajuste manual de saldo com validação contra saldo negativo.
+- Resgate de recompensas com baixa atômica dos pontos.
+- Histórico de resgates e movimentos.
+- Bloco de fidelidade integrado ao perfil 360º do cliente.
+- Migrações automáticas e índices no SQLite.
+
+OBSERVAÇÃO
+Antes de substituir a versão em uso, faça uma cópia do arquivo database/bytech_agenda.db.
+A pontuação automática ao finalizar atendimento será conectada na sprint de automações/regras do fluxo de agenda; esta entrega já contém toda a base, configurações, saldos, recompensas e resgates.

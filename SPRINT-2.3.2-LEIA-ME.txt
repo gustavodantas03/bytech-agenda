@@ -1,0 +1,20 @@
+BYTECH AGENDA — SPRINT 2.3.2
+MÓDULO: MENSALIDADES
+
+Implementado:
+- Lista completa de mensalidades sem limite artificial de 500 registros.
+- Busca por nome ou identificador da empresa.
+- Filtros por empresa, plano, competência e status.
+- Colunas Empresa, Plano, Competência, Vencimento, Valor, Status e Ações.
+- Status visuais: Aberta, Vencida, Paga e Cancelada.
+- Cards e totais recalculados conforme os filtros.
+- Total da listagem no rodapé.
+- Datas e competência formatadas no padrão brasileiro.
+- Estado vazio com opção para limpar filtros.
+- Layout responsivo.
+- Integração preservada com registro de pagamento, histórico, recibo PDF e estorno.
+
+Arquivos principais alterados:
+- routes/master.py
+- templates/master/financeiro.html
+- static/css/style.css

@@ -1,0 +1,290 @@
+{% extends 'master/base.html' %}
+
+{% block title %}
+Editar empresa | Bytech Master
+{% endblock %}
+
+{% block content %}
+
+<header class="master-page-header">
+    <div>
+        <span>Gestão da empresa</span>
+        <h1>Editar {{ empresa.nome }}</h1>
+        <p>
+            Atualize os dados, o acesso administrativo e a identidade
+            visual deste cliente.
+        </p>
+    </div>
+
+    <a
+        class="btn btn-secondary"
+        href="{{ url_for('master_dashboard') }}"
+    >
+        Voltar
+    </a>
+</header>
+
+<form method="post" class="master-edit-layout">
+    <section class="panel master-form-panel">
+        <div class="panel-header">
+            <div>
+                <span>Informações</span>
+                <h2>Dados da empresa</h2>
+            </div>
+        </div>
+
+        <div class="master-form-grid">
+            <div class="form-group">
+                <label for="segmento">Segmento *</label>
+                <select id="segmento" name="segmento" required>
+                    {% for chave, item in segmentos.items() %}
+                        <option
+                            value="{{ chave }}"
+                            {% if empresa.segmento == chave %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ item.icone }} {{ item.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="nome">Nome *</label>
+                <input
+                    id="nome"
+                    name="nome"
+                    value="{{ empresa.nome }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="slug">Link personalizado *</label>
+                <input
+                    id="slug"
+                    name="slug"
+                    value="{{ empresa.slug }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input
+                    id="telefone"
+                    name="telefone"
+                    value="{{ empresa.telefone or '' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="instagram">Instagram</label>
+                <input
+                    id="instagram"
+                    name="instagram"
+                    value="{{ empresa.instagram or '' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="horario_texto">
+                    Horário de funcionamento
+                </label>
+                <input
+                    id="horario_texto"
+                    name="horario_texto"
+                    value="{{ empresa.horario_texto or '' }}"
+                >
+            </div>
+
+            <div class="form-group master-form-full">
+                <label for="endereco">Endereço</label>
+                <input
+                    id="endereco"
+                    name="endereco"
+                    value="{{ empresa.endereco or '' }}"
+                >
+            </div>
+
+            <div class="form-group master-form-full">
+                <label for="maps_url">Google Maps</label>
+                <input
+                    id="maps_url"
+                    name="maps_url"
+                    value="{{ empresa.maps_url or '' }}"
+                >
+            </div>
+
+            <div class="form-group master-form-full">
+                <label for="descricao">Descrição</label>
+                <textarea
+                    id="descricao"
+                    name="descricao"
+                    rows="4"
+                >{{ empresa.descricao or '' }}</textarea>
+            </div>
+        </div>
+    </section>
+
+    <aside class="master-edit-side">
+        <section class="panel">
+            <div class="panel-header"><div><span>Financeiro</span><h2>Plano e cobrança</h2></div></div>
+            <label for="plano_id">Plano</label>
+            <select id="plano_id" name="plano_id">
+                {% for plano in planos %}
+                    <option value="{{ plano.id }}" {% if empresa.plano_id == plano.id %}selected{% endif %}>{{ plano.nome }} — R$ {{ '%.2f'|format(plano.valor or 0)|replace('.', ',') }}</option>
+                {% endfor %}
+            </select>
+            <label for="mensalidade">Mensalidade (R$)</label>
+            <input id="mensalidade" name="mensalidade" type="number" min="0" step="0.01" value="{{ empresa.mensalidade or 0 }}">
+            <label for="dia_vencimento">Dia do vencimento</label>
+            <input id="dia_vencimento" name="dia_vencimento" type="number" min="1" max="31" value="{{ empresa.dia_vencimento or 10 }}">
+            <label for="tolerancia_dias">Dias de tolerância</label>
+            <input id="tolerancia_dias" name="tolerancia_dias" type="number" min="0" value="{{ empresa.tolerancia_dias or 5 if empresa is defined else 5 }}">
+            <label for="bloquear_apos_dias">Bloquear após quantos dias</label>
+            <input id="bloquear_apos_dias" name="bloquear_apos_dias" type="number" min="1" value="{{ empresa.bloquear_apos_dias or 15 if empresa is defined else 15 }}">
+            <a class="btn btn-secondary" style="width:100%;margin-top:12px" href="{{ url_for('master_empresa_financeiro', empresa_id=empresa.id) }}">Ver histórico financeiro</a>
+            <div class="finance-auto-summary">
+                <span>Situação automática</span>
+                <strong class="master-payment-badge {{ empresa.status_pagamento or 'em_dia' }}">{% if empresa.status_pagamento == 'inadimplente' %}Inadimplente{% elif empresa.status_pagamento == 'pendente' %}Pendente{% else %}Em dia{% endif %}</strong>
+                <small>Próximo vencimento: {{ empresa.proximo_vencimento or 'Será calculado' }}</small>
+                <small>Último pagamento: {{ empresa.ultimo_pagamento or 'Nenhum registrado' }}</small>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <span>Acesso</span>
+                    <h2>Administrador</h2>
+                </div>
+            </div>
+
+            <label for="usuario">Usuário *</label>
+            <input
+                id="usuario"
+                name="usuario"
+                value="{{ empresa.usuario or '' }}"
+                required
+            >
+
+            <label for="nova_senha">Nova senha</label>
+            <input
+                id="nova_senha"
+                name="nova_senha"
+                type="password"
+                placeholder="Deixe vazio para manter"
+            >
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <span>Identidade visual</span>
+                    <h2>Cores do template</h2>
+                </div>
+            </div>
+
+            <label class="master-palette-option">
+                <input
+                    type="checkbox"
+                    name="aplicar_paleta"
+                    value="1"
+                >
+
+                <span>
+                    <strong>Aplicar paleta padrão do segmento</strong>
+                    <small>
+                        Recomendado ao trocar o segmento.
+                    </small>
+                </span>
+            </label>
+
+            <div class="master-colors-grid">
+                <label>
+                    Principal
+                    <input
+                        type="color"
+                        name="cor_principal"
+                        value="{{ empresa.cor_principal or '#2563EB' }}"
+                    >
+                </label>
+
+                <label>
+                    Secundária
+                    <input
+                        type="color"
+                        name="cor_secundaria"
+                        value="{{ empresa.cor_secundaria or '#60A5FA' }}"
+                    >
+                </label>
+
+                <label>
+                    Botão
+                    <input
+                        type="color"
+                        name="cor_botao"
+                        value="{{ empresa.cor_botao or '#2563EB' }}"
+                    >
+                </label>
+
+                <label>
+                    Sidebar
+                    <input
+                        type="color"
+                        name="cor_sidebar"
+                        value="{{ empresa.cor_sidebar or '#0F172A' }}"
+                    >
+                </label>
+            </div>
+        </section>
+
+        <button class="btn btn-primary full" type="submit">
+            Salvar alterações
+        </button>
+    </aside>
+</form>
+
+<section class="panel master-danger-zone">
+    <div>
+        <span>Zona de perigo</span>
+        <h2>Excluir empresa definitivamente</h2>
+        <p>
+            Esta ação remove usuários, clientes, serviços, profissionais,
+            agendamentos e dados de fidelidade. Não poderá ser desfeita.
+        </p>
+    </div>
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'master_excluir_empresa',
+            empresa_id=empresa.id
+        ) }}"
+        onsubmit="
+            return confirm(
+                'Tem certeza de que deseja excluir esta empresa?'
+            );
+        "
+    >
+        <label for="confirmacao">
+            Digite exatamente:
+            <strong>{{ empresa.nome }}</strong>
+        </label>
+
+        <input
+            id="confirmacao"
+            name="confirmacao"
+            required
+            autocomplete="off"
+        >
+
+        <button class="btn btn-danger" type="submit">
+            Excluir definitivamente
+        </button>
+    </form>
+</section>
+
+{% endblock %}

@@ -1,15 +1,20 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}Agenda{% endblock %}
+{% block title %}Agenda Premium{% endblock %}
 
 {% block content %}
 
-<header class="page-header">
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/agenda-premium.css') }}?v=3"
+>
+
+<header class="page-header agenda-premium-header">
     <div>
         <span>Organização</span>
         <h1>Agenda</h1>
         <p class="page-subtitle">
-            Acompanhe os agendamentos por data e barbeiro.
+            Acompanhe o movimento do dia e atualize os atendimentos sem recarregar a página.
         </p>
     </div>
 
@@ -17,22 +22,47 @@
         class="btn btn-primary"
         href="{{ url_for('novo_agendamento') }}"
     >
-        + Novo agendamento
+        <span>＋</span>
+        Novo agendamento
     </a>
 </header>
 
-<section class="panel agenda-filter-panel">
+<section class="agenda-toolbar">
+    <div class="agenda-date-navigation">
+        <a
+            class="agenda-nav-button"
+            href="{{ url_for('admin_agenda', data=data_anterior, funcionario_id=funcionario_id or '') }}"
+            aria-label="Dia anterior"
+        >
+            ‹
+        </a>
 
-    <form
-        method="get"
-        class="agenda-filters"
-    >
+        <a
+            class="agenda-quick-date {% if data_filtro == data_hoje %}active{% endif %}"
+            href="{{ url_for('admin_agenda', data=data_hoje, funcionario_id=funcionario_id or '') }}"
+        >
+            Hoje
+        </a>
 
-        <div class="field-group">
-            <label for="data">
-                Data
-            </label>
+        <a
+            class="agenda-quick-date {% if data_filtro == data_amanha %}active{% endif %}"
+            href="{{ url_for('admin_agenda', data=data_amanha, funcionario_id=funcionario_id or '') }}"
+        >
+            Amanhã
+        </a>
 
+        <a
+            class="agenda-nav-button"
+            href="{{ url_for('admin_agenda', data=data_seguinte, funcionario_id=funcionario_id or '') }}"
+            aria-label="Próximo dia"
+        >
+            ›
+        </a>
+    </div>
+
+    <form method="get" class="agenda-premium-filters">
+        <div class="agenda-filter-field">
+            <label for="data">Data</label>
             <input
                 id="data"
                 name="data"
@@ -41,169 +71,353 @@
             >
         </div>
 
-        <div class="field-group">
+        <div class="agenda-filter-field">
             <label for="funcionario_id">
-                Barbeiro
+                {{ ui.profissional_singular|capitalize if ui else 'Profissional' }}
             </label>
 
-            <select
-                id="funcionario_id"
-                name="funcionario_id"
-            >
+            <select id="funcionario_id" name="funcionario_id">
                 <option value="">
-                    Todos os barbeiros
+                    Todos os profissionais
                 </option>
 
                 {% for funcionario in funcionarios %}
-
                     <option
                         value="{{ funcionario.id }}"
-                        {% if funcionario_id == funcionario.id %}
-                            selected
-                        {% endif %}
+                        {% if funcionario_id == funcionario.id %}selected{% endif %}
                     >
                         {{ funcionario.nome }}
                     </option>
-
                 {% endfor %}
             </select>
         </div>
 
-        <button
-            class="btn btn-secondary"
-            type="submit"
-        >
-            Filtrar
+        <button class="btn btn-secondary" type="submit">
+            Aplicar
         </button>
-
     </form>
-
 </section>
 
-<section class="agenda-summary-grid">
-
-    <article class="agenda-summary-card">
-        <span>Data selecionada</span>
-        <strong>{{ data_filtro }}</strong>
+<section class="agenda-kpis" aria-label="Resumo da agenda">
+    <article class="agenda-kpi agenda-kpi-neutral">
+        <div class="agenda-kpi-icon">◷</div>
+        <div>
+            <span>Agendados</span>
+            <strong data-kpi="agendados">{{ resumo.agendados }}</strong>
+        </div>
     </article>
 
-    <article class="agenda-summary-card">
-        <span>Total de agendamentos</span>
-        <strong>{{ agendamentos|length }}</strong>
+    <article class="agenda-kpi agenda-kpi-success">
+        <div class="agenda-kpi-icon">✓</div>
+        <div>
+            <span>Confirmados</span>
+            <strong data-kpi="confirmados">{{ resumo.confirmados }}</strong>
+        </div>
     </article>
 
-    <article class="agenda-summary-card">
-        <span>Profissional</span>
-
-        <strong>
-            {% if funcionario_id %}
-                {% for funcionario in funcionarios %}
-                    {% if funcionario.id == funcionario_id %}
-                        {{ funcionario.nome }}
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                Todos
-            {% endif %}
-        </strong>
+    <article class="agenda-kpi agenda-kpi-info">
+        <div class="agenda-kpi-icon">▶</div>
+        <div>
+            <span>Em atendimento</span>
+            <strong data-kpi="em_atendimento">{{ resumo.em_atendimento }}</strong>
+        </div>
     </article>
 
+    <article class="agenda-kpi agenda-kpi-purple">
+        <div class="agenda-kpi-icon">★</div>
+        <div>
+            <span>Finalizados</span>
+            <strong data-kpi="finalizados">{{ resumo.finalizados }}</strong>
+        </div>
+    </article>
+
+    <article class="agenda-kpi agenda-kpi-danger">
+        <div class="agenda-kpi-icon">×</div>
+        <div>
+            <span>Cancelados</span>
+            <strong data-kpi="cancelados">{{ resumo.cancelados }}</strong>
+        </div>
+    </article>
+
+    <article class="agenda-kpi agenda-kpi-money">
+        <div class="agenda-kpi-icon">R$</div>
+        <div>
+            <span>Previsão do dia</span>
+            <strong data-kpi="previsao">
+                R$ {{ '%.2f'|format(resumo.previsao)|replace('.', ',') }}
+            </strong>
+        </div>
+    </article>
 </section>
 
-<section class="panel agenda-panel">
+<section class="panel agenda-premium-panel">
+    <div class="agenda-list-header">
+        <div>
+            <span class="agenda-section-label">Atendimentos</span>
+            <h2>Horários do dia</h2>
+            <p>
+                <strong data-kpi="total">{{ resumo.total }}</strong>
+                agendamento(s) encontrado(s).
+            </p>
+        </div>
+
+        <div class="agenda-search-wrap">
+            <span>⌕</span>
+            <input
+                id="agendaSearch"
+                type="search"
+                placeholder="Buscar por cliente ou WhatsApp"
+                autocomplete="off"
+            >
+        </div>
+    </div>
+
+    <div id="agendaFeedback" class="agenda-feedback" role="status"></div>
 
     {% if agendamentos %}
-
-        <div class="agenda-list">
-
+        <div
+            class="agenda-premium-list"
+            id="agendaList"
+            data-funcionario-id="{{ funcionario_id or '' }}"
+        >
             {% for item in agendamentos %}
-
                 <article
-                    class="agenda-item
-                    {% if item.status == 'cancelado' %}
-                        agenda-item-cancelado
-                    {% endif %}"
+                    class="agenda-premium-item status-border-{{ item.status }}"
+                    data-agendamento-id="{{ item.id }}"
+                    data-cliente-id="{{ item.cliente_id or '' }}"
+                    data-status-url="{{ url_for('atualizar_status_agendamento', agendamento_id=item.id) }}"
+                    data-client-url="{{ url_for('resumo_cliente_por_agendamento', agendamento_id=item.id) }}"
+                    data-status="{{ item.status }}"
+                    data-search="{{ (item.cliente_nome ~ ' ' ~ item.cliente_telefone ~ ' ' ~ item.servico_nome ~ ' ' ~ (item.funcionario_nome or ''))|lower }}"
                 >
-
-                    <div class="agenda-time">
-                        {{ item.hora }}
+                    <div class="agenda-premium-time">
+                        <strong>{{ item.hora }}</strong>
+                        <span>{{ item.duracao_total or 40 }} min</span>
                     </div>
 
-                    <div class="agenda-data">
-
-                        <strong>
-                            {{ item.cliente_nome }}
-                        </strong>
-
-                        <span>
-                            {{ item.servico_nome }}
-                        </span>
-
-                        <small>
-                            {{ item.funcionario_nome or 'Sem barbeiro' }}
-                            · {{ item.cliente_telefone }}
-                        </small>
-
+                    <div class="agenda-client-avatar">
+                        {{ item.cliente_nome[:1]|upper }}
                     </div>
 
-                    <span class="status {{ item.status }}">
-                        {{ item.status }}
-                    </span>
+                    <div class="agenda-premium-data" data-open-client role="button" tabindex="0" aria-label="Abrir detalhes de {{ item.cliente_nome }}">
+                        <div class="agenda-client-line">
+                            <strong>{{ item.cliente_nome }}</strong>
+                            <span class="status status-{{ item.status }}" data-status-label>
+                                {% if item.status == 'em_atendimento' %}
+                                    Em atendimento
+                                {% elif item.status == 'faltou' %}
+                                    Não compareceu
+                                {% else %}
+                                    {{ item.status|capitalize }}
+                                {% endif %}
+                            </span>
+                        </div>
 
-                    {% if item.status != 'cancelado' %}
+                        <p>{{ item.servico_nome }}</p>
 
-                        <form
-                            method="post"
-                            action="{{ url_for(
-                                'cancelar_agendamento',
-                                agendamento_id=item.id
-                            ) }}"
-                            onsubmit="return confirm(
-                                'Deseja cancelar este agendamento?'
-                            )"
+                        <div class="agenda-meta">
+                            <span>♙ {{ item.funcionario_nome or 'Sem profissional' }}</span>
+                            <span>◉ {{ item.cliente_telefone }}</span>
+                            <span>
+                                R$ {{ '%.2f'|format(item.valor_total or 0)|replace('.', ',') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="agenda-quick-actions">
+                        <button
+                            type="button"
+                            class="agenda-action agenda-action-client"
+                            data-open-client-button
                         >
+                            👤 Cliente
+                        </button>
+
+                        {% if item.status == 'agendado' %}
                             <button
-                                class="btn btn-small btn-danger"
-                                type="submit"
+                                type="button"
+                                class="agenda-action agenda-action-confirm"
+                                data-new-status="confirmado"
                             >
-                                Cancelar
+                                ✓ Confirmar
                             </button>
-                        </form>
+                        {% endif %}
 
-                    {% endif %}
+                        {% if item.status in ['agendado', 'confirmado'] %}
+                            <button
+                                type="button"
+                                class="agenda-action agenda-action-start"
+                                data-new-status="em_atendimento"
+                            >
+                                ▶ Iniciar
+                            </button>
+                        {% endif %}
 
+                        {% if item.status == 'em_atendimento' %}
+                            <button
+                                type="button"
+                                class="agenda-action agenda-action-finish"
+                                data-new-status="finalizado"
+                            >
+                                ★ Finalizar
+                            </button>
+                        {% endif %}
+
+                        {% if item.status not in ['finalizado', 'cancelado', 'faltou'] %}
+                            <button
+                                type="button"
+                                class="agenda-action agenda-action-missed"
+                                data-new-status="faltou"
+                            >
+                                ! Faltou
+                            </button>
+
+                            <button
+                                type="button"
+                                class="agenda-action agenda-action-cancel"
+                                data-new-status="cancelado"
+                            >
+                                × Cancelar
+                            </button>
+                        {% endif %}
+                    </div>
                 </article>
-
             {% endfor %}
-
         </div>
 
+        <div id="agendaSearchEmpty" class="agenda-search-empty" hidden>
+            Nenhum agendamento corresponde à pesquisa.
+        </div>
     {% else %}
+        <div class="agenda-premium-empty">
+            <div>◷</div>
+            <h3>Nenhum agendamento nesta data</h3>
+            <p>Cadastre um novo horário para começar a organizar o dia.</p>
+            <a class="btn btn-primary" href="{{ url_for('novo_agendamento') }}">
+                ＋ Novo agendamento
+            </a>
+        </div>
+    {% endif %}
+</section>
 
-        <div class="empty-state agenda-empty-state">
 
-            <div class="empty-icon">
-                📅
+<div id="clientDrawerBackdrop" class="client-drawer-backdrop" hidden></div>
+
+<aside
+    id="clientDrawer"
+    class="client-drawer"
+    aria-hidden="true"
+    aria-labelledby="clientDrawerTitle"
+    data-client-edit-url-template="{{ url_for('admin_editar_cliente', cliente_id=0) }}"
+>
+    <div class="client-drawer-loading" id="clientDrawerLoading">
+        <div class="client-drawer-spinner"></div>
+        <span>Carregando cliente...</span>
+    </div>
+
+    <div id="clientDrawerContent" hidden>
+        <header class="client-drawer-header">
+            <div class="client-drawer-profile">
+                <div class="client-drawer-avatar" id="drawerAvatar">C</div>
+                <div>
+                    <span>Perfil do cliente</span>
+                    <h2 id="clientDrawerTitle">Cliente</h2>
+                    <p id="drawerClientSince">Cliente desde —</p>
+                </div>
             </div>
 
-            <h3>Nenhum agendamento encontrado</h3>
-
-            <p>
-                Não existem horários marcados para
-                os filtros selecionados.
-            </p>
-
-            <a
-                class="btn btn-primary"
-                href="{{ url_for('novo_agendamento') }}"
+            <button
+                id="closeClientDrawer"
+                class="client-drawer-close"
+                type="button"
+                aria-label="Fechar painel"
             >
-                Criar agendamento
-            </a>
+                ×
+            </button>
+        </header>
 
+        <div class="client-drawer-body">
+            <section class="client-drawer-contact">
+                <a id="drawerWhatsapp" href="#" target="_blank" rel="noopener">
+                    <span>WhatsApp</span>
+                    <strong id="drawerPhone">—</strong>
+                </a>
+                <div>
+                    <span>E-mail</span>
+                    <strong id="drawerEmail">Não informado</strong>
+                </div>
+                <div>
+                    <span>Aniversário</span>
+                    <strong id="drawerBirthday">Não informado</strong>
+                </div>
+                <div>
+                    <span>Instagram</span>
+                    <strong id="drawerInstagram">Não informado</strong>
+                </div>
+            </section>
+
+            <section class="client-drawer-stats">
+                <article><span>Visitas</span><strong id="drawerVisits">0</strong></article>
+                <article><span>Total gasto</span><strong id="drawerSpent">R$ 0,00</strong></article>
+                <article><span>Ticket médio</span><strong id="drawerTicket">R$ 0,00</strong></article>
+                <article><span>Fidelidade</span><strong id="drawerPoints">0/10</strong></article>
+            </section>
+
+            <section class="client-drawer-favorites">
+                <div>
+                    <span>Serviço favorito</span>
+                    <strong id="drawerFavoriteService">Ainda não definido</strong>
+                </div>
+                <div>
+                    <span>Profissional favorito</span>
+                    <strong id="drawerFavoriteProfessional">Ainda não definido</strong>
+                </div>
+                <div>
+                    <span>Última visita</span>
+                    <strong id="drawerLastVisit">Ainda não</strong>
+                </div>
+                <div>
+                    <span>Recompensas</span>
+                    <strong id="drawerRewards">0 disponível</strong>
+                </div>
+            </section>
+
+            <section class="client-drawer-section">
+                <div class="client-drawer-section-title">
+                    <div>
+                        <span>Relacionamento</span>
+                        <h3>Histórico recente</h3>
+                    </div>
+                </div>
+                <div id="drawerHistory" class="client-history-list"></div>
+            </section>
+
+            <section class="client-drawer-section">
+                <div class="client-drawer-section-title">
+                    <div>
+                        <span>Cadastro</span>
+                        <h3>Observações</h3>
+                    </div>
+                </div>
+                <p id="drawerNotes" class="client-drawer-notes">Nenhuma observação cadastrada.</p>
+            </section>
         </div>
 
-    {% endif %}
+        <footer class="client-drawer-footer">
+            <a id="drawerEditClient" class="btn btn-secondary" href="#">
+                Editar cliente
+            </a>
+            <a id="drawerWhatsappButton" class="btn btn-primary" href="#" target="_blank" rel="noopener">
+                Abrir WhatsApp
+            </a>
+        </footer>
+    </div>
+</aside>
 
-</section>
+
+<script
+    src="{{ url_for('static', filename='js/agenda.js') }}?v=8"
+    defer
+></script>
 
 {% endblock %}

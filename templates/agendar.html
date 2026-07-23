@@ -22,11 +22,19 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=12"
+    href="{{ url_for('static', filename='css/style.css') }}?v=24"
     >
 </head>
 
-<body class="booking-page">
+<body
+    class="booking-page"
+    style="
+        --accent: {{ empresa.cor_principal or '#0066ff' }};
+        --accent-2: {{ empresa.cor_secundaria or '#00a7ff' }};
+        --empresa-botao: {{ empresa.cor_botao or empresa.cor_principal or '#0066ff' }};
+        --empresa-sidebar: {{ empresa.cor_sidebar or '#07111f' }};
+    "
+>
 
     <main class="booking-shell">
 
@@ -110,7 +118,8 @@
                 <h1>Reserve seu horário</h1>
 
                 <p>
-                    Escolha o serviço, o barbeiro,
+                    Escolha o serviço,
+                    {{ ui.profissional_singular if ui else 'profissional' }},
                     a data e o melhor horário para você.
                 </p>
 
@@ -386,11 +395,19 @@
                 <div class="booking-question">
 
                     <div class="booking-question-icon">
-                        💈
+                        {{ ui.icone if ui else '👤' }}
                     </div>
 
                     <div>
-                        <label>Escolha o barbeiro</label>
+                        <label>
+                            Escolha
+                            {% if ui and ui.profissional_singular in ['manicure', 'depiladora'] %}
+                                sua
+                            {% else %}
+                                seu
+                            {% endif %}
+                            {{ ui.profissional_singular if ui else 'profissional' }}
+                        </label>
 
                         <p>
                             Selecione quem vai atender você.
@@ -615,7 +632,7 @@
             <strong>Precisa de ajuda?</strong>
 
             <span>
-                Entre em contato diretamente com a barbearia.
+                Entre em contato diretamente com {{ ui.nome_empresa if ui else 'a empresa' }}.
             </span>
 
         </footer>
@@ -625,12 +642,17 @@
     <script>
         window.APP_CONFIG = {
             slug: "{{ empresa.slug }}",
-            telefone: "{{ empresa.telefone or '' }}"
+            telefone: "{{ empresa.telefone or '' }}",
+            segmento: "{{ empresa.segmento or 'barbearia' }}",
+            profissionalSingular: "{{ ui.profissional_singular if ui else 'profissional' }}",
+            profissionalPlural: "{{ ui.profissional_plural if ui else 'profissionais' }}",
+            nomeEmpresa: "{{ ui.nome_empresa if ui else 'empresa' }}"
         };
     </script>
 
     <script
-        src="{{ url_for('static', filename='js/agendar.js') }}?v=7"
+        type="module"
+        src="{{ url_for('static', filename='js/main.js') }}?v=1"
     ></script>
 
 </body>

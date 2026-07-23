@@ -1,0 +1,20 @@
+BYTECH AGENDA — CRM PREMIUM — SPRINT 4
+======================================
+
+ENTREGA
+- Painel de inteligência do CRM.
+- Segmentação automática de clientes VIP, em risco e inativos.
+- Critérios configuráveis por empresa.
+- Aniversariantes de hoje, próximos 7 dias e próximos 30 dias.
+- Alertas e atalhos para perfil/WhatsApp.
+- Cadastro, ativação, pausa e exclusão de campanhas.
+- Público-alvo: todos, VIP, em risco, inativos ou aniversariantes.
+- Migrações automáticas no SQLite.
+- Interface responsiva integrada ao menu do painel.
+
+OBSERVAÇÃO
+As campanhas desta sprint organizam público, período e mensagem. O disparo automático
+via WhatsApp/e-mail fica preparado para uma integração futura com API oficial.
+
+ANTES DE ATUALIZAR
+Faça backup do arquivo database/bytech_agenda.db.

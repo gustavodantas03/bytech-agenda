@@ -1,0 +1,24 @@
+BYTECH AGENDA — CRM PREMIUM — SPRINT 1
+
+Implementado:
+- Dashboard do CRM em /admin/crm
+- Indicadores de clientes, novos cadastros, recorrência e inatividade
+- Lista de cadastros recentes
+- Aniversariantes do mês
+- Cadastro manual de cliente
+- Edição e ativação/inativação de cliente
+- Nome e WhatsApp obrigatórios
+- E-mail, nascimento, Instagram e observações opcionais
+- Pesquisa por nome, WhatsApp, e-mail e Instagram
+- Filtros: todos, ativos, inativos, destaques, recompensas e aniversariantes
+- Migração automática do campo ativo em clientes
+- Navegação do painel atualizada para o CRM
+
+Teste recomendado:
+1. Inicie o sistema normalmente.
+2. Acesse o menu CRM.
+3. Cadastre um novo cliente.
+4. Edite, inative e pesquise o cadastro.
+5. Valide os filtros e os cards do dashboard.
+
+Antes de substituir uma instalação em uso, faça backup do arquivo SQLite.

@@ -1,0 +1,15 @@
+AJUSTE VISUAL — FIDELIDADE E RECOMPENSAS
+
+Alterações realizadas:
+- Indicadores transformados em cards responsivos.
+- Botões corrigidos e padronizados sem borda preta.
+- Status do programa no cabeçalho.
+- Controles de ativação em formato de switch.
+- Simulador de pontuação em tempo real.
+- Recompensas exibidas em cards.
+- Ranking com medalhas e barras de progresso.
+- Movimentações com badges de pontos.
+- Estados vazios mais claros e profissionais.
+- Melhorias para celular e tablet.
+
+Não houve alteração das regras do banco de dados nem das rotas existentes.

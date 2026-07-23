@@ -1,0 +1,23 @@
+BYTECH AGENDA 2.0 - SPRINT 1 (BASE ESTABILIZADA)
+
+O que foi feito:
+- Corrigido carregamento do JavaScript da Agenda em static/js/agenda.js.
+- Removido JavaScript Jinja inline que o VS Code marcava como erro.
+- Agenda usa atributos data-* para funcionário e URL de edição.
+- Painel lateral do cliente respeita o atributo hidden.
+- Configurações centrais movidas para config.py.
+- Chave secreta pode ser definida por BYTECH_SECRET_KEY.
+- ReportLab tornou-se opcional: o sistema inicia mesmo sem ele.
+- Criado instalador do Windows e script de diagnóstico.
+
+Como executar:
+1. Clique duas vezes em INSTALAR-E-EXECUTAR-WINDOWS.bat
+OU rode:
+   py -m pip install -r requirements.txt
+   py diagnostico.py
+   py app.py
+
+Próxima sprint:
+- Consolidar planos, mensalidades, cobranças e pagamentos em serviços/repositórios.
+- Reforçar bloqueio automático e histórico financeiro.
+- Finalizar dashboard Master financeiro e gráficos.

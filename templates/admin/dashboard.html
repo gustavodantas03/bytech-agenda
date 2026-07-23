@@ -1,54 +1,295 @@
 {% extends 'admin/base.html' %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<header class="page-header">
-    <div><span>Visão geral</span><h1>{{ empresa.nome }}</h1></div>
-    <a class="btn btn-secondary" href="{{ url_for('landing', slug=empresa.slug) }}" target="_blank">Ver página</a>
-</header>
-<div class="page-header-actions">
 
-    <a
-        class="btn btn-primary"
-        href="{{ url_for('novo_agendamento') }}"
-    >
-        + Novo agendamento
-    </a>
+<section class="dashboard-welcome">
+    <div class="dashboard-welcome-copy">
+        <span class="dashboard-greeting">
+            {{ saudacao_icone }}
+            {{ saudacao }},
+            {{ empresa.nome }}!
+        </span>
 
-    <a
-        class="btn btn-secondary"
-        href="{{ url_for(
-            'landing',
-            slug=empresa.slug
-        ) }}"
-        target="_blank"
-    >
-        Ver página
-    </a>
+        <h1>
+            Hoje é {{ data_extenso }}
+        </h1>
 
-</div>
-<section class="stats-grid">
-    <article class="stat-card"><span>Agendamentos hoje</span><strong>{{ agendamentos|length }}</strong></article>
-    <article class="stat-card"><span>Total de agendamentos</span><strong>{{ total }}</strong></article>
-    <article class="stat-card"><span>Barbeiros ativos</span><strong>{{ total_funcionarios }}</strong></article>
-</section>
+        <p>
+            Você possui
+            <strong>{{ agendamentos|length }}</strong>
+            {% if agendamentos|length == 1 %}
+                agendamento para hoje.
+            {% else %}
+                agendamentos para hoje.
+            {% endif %}
+        </p>
 
-<section class="panel">
-    <div class="panel-header"><div><span>Agenda do dia</span><h2>{{ hoje }}</h2></div></div>
-    {% if agendamentos %}
-        <div class="agenda-list">
-            {% for item in agendamentos %}
-            <article class="agenda-item">
-                <div class="agenda-time">{{ item.hora }}</div>
-                <div class="agenda-data">
-                    <strong>{{ item.cliente_nome }}</strong>
-                    <span>{{ item.servico_nome }} · {{ item.funcionario_nome or 'Sem barbeiro' }} · {{ item.cliente_telefone }}</span>
-                </div>
-                <span class="status {{ item.status }}">{{ item.status }}</span>
-            </article>
-            {% endfor %}
+        <div class="dashboard-day-message">
+            <span>💬</span>
+            {{ mensagem_dia }}
         </div>
-    {% else %}
-        <div class="empty-state">Nenhum agendamento para hoje.</div>
-    {% endif %}
+    </div>
+
+    <div class="dashboard-welcome-actions">
+        <a
+            class="btn btn-primary"
+            href="{{ url_for('novo_agendamento') }}"
+        >
+            + Novo agendamento
+        </a>
+
+        <a
+            class="btn btn-secondary"
+            href="{{ url_for('landing', slug=empresa.slug) }}"
+            target="_blank"
+        >
+            Ver página
+        </a>
+    </div>
 </section>
+
+<section class="dashboard-metrics-grid">
+    <article class="dashboard-metric-card">
+        <div class="dashboard-metric-icon">📅</div>
+        <div>
+            <span>Agendamentos hoje</span>
+            <strong>{{ agendamentos|length }}</strong>
+            <small>Agenda do dia</small>
+        </div>
+    </article>
+
+    <article class="dashboard-metric-card">
+        <div class="dashboard-metric-icon">💰</div>
+        <div>
+            <span>Faturamento do mês</span>
+            <strong>
+                R$
+                {{ '%.2f'|format(faturamento_mes or 0)|replace('.', ',') }}
+            </strong>
+            <small>Agendamentos não cancelados</small>
+        </div>
+    </article>
+
+    <article class="dashboard-metric-card">
+        <div class="dashboard-metric-icon">👥</div>
+        <div>
+            <span>Clientes cadastrados</span>
+            <strong>{{ total_clientes or 0 }}</strong>
+            <small>Base de relacionamento</small>
+        </div>
+    </article>
+
+    <article class="dashboard-metric-card">
+        <div class="dashboard-metric-icon">🎁</div>
+        <div>
+            <span>Recompensas</span>
+            <strong>{{ recompensas_pendentes or 0 }}</strong>
+            <small>Disponíveis para clientes</small>
+        </div>
+    </article>
+</section>
+
+<section class="dashboard-main-grid">
+    <article class="panel dashboard-agenda-panel">
+        <div class="panel-header dashboard-panel-header">
+            <div>
+                <span>Agenda de hoje</span>
+                <h2>{{ data_extenso }}</h2>
+            </div>
+
+            <a
+                class="dashboard-panel-link"
+                href="{{ url_for('admin_agenda') }}"
+            >
+                Ver agenda completa →
+            </a>
+        </div>
+
+        {% if agendamentos %}
+            <div class="dashboard-appointments">
+                {% for item in agendamentos %}
+                    <article class="dashboard-appointment-card">
+                        <div class="dashboard-appointment-time">
+                            <strong>{{ item.hora }}</strong>
+                            <span>{{ item.duracao_total or 40 }} min</span>
+                        </div>
+
+                        <div class="dashboard-appointment-content">
+                            <strong>{{ item.cliente_nome }}</strong>
+
+                            <span>
+                                {{ item.servico_nome }}
+                            </span>
+
+                            <small>
+                                {{ item.funcionario_nome or (
+                                    'Sem ' + (
+                                        ui.profissional_singular
+                                        if ui
+                                        else 'profissional'
+                                    )
+                                ) }}
+                                · {{ item.cliente_telefone }}
+                            </small>
+                        </div>
+
+                        <span class="status {{ item.status }}">
+                            {{ item.status|replace('_', ' ') }}
+                        </span>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="dashboard-empty-agenda">
+                <div class="dashboard-empty-icon">🗓️</div>
+                <h3>Nenhum agendamento hoje</h3>
+                <p>
+                    Aproveite esse tempo para divulgar seus serviços,
+                    cadastrar novidades ou organizar sua agenda.
+                </p>
+
+                <a
+                    class="btn btn-primary"
+                    href="{{ url_for('novo_agendamento') }}"
+                >
+                    Criar agendamento
+                </a>
+            </div>
+        {% endif %}
+    </article>
+
+    <aside class="dashboard-side-column">
+        <article class="panel dashboard-week-panel">
+            <div class="panel-header dashboard-panel-header">
+                <div>
+                    <span>Últimos 7 dias</span>
+                    <h2>Movimento semanal</h2>
+                </div>
+            </div>
+
+            <div class="dashboard-week-chart">
+                {% for item in dados_semana %}
+                    <div class="dashboard-week-item">
+                        <div class="dashboard-week-bar-area">
+                            <span
+                                class="dashboard-week-bar"
+                                data-height="{{ item.percentual }}"
+                                title="{{ item.quantidade }} agendamento(s)"
+                            ></span>
+                        </div>
+
+                        <strong>{{ item.quantidade }}</strong>
+                        <small>{{ item.dia }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel dashboard-insight-card">
+            <div class="dashboard-insight-icon">💡</div>
+
+            <div>
+                <span>Insight da Bytech</span>
+
+                {% if agendamentos|length == 0 %}
+                    <strong>Transforme o horário livre em oportunidade.</strong>
+                    <p>
+                        Publique seus serviços nas redes sociais e compartilhe
+                        o link de agendamento com seus clientes.
+                    </p>
+                {% elif agendamentos|length >= 8 %}
+                    <strong>Sua agenda está movimentada.</strong>
+                    <p>
+                        Confirme os próximos horários e mantenha a equipe
+                        preparada para oferecer uma ótima experiência.
+                    </p>
+                {% else %}
+                    <strong>Seu dia está bem organizado.</strong>
+                    <p>
+                        Ainda existem espaços na agenda para receber novos
+                        clientes hoje.
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+
+        <article class="panel dashboard-client-highlight">
+            <div class="dashboard-highlight-header">
+                <div>
+                    <span>Cliente destaque</span>
+                    <h2>Fidelidade</h2>
+                </div>
+
+                <div class="dashboard-highlight-icon">👑</div>
+            </div>
+
+            {% if cliente_destaque %}
+                {% set pontos = cliente_destaque.pontos_fidelidade or 0 %}
+
+                <strong class="dashboard-highlight-name">
+                    {{ cliente_destaque.nome }}
+                </strong>
+
+                <div class="dashboard-highlight-progress">
+                    <div>
+                        <span>{{ pontos }} de 10 pontos</span>
+                        <strong>{{ pontos * 10 }}%</strong>
+                    </div>
+
+                    <div class="dashboard-highlight-track">
+                        <span data-width="{{ pontos * 10 }}"></span>
+                    </div>
+                </div>
+
+                {% if cliente_destaque.recompensas_disponiveis %}
+                    <p>🎁 Recompensa disponível para este cliente.</p>
+                {% else %}
+                    <p>
+                        Faltam {{ 10 - pontos }} pontos para a próxima
+                        recompensa.
+                    </p>
+                {% endif %}
+            {% else %}
+                <div class="dashboard-highlight-empty">
+                    Os clientes aparecerão aqui conforme utilizarem
+                    o programa de fidelidade.
+                </div>
+            {% endif %}
+        </article>
+    </aside>
+</section>
+
+<script>
+    document
+        .querySelectorAll(".dashboard-week-bar")
+        .forEach((bar) => {
+            const height = Math.min(
+                100,
+                Math.max(
+                    4,
+                    Number(bar.dataset.height || 0)
+                )
+            );
+
+            bar.style.height = `${height}%`;
+        });
+
+    document
+        .querySelectorAll(
+            ".dashboard-highlight-track span"
+        )
+        .forEach((bar) => {
+            const width = Math.min(
+                100,
+                Math.max(
+                    0,
+                    Number(bar.dataset.width || 0)
+                )
+            );
+
+            bar.style.width = `${width}%`;
+        });
+</script>
+
 {% endblock %}

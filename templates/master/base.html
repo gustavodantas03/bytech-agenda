@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>
         {% block title %}Bytech Master{% endblock %}
@@ -10,46 +13,76 @@
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}?v=25"
     >
 </head>
 
-<body class="admin-page">
+<body class="master-page">
 
-    <aside class="sidebar">
+    <div
+        id="masterOverlay"
+        class="master-overlay"
+        onclick="fecharMenuMaster()"
+    ></div>
 
-        <div class="brand">
-
-            <div class="logo-mark small">
-                B
-            </div>
+    <aside
+        id="masterSidebar"
+        class="master-sidebar"
+    >
+        <div class="master-brand">
+            <div class="master-brand-mark">B</div>
 
             <div>
                 <strong>Bytech</strong>
                 <span>Master</span>
             </div>
-
         </div>
 
-        <nav>
+        <div class="master-sidebar-label">
+            Plataforma
+        </div>
 
-            <a href="{{ url_for('master_dashboard') }}">
-                Barbearias
-            </a>
-
-            <a href="{{ url_for('master_nova_empresa') }}">
-                Nova barbearia
-            </a>
-
-            <a href="{{ url_for('master_sair') }}">
-                Sair
-            </a>
-
+        <nav class="master-nav">
+            <a class="{% if request.endpoint == 'master_dashboard' %}active{% endif %}" href="{{ url_for('master_dashboard') }}"><span>⌂</span> Dashboard</a>
+            <a class="{% if request.endpoint in ['master_empresas','master_nova_empresa','master_editar_empresa','master_empresa_criada'] %}active{% endif %}" href="{{ url_for('master_empresas') }}"><span>🏢</span> Empresas</a>
+            <a class="{% if request.endpoint in ['master_planos','master_novo_plano','master_editar_plano'] %}active{% endif %}" href="{{ url_for('master_planos') }}"><span>◆</span> Planos</a>
+            <a class="{% if request.endpoint == 'master_financeiro_dashboard' %}active{% endif %}" href="{{ url_for('master_financeiro_dashboard') }}"><span>📊</span> Dashboard financeiro</a>
+            <a class="{% if request.endpoint in ['master_financeiro','master_recibo','master_empresa_financeiro','master_registrar_pagamento','master_estornar_pagamento'] %}active{% endif %}" href="{{ url_for('master_financeiro') }}"><span>💳</span> Cobranças</a>
+            <a class="{% if request.endpoint in ['master_inadimplentes','master_inadimplente_bloqueio'] %}active{% endif %}" href="{{ url_for('master_inadimplentes') }}"><span>⚠</span> Inadimplentes</a>
+            <a class="{% if request.endpoint == 'master_configuracoes_financeiras' %}active{% endif %}" href="{{ url_for('master_configuracoes_financeiras') }}"><span>⚙</span> Configurações</a>
         </nav>
 
+        <div class="master-sidebar-bottom">
+            <div class="master-info-card">
+                <span>⚡</span>
+                <div>
+                    <strong>Controle central</strong>
+                    <small>
+                        Gerencie todas as empresas da plataforma.
+                    </small>
+                </div>
+            </div>
+
+            <a
+                class="master-logout"
+                href="{{ url_for('master_sair') }}"
+            >
+                ↪ Sair do painel
+            </a>
+        </div>
     </aside>
 
-    <main class="admin-content">
+    <main class="master-content">
+        <button
+            class="master-menu-button"
+            type="button"
+            onclick="abrirMenuMaster()"
+        >
+            ☰
+        </button>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
@@ -60,8 +93,29 @@
         {% endwith %}
 
         {% block content %}{% endblock %}
-
     </main>
+
+    <script>
+        function abrirMenuMaster() {
+            document
+                .getElementById("masterSidebar")
+                ?.classList.add("open");
+
+            document
+                .getElementById("masterOverlay")
+                ?.classList.add("open");
+        }
+
+        function fecharMenuMaster() {
+            document
+                .getElementById("masterSidebar")
+                ?.classList.remove("open");
+
+            document
+                .getElementById("masterOverlay")
+                ?.classList.remove("open");
+        }
+    </script>
 
 </body>
 </html>

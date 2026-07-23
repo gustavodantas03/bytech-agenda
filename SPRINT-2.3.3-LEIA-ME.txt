@@ -1,0 +1,33 @@
+BYTECH AGENDA — SPRINT 2.3.3
+REGISTRO DE PAGAMENTO
+
+IMPLEMENTADO
+- Modal profissional de registro de pagamento.
+- Exibição da empresa, competência e valor original.
+- Desconto opcional.
+- Acréscimo opcional.
+- Cálculo automático do valor final no navegador.
+- Validação do cálculo também no servidor.
+- Data e forma de pagamento obrigatórias.
+- Observações opcionais.
+- Persistência de valor original, desconto, acréscimo e valor final.
+- Atualização da cobrança para paga.
+- Atualização financeira e desbloqueio automático da empresa.
+- Geração da próxima mensalidade.
+- Registro no histórico financeiro.
+- Recibo PDF detalhado com desconto e acréscimo.
+- Compatibilidade mantida com os formulários de pagamento já existentes.
+
+VALIDAÇÕES EXECUTADAS
+- Compilação dos arquivos Python.
+- Migração de banco em base temporária.
+- Pagamento integrado com valor original R$ 100, desconto R$ 10,
+  acréscimo R$ 5 e valor final R$ 95.
+- Conferência dos dados gravados em pagamentos e cobranças.
+
+COMO TESTAR
+1. Extraia o ZIP.
+2. Instale as dependências: py -m pip install -r requirements.txt
+3. Execute: py app.py
+4. Acesse o Painel Master > Financeiro.
+5. Em uma mensalidade aberta, clique em Registrar pagamento.

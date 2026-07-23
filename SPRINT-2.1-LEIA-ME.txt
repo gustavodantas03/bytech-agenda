@@ -1,0 +1,43 @@
+BYTECH AGENDA SAAS — SPRINT 2.1
+
+ENTREGA
+- Painel Master separado em Dashboard, Empresas, Planos e Financeiro.
+- Dashboard executivo com receita, inadimplência, empresas recentes e pagamentos recentes.
+- Cadastro real de planos no banco de dados.
+- Cadastro de recursos por plano.
+- Planos padrão: Essencial, Profissional e Premium.
+- Seleção do plano no cadastro e na edição da empresa.
+- Migração automática das empresas antigas para o novo plano_id.
+- Estrutura preserva o campo plano antigo para compatibilidade.
+
+NOVAS TABELAS
+- planos
+- recursos
+- plano_recursos
+
+NOVAS ROTAS
+- /master/empresas
+- /master/planos
+- /master/planos/novo
+- /master/planos/<id>/editar
+
+TESTES EXECUTADOS
+- 44 rotas registradas.
+- Dashboard Master: HTTP 200.
+- Empresas: HTTP 200.
+- Planos: HTTP 200.
+- Novo plano: HTTP 200.
+- Financeiro: HTTP 200.
+- Nova empresa: HTTP 200.
+- Criação real de empresa com plano: validada.
+- Edição de empresa: validada.
+
+COMO EXECUTAR NO WINDOWS
+1. Abra o PowerShell na pasta do projeto.
+2. Execute:
+   py -m pip install -r requirements.txt
+3. Depois:
+   py app.py
+
+Acesse o painel Master em:
+http://127.0.0.1:5000/master/login

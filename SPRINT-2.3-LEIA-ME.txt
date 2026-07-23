@@ -1,0 +1,17 @@
+BYTECH AGENDA SAAS — SPRINT 2.3
+
+Entregas:
+- Dashboard financeiro com KPIs do mês.
+- Filtros por empresa, competência e status.
+- Registro de pagamento em modal.
+- Geração automática da próxima mensalidade.
+- Desbloqueio automático após pagamento.
+- Histórico financeiro individual por empresa.
+- Timeline de ações financeiras.
+- Estorno de pagamento com motivo.
+- Recibo PDF.
+- Migrações automáticas sem apagar dados.
+
+Execução:
+py -m pip install -r requirements.txt
+py app.py

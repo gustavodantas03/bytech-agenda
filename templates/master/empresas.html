@@ -1,0 +1,91 @@
+{% extends 'master/base.html' %}
+{% block title %}Empresas | Bytech Master{% endblock %}
+{% block content %}
+<header class="master-page-header">
+  <div><span>Bytech Agenda SaaS</span><h1>Empresas</h1><p>Gerencie os clientes, planos, acessos e situação financeira da plataforma.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('master_nova_empresa') }}">+ Nova empresa</a>
+</header>
+
+<section class="master-stats-grid master-financial-stats">
+  <article><div>🏢</div><span>Empresas</span><strong>{{ resumo.total or 0 }}</strong><small>{{ resumo.ativas or 0 }} ativas</small></article>
+  <article><div>🟢</div><span>Em dia</span><strong>{{ resumo.em_dia or 0 }}</strong><small>Sem pendências</small></article>
+  <article><div>🟡</div><span>Pendentes</span><strong>{{ resumo.pendentes or 0 }}</strong><small>Dentro da tolerância</small></article>
+  <article><div>🔴</div><span>Inadimplentes</span><strong>{{ resumo.inadimplentes or 0 }}</strong><small>Após a tolerância</small></article>
+  <article><div>📈</div><span>Receita prevista</span><strong>R$ {{ '%.2f'|format(resumo.receita_prevista or 0)|replace('.', ',') }}</strong><small>Mensal recorrente</small></article>
+  <article><div>💳</div><span>Recebido no mês</span><strong>R$ {{ '%.2f'|format(recebido_mes or 0)|replace('.', ',') }}</strong><small>Pagamentos registrados</small></article>
+</section>
+
+<section class="master-chart-grid">
+  <article class="panel master-chart-card">
+    <div class="panel-header"><div><span>Fluxo mensal</span><h2>Previsto x recebido</h2></div></div>
+    {% set maior = ([1] + historico|map(attribute='previsto')|list + historico|map(attribute='recebido')|list)|max %}
+    <div class="finance-bars">
+      {% for mes in historico %}
+      <div class="finance-bar-group">
+        <div class="finance-bar-area">
+          <span class="finance-bar previsto" style="height: {{ ((mes.previsto or 0) / maior * 100)|round }}%" title="Previsto: R$ {{ '%.2f'|format(mes.previsto or 0) }}"></span>
+          <span class="finance-bar recebido" style="height: {{ ((mes.recebido or 0) / maior * 100)|round }}%" title="Recebido: R$ {{ '%.2f'|format(mes.recebido or 0) }}"></span>
+        </div>
+        <small>{{ mes.competencia[5:7] }}/{{ mes.competencia[2:4] }}</small>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="finance-legend"><span><i class="legend-previsto"></i> Previsto</span><span><i class="legend-recebido"></i> Recebido</span></div>
+  </article>
+
+  <article class="panel master-chart-card">
+    <div class="panel-header"><div><span>Carteira</span><h2>Situação das empresas</h2></div></div>
+    {% set total_status = resumo.total or 1 %}
+    {% set pct_em_dia = ((resumo.em_dia or 0) / total_status * 100) %}
+    {% set pct_pendente = ((resumo.pendentes or 0) / total_status * 100) %}
+    <div class="finance-donut" style="--ok: {{ pct_em_dia }}%; --pending: {{ pct_pendente }}%;">
+      <div><strong>{{ resumo.total or 0 }}</strong><span>empresas</span></div>
+    </div>
+    <div class="finance-status-list">
+      <span><i class="dot ok"></i> Em dia <strong>{{ resumo.em_dia or 0 }}</strong></span>
+      <span><i class="dot pending"></i> Pendentes <strong>{{ resumo.pendentes or 0 }}</strong></span>
+      <span><i class="dot late"></i> Inadimplentes <strong>{{ resumo.inadimplentes or 0 }}</strong></span>
+    </div>
+  </article>
+</section>
+
+<section class="panel master-toolbar-panel">
+<form method="get" class="master-toolbar">
+  <div class="master-search"><span>⌕</span><input name="q" value="{{ busca or '' }}" placeholder="Pesquisar empresa, link ou usuário"></div>
+  <select name="segmento"><option value="">Todos os segmentos</option>{% for chave,item in segmentos.items() %}<option value="{{ chave }}" {% if segmento_filtro==chave %}selected{% endif %}>{{ item.icone }} {{ item.nome }}</option>{% endfor %}</select>
+  <select name="status">
+    <option value="">Todas as situações</option>
+    <option value="em_dia" {% if status_filtro=='em_dia' %}selected{% endif %}>Em dia</option>
+    <option value="pendente" {% if status_filtro=='pendente' %}selected{% endif %}>Pendentes</option>
+    <option value="inadimplente" {% if status_filtro=='inadimplente' %}selected{% endif %}>Inadimplentes</option>
+    <option value="bloqueadas" {% if status_filtro=='bloqueadas' %}selected{% endif %}>Bloqueadas</option>
+  </select>
+  <button class="btn btn-secondary">Filtrar</button>
+  <a class="btn btn-secondary" href="{{ url_for('master_financeiro') }}">Histórico financeiro</a>
+</form>
+</section>
+
+{% if empresas %}<section class="master-companies-grid">
+{% for empresa in empresas %}{% set config=segmentos.get(empresa.segmento or 'barbearia',segmentos['barbearia']) %}
+<article class="master-company-card" style="--company-main:{{ empresa.cor_principal or config.cor_principal }};--company-soft:{{ empresa.cor_secundaria or config.cor_secundaria }}">
+  <div class="master-company-accent"></div>
+  <div class="master-company-header"><div class="master-company-identity"><div class="master-company-icon">{{ config.icone }}</div><div><strong>{{ empresa.nome }}</strong><span>{{ config.nome }} · {{ empresa.plano or 'Essencial' }}</span></div></div>
+    <span class="master-status-badge {{ 'active' if empresa.ativo else 'blocked' }}">{{ 'Ativa' if empresa.ativo else 'Bloqueada' }}</span>
+  </div>
+  <div class="master-company-link"><span>Link público</span><strong>/{{ empresa.slug }}</strong></div>
+  <div class="master-company-finance detailed">
+    <div><span>Mensalidade</span><strong>R$ {{ '%.2f'|format(empresa.mensalidade or 0)|replace('.', ',') }}</strong></div>
+    <div><span>Vencimento</span><strong>{{ empresa.proximo_vencimento or ('Dia ' ~ (empresa.dia_vencimento or 10)) }}</strong></div>
+    <div><span>Dias em atraso</span><strong>{{ empresa.dias_atraso or 0 }}</strong></div>
+  </div>
+  <div class="company-finance-status"><span class="master-payment-badge {{ empresa.status_pagamento or 'em_dia' }}">{% if empresa.status_pagamento=='inadimplente' %}Inadimplente{% elif empresa.status_pagamento=='pendente' %}Pagamento pendente{% else %}Em dia{% endif %}</span>{% if empresa.bloqueado_financeiro %}<small>Bloqueio financeiro automático</small>{% elif empresa.bloqueio_manual %}<small>Bloqueio manual</small>{% endif %}</div>
+  <div class="master-company-metrics"><div><span>Clientes</span><strong>{{ empresa.total_clientes }}</strong></div><div><span>Agendamentos</span><strong>{{ empresa.total_agendamentos }}</strong></div></div>
+  <div class="master-company-actions">
+    <a class="btn btn-small btn-secondary" href="{{ url_for('landing',slug=empresa.slug) }}" target="_blank">Abrir</a>
+    <a class="btn btn-small master-edit-button" href="{{ url_for('master_editar_empresa',empresa_id=empresa.id) }}">Editar</a>
+    {% if empresa.cobranca_aberta_id %}<form method="post" action="{{ url_for('master_registrar_pagamento',cobranca_id=empresa.cobranca_aberta_id) }}"><input type="hidden" name="forma_pagamento" value="Pix"><button class="btn btn-small master-pay-button" onclick="return confirm('Registrar pagamento desta mensalidade?')">Registrar pagamento</button></form>{% endif %}
+    <form method="post" action="{{ url_for('master_alternar_empresa',empresa_id=empresa.id) }}"><button class="btn btn-small {{ 'btn-danger' if not empresa.bloqueio_manual else 'master-activate-button' }}">{{ 'Bloquear' if not empresa.bloqueio_manual else 'Desbloquear' }}</button></form>
+  </div>
+</article>{% endfor %}
+</section>{% else %}<section class="panel master-empty-state"><div>🏢</div><h2>Nenhuma empresa encontrada</h2></section>{% endif %}
+{% endblock %}

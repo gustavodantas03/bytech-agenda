@@ -1,0 +1,33 @@
+BYTECH AGENDA — AJUSTES REALIZADOS
+
+1. Todos os arquivos JavaScript foram movidos para:
+   static/js/
+
+2. A Agenda administrativa carrega:
+   static/js/agenda.js
+
+3. A página pública de agendamento carrega:
+   static/js/main.js
+
+4. Os imports entre os módulos JavaScript continuam funcionando porque todos
+   permanecem na mesma pasta.
+
+5. A referência inexistente a static/js/ui.js foi removida da landing page,
+   eliminando mais um erro 404.
+
+6. O painel Master completo foi preservado, incluindo:
+   - dashboard com indicadores;
+   - busca e filtros;
+   - cadastro de empresa;
+   - edição de empresa;
+   - ativação e bloqueio;
+   - configuração de segmento, cores e acesso administrativo.
+
+COMO EXECUTAR
+
+Abra o terminal na pasta principal do projeto e execute:
+
+    py app.py
+
+Depois abra o endereço exibido pelo Flask.
+Use Ctrl + F5 no navegador após substituir o projeto para limpar o cache.

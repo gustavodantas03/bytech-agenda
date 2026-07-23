@@ -1,0 +1,9 @@
+AJUSTES REALIZADOS
+
+1. Corrigido o painel lateral do cliente: o carregamento agora desaparece quando os dados chegam.
+2. Painel Master atualizado com plano, mensalidade, vencimento, último pagamento e situação financeira.
+3. Indicadores adicionados: inadimplentes e receita mensal prevista.
+4. Filtro de inadimplentes incluído.
+5. Cadastro e edição de empresa agora possuem seção Plano e cobrança.
+
+Ao iniciar o sistema, init_db() adiciona automaticamente as novas colunas ao banco existente.

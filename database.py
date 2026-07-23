@@ -44,7 +44,13 @@ def init_db():
                 maps_url TEXT,
                 descricao TEXT,
                 logo TEXT,
+                segmento TEXT NOT NULL DEFAULT 'barbearia',
+                template_admin TEXT NOT NULL DEFAULT 'barbearia',
+                template_cliente TEXT NOT NULL DEFAULT 'premium',
                 cor_principal TEXT DEFAULT '#111827',
+                cor_secundaria TEXT DEFAULT '#d4af37',
+                cor_botao TEXT DEFAULT '#d4af37',
+                cor_sidebar TEXT DEFAULT '#0f172a',
                 horario_texto TEXT,
                 ativo INTEGER DEFAULT 1
             );
@@ -53,6 +59,24 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usuario TEXT NOT NULL UNIQUE,
                 senha TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS clientes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                nome TEXT NOT NULL,
+                telefone TEXT NOT NULL,
+                email TEXT,
+                data_nascimento TEXT,
+                instagram TEXT,
+                observacoes TEXT,
+                pontos_fidelidade INTEGER NOT NULL DEFAULT 0,
+                recompensas_disponiveis INTEGER NOT NULL DEFAULT 0,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id)
+                    REFERENCES empresas(id),
+                UNIQUE (empresa_id, telefone)
             );
 
             CREATE TABLE IF NOT EXISTS servicos (
@@ -79,6 +103,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS agendamentos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 empresa_id INTEGER NOT NULL,
+                cliente_id INTEGER,
                 cliente_nome TEXT NOT NULL,
                 cliente_telefone TEXT NOT NULL,
                 servico_id INTEGER NOT NULL,
@@ -91,6 +116,8 @@ def init_db():
                 valor_total REAL NOT NULL DEFAULT 0,
                 FOREIGN KEY (empresa_id)
                     REFERENCES empresas(id),
+                FOREIGN KEY (cliente_id)
+                    REFERENCES clientes(id),
                 FOREIGN KEY (servico_id)
                     REFERENCES servicos(id),
                 FOREIGN KEY (funcionario_id)
@@ -110,6 +137,25 @@ def init_db():
                 UNIQUE (agendamento_id, servico_id)
             );
 
+            CREATE TABLE IF NOT EXISTS fidelidade_movimentos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                cliente_id INTEGER NOT NULL,
+                agendamento_id INTEGER,
+                tipo TEXT NOT NULL,
+                quantidade INTEGER NOT NULL DEFAULT 1,
+                descricao TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id)
+                    REFERENCES empresas(id),
+                FOREIGN KEY (cliente_id)
+                    REFERENCES clientes(id),
+                FOREIGN KEY (agendamento_id)
+                    REFERENCES agendamentos(id)
+                    ON DELETE CASCADE,
+                UNIQUE (agendamento_id, tipo)
+            );
+
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 empresa_id INTEGER NOT NULL,
@@ -118,6 +164,93 @@ def init_db():
                 FOREIGN KEY (empresa_id)
                     REFERENCES empresas(id)
             );
+
+            CREATE TABLE IF NOT EXISTS cobrancas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                competencia TEXT NOT NULL,
+                descricao TEXT,
+                valor REAL NOT NULL DEFAULT 0,
+                vencimento TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'aberta',
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+                UNIQUE (empresa_id, competencia)
+            );
+
+            CREATE TABLE IF NOT EXISTS pagamentos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                cobranca_id INTEGER NOT NULL,
+                valor REAL NOT NULL,
+                data_pagamento TEXT NOT NULL,
+                forma_pagamento TEXT DEFAULT 'Pix',
+                observacoes TEXT,
+                recibo_numero TEXT NOT NULL UNIQUE,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+                FOREIGN KEY (cobranca_id) REFERENCES cobrancas(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS logs_financeiros (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER,
+                cobranca_id INTEGER,
+                pagamento_id INTEGER,
+                acao TEXT NOT NULL,
+                descricao TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+                FOREIGN KEY (cobranca_id) REFERENCES cobrancas(id),
+                FOREIGN KEY (pagamento_id) REFERENCES pagamentos(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS configuracoes_financeiras (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                dia_vencimento_padrao INTEGER NOT NULL DEFAULT 10,
+                tolerancia_dias_padrao INTEGER NOT NULL DEFAULT 5,
+                bloquear_apos_dias_padrao INTEGER NOT NULL DEFAULT 15,
+                multa_percentual REAL NOT NULL DEFAULT 0,
+                juros_mensal_percentual REAL NOT NULL DEFAULT 0,
+                desconto_antecipacao_percentual REAL NOT NULL DEFAULT 0,
+                forma_pagamento_padrao TEXT NOT NULL DEFAULT 'Pix',
+                mensagem_cobranca TEXT,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+        )
+
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS planos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL UNIQUE,
+                descricao TEXT,
+                valor REAL NOT NULL DEFAULT 0,
+                limite_profissionais INTEGER,
+                limite_usuarios INTEGER,
+                limite_agendamentos INTEGER,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS recursos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chave TEXT NOT NULL UNIQUE,
+                nome TEXT NOT NULL,
+                descricao TEXT,
+                ativo INTEGER NOT NULL DEFAULT 1
+            );
+
+            CREATE TABLE IF NOT EXISTS plano_recursos (
+                plano_id INTEGER NOT NULL,
+                recurso_id INTEGER NOT NULL,
+                PRIMARY KEY (plano_id, recurso_id),
+                FOREIGN KEY (plano_id) REFERENCES planos(id) ON DELETE CASCADE,
+                FOREIGN KEY (recurso_id) REFERENCES recursos(id) ON DELETE CASCADE
+            );
             """
         )
 
@@ -125,6 +258,150 @@ def init_db():
             conn.execute(
                 "ALTER TABLE empresas ADD COLUMN logo TEXT"
             )
+
+        campos_cliente = {
+            "email": "TEXT",
+            "data_nascimento": "TEXT",
+            "instagram": "TEXT",
+            "observacoes": "TEXT",
+            "ativo": "INTEGER NOT NULL DEFAULT 1",
+        }
+
+        for coluna, definicao in campos_cliente.items():
+            if not _column_exists(conn, "clientes", coluna):
+                conn.execute(
+                    f"ALTER TABLE clientes ADD COLUMN {coluna} {definicao}"
+                )
+
+        campos_empresa = {
+            "segmento": "TEXT NOT NULL DEFAULT 'barbearia'",
+            "template_admin": "TEXT NOT NULL DEFAULT 'barbearia'",
+            "template_cliente": "TEXT NOT NULL DEFAULT 'premium'",
+            "cor_secundaria": "TEXT DEFAULT '#d4af37'",
+            "cor_botao": "TEXT DEFAULT '#d4af37'",
+            "cor_sidebar": "TEXT DEFAULT '#0f172a'",
+            "plano": "TEXT NOT NULL DEFAULT 'Essencial'",
+            "mensalidade": "REAL NOT NULL DEFAULT 0",
+            "dia_vencimento": "INTEGER NOT NULL DEFAULT 10",
+            "status_pagamento": "TEXT NOT NULL DEFAULT 'em_dia'",
+            "proximo_vencimento": "TEXT",
+            "ultimo_pagamento": "TEXT",
+            "tolerancia_dias": "INTEGER NOT NULL DEFAULT 5",
+            "bloquear_apos_dias": "INTEGER NOT NULL DEFAULT 15",
+            "dias_atraso": "INTEGER NOT NULL DEFAULT 0",
+            "bloqueado_financeiro": "INTEGER NOT NULL DEFAULT 0",
+            "bloqueio_manual": "INTEGER NOT NULL DEFAULT 0",
+            "financeiro_atualizado_em": "TEXT",
+            "plano_id": "INTEGER",
+        }
+
+        for coluna, definicao in campos_empresa.items():
+            if not _column_exists(conn, "empresas", coluna):
+                conn.execute(
+                    f"ALTER TABLE empresas ADD COLUMN {coluna} {definicao}"
+                )
+
+        campos_cobranca = {
+            "desconto": "REAL NOT NULL DEFAULT 0",
+            "acrescimo": "REAL NOT NULL DEFAULT 0",
+            "valor_final": "REAL",
+            "cancelada_em": "TEXT",
+            "motivo_cancelamento": "TEXT",
+        }
+        for coluna, definicao in campos_cobranca.items():
+            if not _column_exists(conn, "cobrancas", coluna):
+                conn.execute(f"ALTER TABLE cobrancas ADD COLUMN {coluna} {definicao}")
+
+        campos_pagamento = {
+            "valor_original": "REAL NOT NULL DEFAULT 0",
+            "desconto": "REAL NOT NULL DEFAULT 0",
+            "acrescimo": "REAL NOT NULL DEFAULT 0",
+            "valor_final": "REAL NOT NULL DEFAULT 0",
+            "estornado": "INTEGER NOT NULL DEFAULT 0",
+            "estornado_em": "TEXT",
+            "motivo_estorno": "TEXT",
+        }
+        for coluna, definicao in campos_pagamento.items():
+            if not _column_exists(conn, "pagamentos", coluna):
+                conn.execute(f"ALTER TABLE pagamentos ADD COLUMN {coluna} {definicao}")
+
+        conn.execute("UPDATE cobrancas SET valor_final = COALESCE(valor_final, valor + COALESCE(acrescimo,0) - COALESCE(desconto,0))")
+
+        recursos_padrao = [
+            ("agenda", "Agenda", "Agenda e agendamento público"),
+            ("crm", "CRM", "Cadastro e histórico de clientes"),
+            ("financeiro", "Financeiro", "Controle financeiro da empresa"),
+            ("fidelidade", "Fidelidade", "Pontos e recompensas"),
+            ("whatsapp", "WhatsApp", "Comunicações e lembretes"),
+            ("relatorios", "Relatórios", "Indicadores e relatórios gerenciais"),
+            ("api", "API", "Integrações externas"),
+        ]
+        conn.executemany(
+            "INSERT OR IGNORE INTO recursos (chave, nome, descricao) VALUES (?, ?, ?)",
+            recursos_padrao,
+        )
+
+        planos_padrao = [
+            ("Essencial", "Para começar a organizar os agendamentos.", 49.90, 2, 2, 150),
+            ("Profissional", "CRM, fidelidade, financeiro e relatórios.", 99.90, None, None, None),
+            ("Premium", "Todos os recursos e integrações avançadas.", 149.90, None, None, None),
+        ]
+        conn.executemany(
+            """
+            INSERT OR IGNORE INTO planos
+            (nome, descricao, valor, limite_profissionais, limite_usuarios, limite_agendamentos)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            planos_padrao,
+        )
+
+        mapa_recursos = {
+            "Essencial": ("agenda", "crm"),
+            "Profissional": ("agenda", "crm", "financeiro", "fidelidade", "relatorios", "whatsapp"),
+            "Premium": ("agenda", "crm", "financeiro", "fidelidade", "relatorios", "whatsapp", "api"),
+        }
+        for nome_plano, chaves in mapa_recursos.items():
+            plano = conn.execute("SELECT id FROM planos WHERE nome = ?", (nome_plano,)).fetchone()
+            if not plano:
+                continue
+            for chave in chaves:
+                recurso = conn.execute("SELECT id FROM recursos WHERE chave = ?", (chave,)).fetchone()
+                if recurso:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO plano_recursos (plano_id, recurso_id) VALUES (?, ?)",
+                        (plano["id"], recurso["id"]),
+                    )
+
+        conn.execute(
+            """
+            UPDATE empresas
+            SET plano_id = (SELECT id FROM planos WHERE planos.nome = empresas.plano)
+            WHERE plano_id IS NULL
+            """
+        )
+
+        conn.execute("""
+            INSERT OR IGNORE INTO configuracoes_financeiras
+            (id, dia_vencimento_padrao, tolerancia_dias_padrao, bloquear_apos_dias_padrao,
+             multa_percentual, juros_mensal_percentual, desconto_antecipacao_percentual,
+             forma_pagamento_padrao, mensagem_cobranca)
+            VALUES (1, 10, 5, 15, 0, 0, 0, 'Pix',
+                    'Olá! Identificamos uma mensalidade pendente do Bytech Agenda.')
+        """)
+
+        conn.execute(
+            """
+            UPDATE empresas
+            SET
+                segmento = COALESCE(NULLIF(segmento, ''), 'barbearia'),
+                template_admin = COALESCE(NULLIF(template_admin, ''), 'barbearia'),
+                template_cliente = COALESCE(NULLIF(template_cliente, ''), 'premium'),
+                cor_principal = COALESCE(NULLIF(cor_principal, ''), '#111827'),
+                cor_secundaria = COALESCE(NULLIF(cor_secundaria, ''), '#d4af37'),
+                cor_botao = COALESCE(NULLIF(cor_botao, ''), '#d4af37'),
+                cor_sidebar = COALESCE(NULLIF(cor_sidebar, ''), '#0f172a')
+            """
+        )
 
         if not _column_exists(
             conn,
@@ -161,6 +438,18 @@ def init_db():
                 ALTER TABLE agendamentos
                 ADD COLUMN valor_total REAL
                 NOT NULL DEFAULT 0
+                """
+            )
+
+        if not _column_exists(
+            conn,
+            "agendamentos",
+            "cliente_id",
+        ):
+            conn.execute(
+                """
+                ALTER TABLE agendamentos
+                ADD COLUMN cliente_id INTEGER
                 """
             )
 
@@ -228,6 +517,92 @@ def init_db():
             """
         )
 
+        # Cria clientes a partir dos agendamentos antigos e vincula cliente_id.
+        agendamentos_sem_cliente = conn.execute(
+            """
+            SELECT
+                id,
+                empresa_id,
+                cliente_nome,
+                cliente_telefone
+            FROM agendamentos
+            WHERE cliente_id IS NULL
+            ORDER BY id
+            """
+        ).fetchall()
+
+        for agendamento in agendamentos_sem_cliente:
+            telefone_normalizado = "".join(
+                caractere
+                for caractere in str(
+                    agendamento["cliente_telefone"] or ""
+                )
+                if caractere.isdigit()
+            )
+
+            if not telefone_normalizado:
+                telefone_normalizado = (
+                    f"sem-telefone-{agendamento['id']}"
+                )
+
+            cliente = conn.execute(
+                """
+                SELECT id
+                FROM clientes
+                WHERE empresa_id = ?
+                  AND telefone = ?
+                """,
+                (
+                    agendamento["empresa_id"],
+                    telefone_normalizado,
+                ),
+            ).fetchone()
+
+            if cliente:
+                cliente_id = cliente["id"]
+                conn.execute(
+                    """
+                    UPDATE clientes
+                    SET
+                        nome = ?,
+                        atualizado_em = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                    """,
+                    (
+                        agendamento["cliente_nome"],
+                        cliente_id,
+                    ),
+                )
+            else:
+                cursor_cliente = conn.execute(
+                    """
+                    INSERT INTO clientes (
+                        empresa_id,
+                        nome,
+                        telefone
+                    )
+                    VALUES (?, ?, ?)
+                    """,
+                    (
+                        agendamento["empresa_id"],
+                        agendamento["cliente_nome"],
+                        telefone_normalizado,
+                    ),
+                )
+                cliente_id = cursor_cliente.lastrowid
+
+            conn.execute(
+                """
+                UPDATE agendamentos
+                SET cliente_id = ?
+                WHERE id = ?
+                """,
+                (
+                    cliente_id,
+                    agendamento["id"],
+                ),
+            )
+
         conn.execute(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS
@@ -262,7 +637,37 @@ def init_db():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_clientes_empresa_nome
+            ON clientes (
+                empresa_id,
+                nome
+            )
+            """
+        )
 
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_clientes_empresa_telefone
+            ON clientes (
+                empresa_id,
+                telefone
+            )
+            """
+        )
+
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS
+            idx_fidelidade_cliente
+            ON fidelidade_movimentos (
+                cliente_id
+            )
+            """
+        )
         empresa = conn.execute(
             """
             SELECT id
@@ -282,10 +687,16 @@ def init_db():
                     endereco,
                     maps_url,
                     descricao,
+                    segmento,
+                    template_admin,
+                    template_cliente,
                     cor_principal,
+                    cor_secundaria,
+                    cor_botao,
+                    cor_sidebar,
                     horario_texto
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     "Barbearia do Bairro",
@@ -298,7 +709,13 @@ def init_db():
                         "Cortes modernos, barba e atendimento "
                         "com hora marcada."
                     ),
+                    "barbearia",
+                    "barbearia",
+                    "premium",
                     "#111827",
+                    "#d4af37",
+                    "#d4af37",
+                    "#0f172a",
                     "Segunda a sábado, das 09h às 18h",
                 ),
             )
@@ -414,6 +831,62 @@ def init_db():
                     "bytech",
                     "trocar123",
                 ),
+            )
+
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS fidelidade_configuracoes (
+                empresa_id INTEGER PRIMARY KEY,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                tipo_pontuacao TEXT NOT NULL DEFAULT 'valor',
+                pontos_por_atendimento INTEGER NOT NULL DEFAULT 1,
+                valor_por_ponto REAL NOT NULL DEFAULT 10,
+                validade_dias INTEGER,
+                permitir_ajuste_manual INTEGER NOT NULL DEFAULT 1,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS fidelidade_recompensas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                nome TEXT NOT NULL,
+                descricao TEXT,
+                pontos_necessarios INTEGER NOT NULL,
+                tipo TEXT NOT NULL DEFAULT 'brinde',
+                valor_desconto REAL NOT NULL DEFAULT 0,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS fidelidade_resgates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                cliente_id INTEGER NOT NULL,
+                recompensa_id INTEGER NOT NULL,
+                pontos_utilizados INTEGER NOT NULL,
+                observacoes TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+                FOREIGN KEY (recompensa_id) REFERENCES fidelidade_recompensas(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_fidelidade_movimentos_cliente
+            ON fidelidade_movimentos (empresa_id, cliente_id, criado_em);
+            CREATE INDEX IF NOT EXISTS idx_fidelidade_recompensas_empresa
+            ON fidelidade_recompensas (empresa_id, ativo);
+            """
+        )
+
+        empresas_ids = conn.execute("SELECT id FROM empresas").fetchall()
+        for empresa_item in empresas_ids:
+            conn.execute(
+                """INSERT OR IGNORE INTO fidelidade_configuracoes (empresa_id)
+                   VALUES (?)""",
+                (empresa_item["id"],),
             )
 
         conn.commit()

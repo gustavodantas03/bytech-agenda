@@ -1,10 +1,12 @@
 {% extends 'master/base.html' %}
 
 {% block title %}
-Barbearia criada
+Empresa criada
 {% endblock %}
 
 {% block content %}
+
+{% set segmento = empresa.segmento or 'barbearia' %}
 
 <header class="page-header">
     <div>
@@ -21,15 +23,44 @@ Barbearia criada
             ✓
         </div>
 
-        <h2>Barbearia criada com sucesso!</h2>
+        <h2>
+            {% if segmento == 'barbearia' %}
+                Barbearia criada com sucesso!
+            {% elif segmento == 'manicure' %}
+                Espaço de manicure criado com sucesso!
+            {% elif segmento == 'depilacao' %}
+                Espaço de depilação criado com sucesso!
+            {% elif segmento == 'sobrancelhas' %}
+                Studio de sobrancelhas criado com sucesso!
+            {% else %}
+                Empresa criada com sucesso!
+            {% endif %}
+        </h2>
 
         <p>
-            A empresa, o usuário, os serviços padrão e o funcionário inicial foram criados.
+            A empresa, o usuário administrador, os serviços iniciais
+            e os profissionais foram criados automaticamente.
         </p>
 
     </div>
 
     <div class="summary">
+
+        <p>
+            <strong>Segmento:</strong>
+
+            {% if segmento == 'barbearia' %}
+                💈 Barbearia
+            {% elif segmento == 'manicure' %}
+                💅 Manicure
+            {% elif segmento == 'depilacao' %}
+                ✨ Depilação
+            {% elif segmento == 'sobrancelhas' %}
+                👁️ Design de sobrancelhas
+            {% else %}
+                🏢 Empresa
+            {% endif %}
+        </p>
 
         <p>
             <strong>Página pública:</strong>
