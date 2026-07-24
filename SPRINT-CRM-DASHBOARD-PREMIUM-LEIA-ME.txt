@@ -1,0 +1,44 @@
+BYTECH AGENDA — SPRINT CRM DASHBOARD PREMIUM
+
+Base utilizada:
+- bytech_agenda_saas(7).zip
+
+Arquivos alterados:
+- routes/clientes.py
+- templates/admin/crm_dashboard.html
+- templates/admin/base.html
+
+Arquivos adicionados:
+- static/css/crm-dashboard.css
+- static/js/crm-dashboard.js
+
+O que foi entregue:
+- Dashboard do CRM redesenhado no padrão visual do sistema.
+- Indicadores de clientes cadastrados, ativos, recorrentes e sem retorno.
+- Comparação dos novos clientes com o período anterior.
+- Gráfico dos novos clientes nos últimos seis meses, sem biblioteca externa.
+- Próximos atendimentos.
+- Cadastros recentes com pontos e recompensas.
+- Aniversariantes do mês.
+- Clientes sem retornar há mais de 60 dias.
+- Clientes próximos da primeira recompensa ativa.
+- Atalhos para Inteligência CRM, clientes, agenda e fidelidade.
+- Estados vazios orientativos.
+- Layout responsivo.
+- CSS e JavaScript separados do template.
+- Menu CRM permanece ativo nas páginas internas do módulo.
+
+Validações executadas:
+- Compilação sintática de todos os arquivos Python: OK.
+- Consultas SQL novas testadas no banco incluído: OK.
+- Integridade do ZIP: OK.
+
+Como executar:
+1. Extraia o projeto em uma pasta nova.
+2. Mantenha uma cópia de segurança de database/bytech_agenda.db.
+3. No Windows, execute INSTALAR-E-EXECUTAR-WINDOWS.bat.
+4. Entre no painel e abra CRM.
+5. Atualize o navegador com Ctrl + F5 caso o CSS antigo permaneça em cache.
+
+Observação:
+O diagnóstico completo de execução depende das bibliotecas do requirements.txt instaladas na máquina.

@@ -1,18 +1,311 @@
 {% extends "admin/base.html" %}
 {% block title %}CRM | Bytech Agenda{% endblock %}
+
 {% block content %}
-<header class="page-header crm-head"><div><span>Relacionamento</span><h1>CRM</h1><p class="page-subtitle">Visão geral da sua base de clientes e oportunidades de relacionamento.</p></div><a class="btn btn-primary" href="{{ url_for('admin_novo_cliente') }}">+ Novo cliente</a></header>
-<section class="crm-kpis">
-<article><span>Clientes cadastrados</span><strong>{{ indicadores.total_clientes or 0 }}</strong><small>{{ indicadores.novos_30_dias or 0 }} novos nos últimos 30 dias</small></article>
-<article><span>Clientes ativos</span><strong>{{ indicadores.ativos or 0 }}</strong><small>Cadastros disponíveis para atendimento</small></article>
-<article><span>Clientes recorrentes</span><strong>{{ comportamento.recorrentes or 0 }}</strong><small>Com 2 ou mais atendimentos concluídos</small></article>
-<article><span>Inativos há 60 dias</span><strong>{{ comportamento.inativos_60_dias or 0 }}</strong><small>Oportunidade de reativação</small></article>
-</section>
-<section class="crm-grid">
-<article class="panel"><div class="crm-panel-title"><div><span>Base de clientes</span><h2>Cadastros recentes</h2></div><a href="{{ url_for('admin_clientes') }}">Ver todos</a></div>{% if recentes %}<div class="crm-list">{% for cliente in recentes %}<a href="{{ url_for('admin_editar_cliente', cliente_id=cliente.id) }}"><div class="crm-avatar">{{ cliente.nome[:1]|upper }}</div><div><strong>{{ cliente.nome }}</strong><span>{{ cliente.telefone }} · {{ cliente.atendimentos or 0 }} atendimento(s)</span></div><time>{{ cliente.criado_em[8:10] }}/{{ cliente.criado_em[5:7] }}</time></a>{% endfor %}</div>{% else %}<p class="crm-empty">Nenhum cliente cadastrado.</p>{% endif %}</article>
-<article class="panel"><div class="crm-panel-title"><div><span>Relacionamento</span><h2>Aniversariantes do mês</h2></div><a href="{{ url_for('admin_clientes', filtro='aniversariantes') }}">Ver lista</a></div>{% if aniversariantes %}<div class="crm-list">{% for cliente in aniversariantes %}<a href="{{ url_for('admin_editar_cliente', cliente_id=cliente.id) }}"><div class="crm-avatar">🎂</div><div><strong>{{ cliente.nome }}</strong><span>{{ cliente.telefone }}</span></div><time>{{ cliente.data_nascimento[8:10] }}/{{ cliente.data_nascimento[5:7] }}</time></a>{% endfor %}</div>{% else %}<p class="crm-empty">Nenhum aniversariante neste mês.</p>{% endif %}</article>
-</section>
-<style>
-.crm-head{align-items:flex-start}.crm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:22px}.crm-kpis article{background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(15,23,42,.05)}.crm-kpis span,.crm-kpis small{display:block;color:#64748b}.crm-kpis strong{display:block;font-size:2rem;margin:9px 0;color:#0f172a}.crm-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}.crm-panel-title{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.crm-panel-title span{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b}.crm-panel-title h2{margin:4px 0 0;font-size:1.2rem}.crm-panel-title a{font-weight:700;color:var(--cor-principal,#2563eb)}.crm-list{display:flex;flex-direction:column}.crm-list>a{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;padding:13px 0;border-top:1px solid #edf1f7;color:inherit;text-decoration:none}.crm-avatar{width:40px;height:40px;border-radius:12px;background:#eef4ff;display:grid;place-items:center;font-weight:800}.crm-list strong,.crm-list span{display:block}.crm-list span,.crm-list time{font-size:.82rem;color:#64748b}.crm-empty{color:#64748b;padding:24px 0}@media(max-width:1000px){.crm-kpis{grid-template-columns:repeat(2,1fr)}.crm-grid{grid-template-columns:1fr}}@media(max-width:600px){.crm-kpis{grid-template-columns:1fr}.crm-head{gap:15px}.crm-head .btn{width:100%;text-align:center}}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/crm-dashboard.css') }}?v=1">
+
+<div class="crm-page">
+    <header class="crm-hero">
+        <div>
+            <span class="crm-eyebrow">Relacionamento com clientes</span>
+            <h1>CRM</h1>
+            <p>Veja sua base, identifique oportunidades e mantenha seus clientes mais próximos.</p>
+        </div>
+
+        <div class="crm-hero-actions">
+            <a class="crm-btn crm-btn-light" href="{{ url_for('admin_crm_inteligencia') }}">Inteligência CRM</a>
+            <a class="crm-btn crm-btn-primary" href="{{ url_for('admin_novo_cliente') }}">+ Novo cliente</a>
+        </div>
+    </header>
+
+    <section class="crm-kpis" aria-label="Indicadores do CRM">
+        <article class="crm-kpi">
+            <div class="crm-kpi-head">
+                <span>Clientes cadastrados</span>
+                <span class="crm-kpi-icon">👥</span>
+            </div>
+            <strong>{{ indicadores.total_clientes or 0 }}</strong>
+            <div class="crm-kpi-foot">
+                <span class="crm-trend {% if variacao_novos < 0 %}is-negative{% endif %}">
+                    {% if variacao_novos > 0 %}↑{% elif variacao_novos < 0 %}↓{% else %}→{% endif %}
+                    {{ variacao_novos|abs }}%
+                </span>
+                <small>{{ indicadores.novos_30_dias or 0 }} novos em 30 dias</small>
+            </div>
+        </article>
+
+        <article class="crm-kpi">
+            <div class="crm-kpi-head">
+                <span>Clientes ativos</span>
+                <span class="crm-kpi-icon">✓</span>
+            </div>
+            <strong>{{ indicadores.ativos or 0 }}</strong>
+            <div class="crm-kpi-foot">
+                <small>Disponíveis para relacionamento</small>
+            </div>
+        </article>
+
+        <article class="crm-kpi">
+            <div class="crm-kpi-head">
+                <span>Clientes recorrentes</span>
+                <span class="crm-kpi-icon">↻</span>
+            </div>
+            <strong>{{ comportamento.recorrentes or 0 }}</strong>
+            <div class="crm-kpi-foot">
+                <small>Com 2 ou mais visitas concluídas</small>
+            </div>
+        </article>
+
+        <article class="crm-kpi crm-kpi-attention">
+            <div class="crm-kpi-head">
+                <span>Sem retornar há 60 dias</span>
+                <span class="crm-kpi-icon">!</span>
+            </div>
+            <strong>{{ comportamento.inativos_60_dias or 0 }}</strong>
+            <div class="crm-kpi-foot">
+                <small>Oportunidades de reativação</small>
+            </div>
+        </article>
+    </section>
+
+    <section class="crm-main-grid">
+        <article class="crm-card crm-chart-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Crescimento</span>
+                    <h2>Novos clientes</h2>
+                </div>
+                <div class="crm-chart-total">
+                    <strong>{{ indicadores.novos_30_dias or 0 }}</strong>
+                    <small>últimos 30 dias</small>
+                </div>
+            </div>
+
+            <div id="crmClientChart" class="crm-chart" data-labels='{{ grafico_clientes.labels|tojson }}' data-values='{{ grafico_clientes.valores|tojson }}'>
+                <div class="crm-chart-empty">Carregando gráfico...</div>
+            </div>
+        </article>
+
+        <article class="crm-card crm-insights-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Atenção necessária</span>
+                    <h2>Oportunidades de hoje</h2>
+                </div>
+                <a href="{{ url_for('admin_crm_inteligencia') }}">Ver inteligência</a>
+            </div>
+
+            <div class="crm-insights">
+                <a href="{{ url_for('admin_clientes', filtro='inativos') }}" class="crm-insight">
+                    <span class="crm-insight-icon">↩</span>
+                    <div>
+                        <strong>{{ comportamento.inativos_60_dias or 0 }} clientes para reativar</strong>
+                        <small>Sem visita concluída há pelo menos 60 dias</small>
+                    </div>
+                    <span class="crm-arrow">›</span>
+                </a>
+
+                <a href="{{ url_for('admin_clientes', filtro='aniversariantes') }}" class="crm-insight">
+                    <span class="crm-insight-icon">🎂</span>
+                    <div>
+                        <strong>{{ aniversariantes|length }} aniversariantes no mês</strong>
+                        <small>Uma boa oportunidade para uma mensagem especial</small>
+                    </div>
+                    <span class="crm-arrow">›</span>
+                </a>
+
+                <a href="{{ url_for('admin_clientes') }}" class="crm-insight">
+                    <span class="crm-insight-icon">☆</span>
+                    <div>
+                        <strong>{{ comportamento.sem_primeira_visita or 0 }} sem primeira visita</strong>
+                        <small>Clientes cadastrados que ainda não concluíram atendimento</small>
+                    </div>
+                    <span class="crm-arrow">›</span>
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <section class="crm-content-grid">
+        <article class="crm-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Base de clientes</span>
+                    <h2>Cadastros recentes</h2>
+                </div>
+                <a href="{{ url_for('admin_clientes') }}">Ver todos</a>
+            </div>
+
+            {% if recentes %}
+            <div class="crm-list">
+                {% for cliente in recentes %}
+                <a href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}" class="crm-list-item">
+                    <div class="crm-avatar">{{ cliente.nome[:1]|upper }}</div>
+                    <div class="crm-list-content">
+                        <div class="crm-list-title">
+                            <strong>{{ cliente.nome }}</strong>
+                            {% if cliente.recompensas_disponiveis %}<span class="crm-badge">Recompensa</span>{% endif %}
+                        </div>
+                        <span>{{ cliente.telefone }} · {{ cliente.atendimentos or 0 }} atendimento(s)</span>
+                    </div>
+                    <div class="crm-list-side">
+                        <small>{{ cliente.pontos_fidelidade or 0 }} pts</small>
+                        <time>{{ cliente.criado_em[8:10] }}/{{ cliente.criado_em[5:7] }}</time>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="crm-empty-state">
+                <span>👥</span>
+                <strong>Nenhum cliente cadastrado</strong>
+                <p>Cadastre o primeiro cliente para começar a construir seu relacionamento.</p>
+                <a class="crm-btn crm-btn-primary" href="{{ url_for('admin_novo_cliente') }}">Cadastrar cliente</a>
+            </div>
+            {% endif %}
+        </article>
+
+        <article class="crm-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Agenda</span>
+                    <h2>Próximos atendimentos</h2>
+                </div>
+                <a href="{{ url_for('admin_agenda') }}">Abrir agenda</a>
+            </div>
+
+            {% if proximos_agendamentos %}
+            <div class="crm-list">
+                {% for agendamento in proximos_agendamentos %}
+                <div class="crm-list-item crm-list-static">
+                    <div class="crm-date-box">
+                        <strong>{{ agendamento.data[8:10] }}</strong>
+                        <span>{{ agendamento.data[5:7] }}</span>
+                    </div>
+                    <div class="crm-list-content">
+                        <strong>{{ agendamento.cliente_nome }}</strong>
+                        <span>{{ agendamento.servico_nome or 'Serviço' }}{% if agendamento.funcionario_nome %} · {{ agendamento.funcionario_nome }}{% endif %}</span>
+                    </div>
+                    <div class="crm-list-side">
+                        <strong>{{ agendamento.hora[:5] }}</strong>
+                        <small>{{ agendamento.status|capitalize }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="crm-empty-state compact">
+                <span>📅</span>
+                <strong>Nenhum atendimento futuro</strong>
+                <p>Os próximos agendamentos aparecerão aqui.</p>
+            </div>
+            {% endif %}
+        </article>
+    </section>
+
+    <section class="crm-content-grid crm-secondary-grid">
+        <article class="crm-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Relacionamento</span>
+                    <h2>Aniversariantes do mês</h2>
+                </div>
+                <a href="{{ url_for('admin_clientes', filtro='aniversariantes') }}">Ver lista</a>
+            </div>
+
+            {% if aniversariantes %}
+            <div class="crm-list">
+                {% for cliente in aniversariantes %}
+                <a href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}" class="crm-list-item">
+                    <div class="crm-avatar crm-avatar-birthday">🎂</div>
+                    <div class="crm-list-content">
+                        <strong>{{ cliente.nome }}</strong>
+                        <span>{{ cliente.telefone }}</span>
+                    </div>
+                    <div class="crm-list-side">
+                        <time>{{ cliente.data_nascimento[8:10] }}/{{ cliente.data_nascimento[5:7] }}</time>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="crm-empty-state compact">
+                <span>🎂</span>
+                <strong>Nenhum aniversariante neste mês</strong>
+                <p>Cadastre datas de nascimento para aproveitar esta oportunidade.</p>
+            </div>
+            {% endif %}
+        </article>
+
+        <article class="crm-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Reativação</span>
+                    <h2>Clientes sem retornar</h2>
+                </div>
+                <a href="{{ url_for('admin_crm_inteligencia') }}">Planejar ação</a>
+            </div>
+
+            {% if oportunidades %}
+            <div class="crm-list">
+                {% for cliente in oportunidades %}
+                <a href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}" class="crm-list-item">
+                    <div class="crm-avatar crm-avatar-warning">!</div>
+                    <div class="crm-list-content">
+                        <strong>{{ cliente.nome }}</strong>
+                        <span>Última visita em {{ cliente.ultima_visita[8:10] }}/{{ cliente.ultima_visita[5:7] }}/{{ cliente.ultima_visita[:4] }}</span>
+                    </div>
+                    <div class="crm-list-side">
+                        <strong>{{ cliente.dias_sem_visita }} dias</strong>
+                        <small>sem retornar</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="crm-empty-state compact success">
+                <span>✓</span>
+                <strong>Nenhum cliente em atraso</strong>
+                <p>Sua base não possui clientes há mais de 60 dias sem retornar.</p>
+            </div>
+            {% endif %}
+        </article>
+
+        <article class="crm-card">
+            <div class="crm-card-header">
+                <div>
+                    <span>Fidelidade</span>
+                    <h2>Próximos da recompensa</h2>
+                </div>
+                <a href="{{ url_for('admin_fidelidade') }}">Abrir fidelidade</a>
+            </div>
+
+            {% if proximos_recompensa %}
+            <div class="crm-list">
+                {% for cliente in proximos_recompensa %}
+                <a href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}" class="crm-list-item">
+                    <div class="crm-avatar crm-avatar-reward">★</div>
+                    <div class="crm-list-content">
+                        <strong>{{ cliente.nome }}</strong>
+                        <div class="crm-progress"><span data-progress="{{ ((cliente.pontos_fidelidade or 0) * 100 / meta_recompensa)|round|int if meta_recompensa else 0 }}"></span></div>
+                    </div>
+                    <div class="crm-list-side">
+                        <strong>{{ cliente.pontos_fidelidade or 0 }}/{{ meta_recompensa }}</strong>
+                        <small>faltam {{ cliente.faltam }} pts</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="crm-empty-state compact">
+                <span>★</span>
+                <strong>Nenhum cliente próximo</strong>
+                <p>{% if meta_recompensa %}Os clientes próximos da recompensa aparecerão aqui.{% else %}Cadastre uma recompensa ativa no módulo Fidelidade.{% endif %}</p>
+            </div>
+            {% endif %}
+        </article>
+    </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/crm-dashboard.js') }}?v=1"></script>
 {% endblock %}

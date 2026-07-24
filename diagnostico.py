@@ -27,6 +27,10 @@ ARQUIVOS_OBRIGATORIOS = [
     "database.py",
     "requirements.txt",
     "routes/relatorios.py",
+    "routes/crm_inteligencia.py",
+    "templates/admin/fidelidade.html",
+    "static/css/fidelidade.css",
+    "static/js/fidelidade.js",
     "static/js/agenda.js",
     "static/css/agenda-premium.css",
     "templates/admin/agenda.html",
@@ -76,6 +80,20 @@ def verificar_flask() -> None:
     regras = list(flask_app.url_map.iter_rules())
     if not regras:
         falhar("Nenhuma rota Flask foi registrada.")
+
+    rotas_registradas = {regra.rule for regra in regras}
+    rotas_criticas = {
+        "/admin",
+        "/admin/agenda",
+        "/admin/clientes",
+        "/admin/fidelidade",
+        "/admin/crm/inteligencia",
+        "/admin/relatorios",
+        "/master",
+    }
+    ausentes = sorted(rotas_criticas - rotas_registradas)
+    if ausentes:
+        falhar("Rotas críticas não registradas: " + ", ".join(ausentes))
 
     with flask_app.test_client() as client:
         resposta = client.get("/static/js/agenda.js")

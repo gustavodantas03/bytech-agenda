@@ -205,7 +205,7 @@
             {% if tem_recurso and tem_recurso('crm') %}
             <a
                 class="admin-nav-link
-                {% if request.endpoint in ['admin_crm_dashboard', 'admin_clientes', 'admin_novo_cliente', 'admin_editar_cliente'] %}
+                {% if request.endpoint in ['admin_crm_dashboard', 'admin_clientes', 'admin_novo_cliente', 'admin_editar_cliente', 'admin_perfil_cliente', 'admin_crm_inteligencia', 'admin_crm_configuracoes', 'admin_crm_nova_campanha'] %}
                     active
                 {% endif %}"
                 href="{{ url_for('admin_crm_dashboard') }}"

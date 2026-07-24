@@ -1,0 +1,30 @@
+BYTECH AGENDA — SPRINT 0.1 AUDITORIA URGENTE
+
+CORREÇÕES APLICADAS
+- Registrado o módulo routes/crm_inteligencia.py no app.py.
+  Sem essa importação, as rotas /admin/crm/inteligencia e
+  /admin/crm/inteligencia/configuracoes não eram carregadas ao iniciar o Flask.
+- Diagnóstico ampliado para validar os arquivos do módulo de Fidelidade.
+- Diagnóstico ampliado para confirmar as rotas críticas do Admin, CRM,
+  Fidelidade, Relatórios e Painel Master.
+- Removidos do pacote de entrega os diretórios __pycache__, arquivos .pyc
+  e o repositório .git, reduzindo lixo e evitando conflitos ao copiar o projeto.
+
+VALIDAÇÕES REALIZADAS
+- Compilação estática de todos os arquivos Python: aprovada.
+- Verificação de endpoints usados nos templates: nenhum url_for sem função correspondente.
+- Verificação de módulos de rotas não importados: corrigido crm_inteligencia.
+- Integridade do ZIP final: aprovada.
+
+OBSERVAÇÃO SOBRE O TESTE COMPLETO
+O ambiente de geração não teve acesso ao índice de pacotes Python para instalar
+Flask e Werkzeug. Por isso, o teste de inicialização HTTP deve ser executado na
+sua máquina pelo arquivo VERIFICAR-SISTEMA-WINDOWS.bat. O diagnóstico agora
+interrompe com mensagem clara caso alguma rota crítica não seja carregada.
+
+COMO INSTALAR
+1. Faça backup da pasta atual e do banco database/bytech_agenda.db.
+2. Extraia este ZIP.
+3. Execute VERIFICAR-SISTEMA-WINDOWS.bat.
+4. Se tudo aparecer como [OK], execute INSTALAR-E-EXECUTAR-WINDOWS.bat.
+5. Teste especialmente: CRM > Inteligência e Fidelidade.

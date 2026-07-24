@@ -57,8 +57,11 @@ def admin_crm_dashboard():
         SELECT
             COUNT(*) AS total_clientes,
             SUM(CASE WHEN COALESCE(ativo, 1) = 1 THEN 1 ELSE 0 END) AS ativos,
-            SUM(CASE WHEN criado_em >= date('now', '-30 days') THEN 1 ELSE 0 END) AS novos_30_dias,
-            SUM(CASE WHEN data_nascimento IS NOT NULL AND substr(data_nascimento, 5, 6) = ? THEN 1 ELSE 0 END) AS aniversariantes_hoje
+            SUM(CASE WHEN date(criado_em) >= date('now', '-30 days') THEN 1 ELSE 0 END) AS novos_30_dias,
+            SUM(CASE WHEN date(criado_em) >= date('now', '-60 days')
+                      AND date(criado_em) < date('now', '-30 days') THEN 1 ELSE 0 END) AS novos_periodo_anterior,
+            SUM(CASE WHEN data_nascimento IS NOT NULL
+                      AND substr(data_nascimento, 5, 6) = ? THEN 1 ELSE 0 END) AS aniversariantes_hoje
         FROM clientes
         WHERE empresa_id = ?
         """,
@@ -70,6 +73,7 @@ def admin_crm_dashboard():
         SELECT
             COUNT(*) AS clientes_com_visita,
             SUM(CASE WHEN ultima_visita < ? THEN 1 ELSE 0 END) AS inativos_60_dias,
+            SUM(CASE WHEN ultima_visita IS NULL THEN 1 ELSE 0 END) AS sem_primeira_visita,
             SUM(CASE WHEN total_concluidos >= 2 THEN 1 ELSE 0 END) AS recorrentes,
             COALESCE(SUM(total_gasto), 0) AS receita_clientes,
             COALESCE(AVG(CASE WHEN total_concluidos > 0 THEN total_gasto / total_concluidos END), 0) AS ticket_medio
@@ -89,7 +93,8 @@ def admin_crm_dashboard():
 
     recentes = conn.execute(
         """
-        SELECT c.id, c.nome, c.telefone, c.criado_em,
+        SELECT c.id, c.nome, c.telefone, c.criado_em, c.pontos_fidelidade,
+               c.recompensas_disponiveis,
                COUNT(CASE WHEN a.status IN ('finalizado','concluido') THEN 1 END) AS atendimentos,
                MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) AS ultima_visita
         FROM clientes c
@@ -97,7 +102,7 @@ def admin_crm_dashboard():
         WHERE c.empresa_id = ?
         GROUP BY c.id
         ORDER BY c.criado_em DESC
-        LIMIT 8
+        LIMIT 6
         """,
         (empresa_id,),
     ).fetchall()
@@ -110,11 +115,113 @@ def admin_crm_dashboard():
           AND data_nascimento IS NOT NULL
           AND substr(data_nascimento, 6, 2) = strftime('%m', 'now')
         ORDER BY substr(data_nascimento, 9, 2), nome COLLATE NOCASE
-        LIMIT 10
+        LIMIT 6
         """,
         (empresa_id,),
     ).fetchall()
+
+    proximos_agendamentos = conn.execute(
+        """
+        SELECT a.id, a.data, a.hora, a.status,
+               COALESCE(c.id, a.cliente_id) AS cliente_id,
+               COALESCE(c.nome, a.cliente_nome) AS cliente_nome,
+               COALESCE(c.telefone, a.cliente_telefone) AS cliente_telefone,
+               s.nome AS servico_nome,
+               f.nome AS funcionario_nome
+        FROM agendamentos a
+        LEFT JOIN clientes c ON c.id = a.cliente_id
+        LEFT JOIN servicos s ON s.id = a.servico_id
+        LEFT JOIN funcionarios f ON f.id = a.funcionario_id
+        WHERE a.empresa_id = ?
+          AND a.status NOT IN ('cancelado','faltou','finalizado','concluido')
+          AND datetime(a.data || ' ' || a.hora) >= datetime('now', 'localtime')
+        ORDER BY a.data, a.hora
+        LIMIT 6
+        """,
+        (empresa_id,),
+    ).fetchall()
+
+    oportunidades = conn.execute(
+        """
+        SELECT c.id, c.nome, c.telefone, c.pontos_fidelidade,
+               c.recompensas_disponiveis,
+               MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) AS ultima_visita,
+               CAST(julianday('now') - julianday(MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END)) AS INTEGER) AS dias_sem_visita
+        FROM clientes c
+        LEFT JOIN agendamentos a ON a.cliente_id = c.id
+        WHERE c.empresa_id = ? AND COALESCE(c.ativo,1) = 1
+        GROUP BY c.id
+        HAVING ultima_visita IS NOT NULL AND ultima_visita < ?
+        ORDER BY dias_sem_visita DESC
+        LIMIT 5
+        """,
+        (empresa_id, limite_inativo),
+    ).fetchall()
+
+    crescimento = conn.execute(
+        """
+        WITH RECURSIVE meses(n, inicio) AS (
+            SELECT 5, date('now', 'start of month', '-5 months')
+            UNION ALL
+            SELECT n - 1, date(inicio, '+1 month') FROM meses WHERE n > 0
+        )
+        SELECT strftime('%m', inicio) AS mes_numero,
+               strftime('%Y-%m', inicio) AS chave,
+               COUNT(c.id) AS total
+        FROM meses
+        LEFT JOIN clientes c
+          ON c.empresa_id = ?
+         AND strftime('%Y-%m', c.criado_em) = strftime('%Y-%m', inicio)
+        GROUP BY inicio
+        ORDER BY inicio
+        """,
+        (empresa_id,),
+    ).fetchall()
+
+    menor_recompensa = conn.execute(
+        """SELECT MIN(pontos_necessarios) AS pontos
+           FROM fidelidade_recompensas
+           WHERE empresa_id=? AND ativo=1""",
+        (empresa_id,),
+    ).fetchone()
+    meta_recompensa = int(menor_recompensa["pontos"] or 0) if menor_recompensa else 0
+
+    proximos_recompensa = []
+    if meta_recompensa > 0:
+        proximos_recompensa = conn.execute(
+            """
+            SELECT id,nome,telefone,pontos_fidelidade,
+                   (? - pontos_fidelidade) AS faltam
+            FROM clientes
+            WHERE empresa_id=? AND COALESCE(ativo,1)=1
+              AND pontos_fidelidade < ?
+              AND pontos_fidelidade >= MAX(0, ? - 20)
+            ORDER BY faltam, nome COLLATE NOCASE
+            LIMIT 5
+            """,
+            (meta_recompensa, empresa_id, meta_recompensa, meta_recompensa),
+        ).fetchall()
+
     conn.close()
+
+    novos_atual = int(indicadores["novos_30_dias"] or 0)
+    novos_anterior = int(indicadores["novos_periodo_anterior"] or 0)
+    if novos_anterior > 0:
+        variacao_novos = round(((novos_atual - novos_anterior) / novos_anterior) * 100)
+    elif novos_atual > 0:
+        variacao_novos = 100
+    else:
+        variacao_novos = 0
+
+    meses_pt = {
+        "01": "Jan", "02": "Fev", "03": "Mar", "04": "Abr",
+        "05": "Mai", "06": "Jun", "07": "Jul", "08": "Ago",
+        "09": "Set", "10": "Out", "11": "Nov", "12": "Dez",
+    }
+    grafico_clientes = {
+        "labels": [meses_pt.get(item["mes_numero"], item["mes_numero"]) for item in crescimento],
+        "valores": [int(item["total"] or 0) for item in crescimento],
+    }
 
     return render_template(
         "admin/crm_dashboard.html",
@@ -122,6 +229,13 @@ def admin_crm_dashboard():
         comportamento=comportamento,
         recentes=recentes,
         aniversariantes=aniversariantes,
+        proximos_agendamentos=proximos_agendamentos,
+        oportunidades=oportunidades,
+        proximos_recompensa=proximos_recompensa,
+        meta_recompensa=meta_recompensa,
+        variacao_novos=variacao_novos,
+        grafico_clientes=grafico_clientes,
+        hoje=hoje.isoformat(),
     )
 
 
@@ -132,7 +246,12 @@ def admin_clientes():
     empresa_id = session["empresa_id"]
     busca = request.args.get("q", "").strip()
     filtro = request.args.get("filtro", "todos").strip().lower()
-    filtros_validos = {"todos", "ativos", "inativos", "vip", "recompensas", "aniversariantes"}
+    pagina = max(request.args.get("pagina", 1, type=int) or 1, 1)
+    por_pagina = 12
+    filtros_validos = {
+        "todos", "ativos", "inativos", "vip", "recompensas",
+        "aniversariantes", "com_pontos", "sem_retorno"
+    }
     if filtro not in filtros_validos:
         filtro = "todos"
 
@@ -142,8 +261,15 @@ def admin_clientes():
 
     if busca:
         telefone_busca = normalizar_telefone(busca)
-        condicoes.append("(LOWER(c.nome) LIKE LOWER(?) OR c.telefone LIKE ? OR LOWER(COALESCE(c.email,'')) LIKE LOWER(?) OR LOWER(COALESCE(c.instagram,'')) LIKE LOWER(?))")
-        parametros.extend([f"%{busca}%", f"%{telefone_busca or busca}%", f"%{busca}%", f"%{busca}%"])
+        condicoes.append(
+            "(LOWER(c.nome) LIKE LOWER(?) OR c.telefone LIKE ? "
+            "OR LOWER(COALESCE(c.email,'')) LIKE LOWER(?) "
+            "OR LOWER(COALESCE(c.instagram,'')) LIKE LOWER(?))"
+        )
+        parametros.extend([
+            f"%{busca}%", f"%{telefone_busca or busca}%",
+            f"%{busca}%", f"%{busca}%"
+        ])
 
     if filtro == "ativos":
         condicoes.append("COALESCE(c.ativo,1) = 1")
@@ -154,36 +280,88 @@ def admin_clientes():
     elif filtro == "recompensas":
         condicoes.append("c.recompensas_disponiveis > 0")
     elif filtro == "aniversariantes":
-        condicoes.append("c.data_nascimento IS NOT NULL AND substr(c.data_nascimento, 6, 2) = strftime('%m','now')")
+        condicoes.append(
+            "c.data_nascimento IS NOT NULL "
+            "AND substr(c.data_nascimento, 6, 2) = strftime('%m','now','localtime')"
+        )
+    elif filtro == "com_pontos":
+        condicoes.append("COALESCE(c.pontos_fidelidade,0) > 0")
+    elif filtro == "sem_retorno":
+        condicoes.append(
+            "NOT EXISTS (SELECT 1 FROM agendamentos ax "
+            "WHERE ax.cliente_id=c.id AND ax.status IN ('finalizado','concluido') "
+            "AND date(ax.data) >= date('now','localtime','-60 days'))"
+        )
 
     where_sql = " AND ".join(condicoes)
+    total_filtrado = conn.execute(
+        f"SELECT COUNT(*) AS total FROM clientes c WHERE {where_sql}",
+        tuple(parametros),
+    ).fetchone()["total"]
+
+    total_paginas = max((total_filtrado + por_pagina - 1) // por_pagina, 1)
+    pagina = min(pagina, total_paginas)
+    offset = (pagina - 1) * por_pagina
+
     clientes = conn.execute(
         f"""
         SELECT c.*,
-               SUM(CASE WHEN a.status IN ('finalizado','concluido') THEN 1 ELSE 0 END) AS total_concluidos,
+               COALESCE(SUM(CASE WHEN a.status IN ('finalizado','concluido') THEN 1 ELSE 0 END),0) AS total_concluidos,
                MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) AS ultima_visita,
-               SUM(CASE WHEN a.status IN ('finalizado','concluido') THEN COALESCE(a.valor_total,0) ELSE 0 END) AS total_gasto
+               COALESCE(SUM(CASE WHEN a.status IN ('finalizado','concluido') THEN COALESCE(a.valor_total,0) ELSE 0 END),0) AS total_gasto,
+               MIN(CASE WHEN a.status IN ('agendado','confirmado')
+                         AND datetime(a.data || ' ' || a.hora) >= datetime('now','localtime')
+                        THEN a.data || ' ' || a.hora END) AS proximo_agendamento
         FROM clientes c
-        LEFT JOIN agendamentos a ON a.cliente_id = c.id
+        LEFT JOIN agendamentos a ON a.cliente_id = c.id AND a.empresa_id = c.empresa_id
         WHERE {where_sql}
         GROUP BY c.id
-        ORDER BY COALESCE(c.ativo,1) DESC, c.recompensas_disponiveis DESC, c.pontos_fidelidade DESC, c.nome COLLATE NOCASE
+        ORDER BY COALESCE(c.ativo,1) DESC,
+                 CASE WHEN proximo_agendamento IS NOT NULL THEN 0 ELSE 1 END,
+                 proximo_agendamento,
+                 c.recompensas_disponiveis DESC,
+                 c.pontos_fidelidade DESC,
+                 c.nome COLLATE NOCASE
+        LIMIT ? OFFSET ?
         """,
-        tuple(parametros),
+        tuple(parametros + [por_pagina, offset]),
     ).fetchall()
 
     resumo = conn.execute(
         """
         SELECT COUNT(*) AS total_clientes,
                SUM(CASE WHEN COALESCE(ativo,1)=1 THEN 1 ELSE 0 END) AS total_ativos,
+               SUM(CASE WHEN date(criado_em) >= date('now','localtime','start of month') THEN 1 ELSE 0 END) AS novos_mes,
                SUM(CASE WHEN pontos_fidelidade >= 7 OR recompensas_disponiveis > 0 THEN 1 ELSE 0 END) AS total_vip,
+               COALESCE(SUM(pontos_fidelidade),0) AS pontos_distribuidos,
                COALESCE(SUM(recompensas_disponiveis),0) AS recompensas_pendentes
         FROM clientes WHERE empresa_id = ?
         """,
         (empresa_id,),
     ).fetchone()
+
+    financeiro = conn.execute(
+        """
+        SELECT COALESCE(AVG(valor_total),0) AS ticket_medio
+        FROM agendamentos
+        WHERE empresa_id=? AND status IN ('finalizado','concluido')
+        """,
+        (empresa_id,),
+    ).fetchone()
+
     conn.close()
-    return render_template("admin/clientes.html", clientes=clientes, resumo=resumo, busca=busca, filtro=filtro)
+    return render_template(
+        "admin/clientes.html",
+        clientes=clientes,
+        resumo=resumo,
+        ticket_medio=financeiro["ticket_medio"] or 0,
+        busca=busca,
+        filtro=filtro,
+        pagina=pagina,
+        por_pagina=por_pagina,
+        total_filtrado=total_filtrado,
+        total_paginas=total_paginas,
+    )
 
 
 @app.route("/admin/clientes/novo", methods=["GET", "POST"])

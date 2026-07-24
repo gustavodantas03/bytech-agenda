@@ -14,6 +14,7 @@ from routes import servicos  # noqa: F401
 from routes import funcionarios  # noqa: F401
 from routes import agenda  # noqa: F401
 from routes import relatorios  # noqa: F401
+from routes import crm_inteligencia  # noqa: F401
 
 
 if __name__ == "__main__":

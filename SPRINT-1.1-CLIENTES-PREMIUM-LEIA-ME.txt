@@ -1,0 +1,27 @@
+BYTECH AGENDA — SPRINT 1.1 — LISTA PREMIUM DE CLIENTES
+
+Implementado:
+- KPIs: total, ativos, novos do mês, ticket médio, pontos e recompensas.
+- Busca por nome, WhatsApp, e-mail e Instagram.
+- Filtros: ativos, inativos, destaques, recompensas, pontos, aniversariantes e sem retorno.
+- Paginação com 12 clientes por página.
+- Próximo agendamento e última visita por cliente.
+- Total gasto e atendimentos concluídos.
+- Ações para WhatsApp, perfil e edição.
+- Fidelidade com barra de progresso.
+- CSS e JavaScript separados do template.
+- Layout responsivo.
+
+Arquivos alterados:
+- routes/clientes.py
+- templates/admin/clientes.html
+
+Arquivos adicionados:
+- static/css/clientes-premium.css
+- static/js/clientes-premium.js
+
+Validação recomendada:
+1. Execute VERIFICAR-SISTEMA-WINDOWS.bat.
+2. Abra CRM > Clientes.
+3. Teste busca, filtros, paginação, WhatsApp, perfil e edição.
+4. Atualize o navegador com Ctrl + F5.
