@@ -1,96 +1,248 @@
 {% extends "admin/base.html" %}
 {% block title %}{{ cliente.nome }} | CRM Bytech Agenda{% endblock %}
+
 {% block content %}
-<header class="page-header crm-profile-header">
-  <div class="crm-profile-title">
-    <div class="crm-profile-avatar">{{ cliente.nome[0]|upper }}</div>
-    <div><span>Visão 360º do cliente</span><h1>{{ cliente.nome }}</h1><p class="page-subtitle">{{ cliente.telefone }}{% if cliente.instagram %} · {{ cliente.instagram }}{% endif %}</p></div>
-  </div>
-  <div class="crm-profile-actions"><a class="btn btn-secondary" href="{{ url_for('admin_clientes') }}">Voltar</a><a class="btn btn-primary" href="{{ url_for('admin_editar_cliente', cliente_id=cliente.id) }}">Editar cadastro</a></div>
-</header>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cliente-perfil-premium.css') }}">
 
-<section class="crm-profile-kpis">
-  <article><span>Atendimentos concluídos</span><strong>{{ resumo.atendimentos or 0 }}</strong><small>{{ classificacao }}</small></article>
-  <article><span>Total gasto</span><strong>R$ {{ '%.2f'|format(resumo.total_gasto or 0)|replace('.', ',') }}</strong><small>Histórico concluído</small></article>
-  <article><span>Ticket médio</span><strong>R$ {{ '%.2f'|format(resumo.ticket_medio or 0)|replace('.', ',') }}</strong><small>Por atendimento</small></article>
-  <article><span>Frequência média</span><strong>{% if frequencia_dias %}{{ frequencia_dias }} dias{% else %}—{% endif %}</strong><small>Intervalo entre visitas</small></article>
-</section>
-
-<section class="crm-profile-grid">
-  <article class="panel crm-info-card">
-    <div class="panel-header"><div><span>Relacionamento</span><h2>Informações do cliente</h2></div></div>
-    <dl class="crm-info-list">
-      <div><dt>E-mail</dt><dd>{{ cliente.email or 'Não informado' }}</dd></div>
-      <div><dt>Nascimento</dt><dd>{{ data_br(cliente.data_nascimento) or 'Não informado' }}</dd></div>
-      <div><dt>Cliente desde</dt><dd>{{ data_br(cliente.criado_em) or '—' }}</dd></div>
-      <div><dt>Última visita</dt><dd>{{ data_br(resumo.ultima_visita) or 'Ainda não realizou' }}</dd></div>
-      <div><dt>Próximo agendamento</dt><dd>{% if resumo.proximo_agendamento %}{{ data_br(resumo.proximo_agendamento) }} às {{ resumo.proximo_horario }}{% else %}Nenhum agendado{% endif %}</dd></div>
-      <div><dt>Status</dt><dd><span class="crm-classification">{{ classificacao }}</span></dd></div>
-      <div><dt>Serviço favorito</dt><dd>{{ favorito_servico.nome if favorito_servico else 'Sem dados suficientes' }}</dd></div>
-      <div><dt>Profissional favorito</dt><dd>{{ favorito_profissional.nome if favorito_profissional else 'Sem dados suficientes' }}</dd></div>
-    </dl>
-  </article>
-
-  <article class="panel crm-notes-card">
-    <div class="panel-header"><div><span>Uso interno</span><h2>Observações</h2></div></div>
-    <form method="post" action="{{ url_for('admin_salvar_observacoes_cliente', cliente_id=cliente.id) }}">
-      <textarea name="observacoes" rows="9" maxlength="2000" placeholder="Preferências, alergias, horários preferidos e outras informações úteis.">{{ cliente.observacoes or '' }}</textarea>
-      <div class="form-actions"><button class="btn btn-primary" type="submit">Salvar observações</button></div>
-    </form>
-  </article>
-</section>
-
-<section class="panel loyalty-client-panel">
-  <div class="panel-header"><div><span>Programa de fidelidade</span><h2>Saldo e recompensas</h2></div><a class="btn btn-secondary" href="{{ url_for('admin_fidelidade') }}">Configurar programa</a></div>
-  <div class="loyalty-client-grid">
-    <div class="loyalty-balance"><span>Saldo atual</span><strong>{{ cliente.pontos_fidelidade or 0 }}</strong><small>pontos disponíveis</small></div>
-    <form method="post" action="{{ url_for('admin_ajuste_pontos', cliente_id=cliente.id) }}" class="loyalty-inline-form">
-      <h3>Ajuste manual</h3><label>Pontos (+ ou -)<input required type="number" name="quantidade" placeholder="Ex.: 10 ou -5"></label><label>Motivo<input name="descricao" maxlength="200" placeholder="Bônus, correção..."></label><button class="btn btn-primary" type="submit">Aplicar ajuste</button>
-    </form>
-    <form method="post" action="{{ url_for('admin_resgatar_recompensa', cliente_id=cliente.id) }}" class="loyalty-inline-form">
-      <h3>Resgatar recompensa</h3><label>Recompensa<select name="recompensa_id" required><option value="">Selecione</option>{% for r in recompensas_fidelidade %}<option value="{{ r.id }}">{{ r.nome }} · {{ r.pontos_necessarios }} pts</option>{% endfor %}</select></label><label>Observação<input name="observacoes" maxlength="300"></label><button class="btn btn-primary" type="submit" {% if not recompensas_fidelidade %}disabled{% endif %}>Confirmar resgate</button>{% if not recompensas_fidelidade %}<small>Nenhuma recompensa disponível para o saldo atual.</small>{% endif %}
-    </form>
-  </div>
-  {% if movimentos_fidelidade %}<div class="loyalty-mini-history"><h3>Últimas movimentações</h3>{% for m in movimentos_fidelidade %}<div><span>{{ m.descricao or m.tipo|title }}</span><strong class="{{ 'points-positive' if m.quantidade > 0 else 'points-negative' }}">{{ '+' if m.quantidade > 0 else '' }}{{ m.quantidade }} pts</strong></div>{% endfor %}</div>{% endif %}
-</section>
-
-{% if evolucao %}
-<section class="panel crm-evolution-panel">
-  <div class="panel-header"><div><span>Últimos 12 meses</span><h2>Evolução do relacionamento</h2></div></div>
-  {% set maior = evolucao|map(attribute='total')|max or 1 %}
-  <div class="crm-evolution-bars">
-    {% for item in evolucao %}
-    <div class="crm-month-column" title="{{ item.atendimentos }} atendimento(s) · R$ {{ '%.2f'|format(item.total)|replace('.', ',') }}">
-      <div class="crm-month-value">R$ {{ '%.0f'|format(item.total) }}</div>
-      <div class="crm-month-bar"><i style="height:{{ ((item.total / maior) * 100)|round|int }}%"></i></div>
-      <span>{{ item.mes[5:7] }}/{{ item.mes[2:4] }}</span>
-    </div>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
-
-<section class="panel crm-history-panel">
-  <div class="panel-header"><div><span>Agenda e atendimentos</span><h2>Histórico do cliente</h2></div><strong>{{ historico|length }} registro(s)</strong></div>
-  <form method="get" class="crm-history-filters">
-    <label>Status<select name="status"><option value="todos">Todos</option>{% for valor,rotulo in [('agendado','Agendado'),('confirmado','Confirmado'),('concluido','Concluído'),('finalizado','Finalizado'),('cancelado','Cancelado'),('faltou','Faltou')] %}<option value="{{ valor }}" {% if filtros.status==valor %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></label>
-    <label>Serviço<select name="servico_id"><option value="">Todos</option>{% for item in servicos %}<option value="{{ item.id }}" {% if filtros.servico_id==item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
-    <label>Profissional<select name="funcionario_id"><option value="">Todos</option>{% for item in profissionais %}<option value="{{ item.id }}" {% if filtros.funcionario_id==item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
-    <label>De<input type="date" name="data_inicio" value="{{ filtros.data_inicio }}"></label>
-    <label>Até<input type="date" name="data_fim" value="{{ filtros.data_fim }}"></label>
-    <div class="crm-filter-actions"><a class="btn btn-secondary" href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}">Limpar</a><button class="btn btn-primary" type="submit">Filtrar</button></div>
-  </form>
-
-  {% if historico %}<div class="crm-timeline">
-    {% for item in historico %}
-    <article class="crm-timeline-item">
-      <div class="crm-timeline-marker"></div>
-      <div class="crm-timeline-card">
-        <div class="crm-timeline-top"><div><strong>{{ item.servicos_nomes or 'Serviço não informado' }}</strong><span>{{ data_br(item.data) }} às {{ item.hora }}</span></div><span class="crm-status crm-status-{{ item.status }}">{{ item.status|replace('_',' ')|title }}</span></div>
-        <div class="crm-timeline-meta"><span>Profissional: <b>{{ item.profissional_nome or 'Não definido' }}</b></span><span>Duração: <b>{{ item.duracao_total or 0 }} min</b></span><span>Valor: <b>R$ {{ '%.2f'|format(item.valor_total or 0)|replace('.', ',') }}</b></span></div>
+<div class="customer-profile-page">
+  <header class="customer-hero">
+    <div class="customer-identity">
+      <div class="customer-avatar">{{ cliente.nome[0]|upper }}</div>
+      <div>
+        <span class="customer-eyebrow">Visão 360º do cliente</span>
+        <h1>{{ cliente.nome }}</h1>
+        <div class="customer-contact-line">
+          <span>{{ cliente.telefone }}</span>
+          {% if cliente.instagram %}<span>{{ cliente.instagram }}</span>{% endif %}
+          {% if cliente.email %}<span>{{ cliente.email }}</span>{% endif %}
+        </div>
+        <div class="customer-badges">
+          <span class="customer-tag">{{ classificacao }}</span>
+          <span class="customer-tag customer-tag-muted">Cliente desde {{ data_br(cliente.criado_em) or '—' }}</span>
+        </div>
       </div>
+    </div>
+
+    <div class="customer-actions">
+      <a class="btn btn-secondary" href="{{ url_for('admin_clientes') }}">Voltar</a>
+      <button class="btn btn-secondary js-whatsapp" type="button" data-phone="{{ cliente.telefone }}">WhatsApp</button>
+      <a class="btn btn-secondary" href="{{ url_for('novo_agendamento') }}">Agendar</a>
+      <a class="btn btn-primary" href="{{ url_for('admin_editar_cliente', cliente_id=cliente.id) }}">Editar cadastro</a>
+    </div>
+  </header>
+
+  <section class="customer-kpis">
+    <article>
+      <span>Atendimentos</span>
+      <strong>{{ resumo.atendimentos or 0 }}</strong>
+      <small>Concluídos no histórico</small>
     </article>
-    {% endfor %}
-  </div>{% else %}<div class="crm-empty-history"><strong>Nenhum registro encontrado</strong><span>Ajuste os filtros ou aguarde o primeiro agendamento deste cliente.</span></div>{% endif %}
-</section>
+    <article>
+      <span>Total gasto</span>
+      <strong>R$ {{ '%.2f'|format(resumo.total_gasto or 0)|replace('.', ',') }}</strong>
+      <small>Receita gerada</small>
+    </article>
+    <article>
+      <span>Ticket médio</span>
+      <strong>R$ {{ '%.2f'|format(resumo.ticket_medio or 0)|replace('.', ',') }}</strong>
+      <small>Por atendimento</small>
+    </article>
+    <article>
+      <span>Frequência média</span>
+      <strong>{% if frequencia_dias %}{{ frequencia_dias }} dias{% else %}—{% endif %}</strong>
+      <small>Intervalo entre visitas</small>
+    </article>
+    <article class="customer-kpi-highlight">
+      <span>Pontos disponíveis</span>
+      <strong>{{ cliente.pontos_fidelidade or 0 }}</strong>
+      <small>Saldo de fidelidade</small>
+    </article>
+  </section>
+
+  <section class="customer-main-grid">
+    <div class="customer-column customer-column-wide">
+      <article class="customer-panel">
+        <div class="customer-panel-header">
+          <div>
+            <span>Relacionamento</span>
+            <h2>Resumo do cliente</h2>
+          </div>
+        </div>
+
+        <div class="customer-summary-grid">
+          <div><span>E-mail</span><strong>{{ cliente.email or 'Não informado' }}</strong></div>
+          <div><span>Data de nascimento</span><strong>{{ data_br(cliente.data_nascimento) or 'Não informado' }}</strong></div>
+          <div><span>Última visita</span><strong>{{ data_br(resumo.ultima_visita) or 'Ainda não realizou' }}</strong></div>
+          <div><span>Próximo agendamento</span><strong>{% if resumo.proximo_agendamento %}{{ data_br(resumo.proximo_agendamento) }} às {{ resumo.proximo_horario }}{% else %}Nenhum agendado{% endif %}</strong></div>
+          <div><span>Serviço favorito</span><strong>{{ favorito_servico.nome if favorito_servico else 'Sem dados suficientes' }}</strong></div>
+          <div><span>Profissional favorito</span><strong>{{ favorito_profissional.nome if favorito_profissional else 'Sem dados suficientes' }}</strong></div>
+        </div>
+      </article>
+
+      {% if evolucao %}
+      <article class="customer-panel">
+        <div class="customer-panel-header">
+          <div>
+            <span>Últimos 12 meses</span>
+            <h2>Evolução do relacionamento</h2>
+          </div>
+        </div>
+        {% set maior = evolucao|map(attribute='total')|max or 1 %}
+        <div class="customer-chart">
+          {% for item in evolucao %}
+          <div class="customer-chart-column" title="{{ item.atendimentos }} atendimento(s) · R$ {{ '%.2f'|format(item.total)|replace('.', ',') }}">
+            <div class="customer-chart-value">R$ {{ '%.0f'|format(item.total) }}</div>
+            <div class="customer-chart-track">
+              <i class="customer-chart-fill" data-height="{{ ((item.total / maior) * 100)|round|int }}"></i>
+            </div>
+            <span>{{ item.mes[5:7] }}/{{ item.mes[2:4] }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </article>
+      {% endif %}
+    </div>
+
+    <aside class="customer-column">
+      <article class="customer-panel customer-next-card">
+        <div class="customer-panel-header">
+          <div>
+            <span>Próximo passo</span>
+            <h2>Relacionamento</h2>
+          </div>
+        </div>
+        {% if resumo.proximo_agendamento %}
+          <div class="customer-next-date">{{ data_br(resumo.proximo_agendamento) }}</div>
+          <strong>{{ resumo.proximo_horario }}</strong>
+          <p>O cliente já possui um próximo atendimento agendado.</p>
+          <a class="btn btn-secondary customer-full-button" href="{{ url_for('admin_agenda', data=resumo.proximo_agendamento) }}">Ver na agenda</a>
+        {% elif resumo.ultima_visita %}
+          <div class="customer-next-icon">↻</div>
+          <strong>Estimule o retorno</strong>
+          <p>Não existe um próximo atendimento marcado para este cliente.</p>
+          <a class="btn btn-primary customer-full-button" href="{{ url_for('novo_agendamento') }}">Criar agendamento</a>
+        {% else %}
+          <div class="customer-next-icon">★</div>
+          <strong>Primeiro atendimento</strong>
+          <p>Este cliente ainda não possui atendimentos concluídos.</p>
+          <a class="btn btn-primary customer-full-button" href="{{ url_for('novo_agendamento') }}">Agendar agora</a>
+        {% endif %}
+      </article>
+
+      <article class="customer-panel">
+        <div class="customer-panel-header">
+          <div>
+            <span>Uso interno</span>
+            <h2>Observações</h2>
+          </div>
+        </div>
+        <form method="post" action="{{ url_for('admin_salvar_observacoes_cliente', cliente_id=cliente.id) }}" class="customer-notes-form">
+          <textarea name="observacoes" rows="8" maxlength="2000" placeholder="Preferências, restrições, horários preferidos e outras informações importantes.">{{ cliente.observacoes or '' }}</textarea>
+          <button class="btn btn-primary" type="submit">Salvar observações</button>
+        </form>
+      </article>
+    </aside>
+  </section>
+
+  <section class="customer-panel customer-loyalty-panel">
+    <div class="customer-panel-header customer-panel-header-actions">
+      <div>
+        <span>Programa de fidelidade</span>
+        <h2>Saldo, ajustes e recompensas</h2>
+      </div>
+      <a class="btn btn-secondary" href="{{ url_for('admin_fidelidade') }}">Configurar programa</a>
+    </div>
+
+    <div class="customer-loyalty-grid">
+      <div class="customer-loyalty-balance">
+        <span>Saldo atual</span>
+        <strong>{{ cliente.pontos_fidelidade or 0 }}</strong>
+        <small>pontos disponíveis</small>
+      </div>
+
+      <form method="post" action="{{ url_for('admin_ajuste_pontos', cliente_id=cliente.id) }}" class="customer-mini-form">
+        <h3>Ajuste manual</h3>
+        <label>Pontos (+ ou -)<input required type="number" name="quantidade" placeholder="Ex.: 10 ou -5"></label>
+        <label>Motivo<input name="descricao" maxlength="200" placeholder="Bônus, correção..."></label>
+        <button class="btn btn-primary" type="submit">Aplicar ajuste</button>
+      </form>
+
+      <form method="post" action="{{ url_for('admin_resgatar_recompensa', cliente_id=cliente.id) }}" class="customer-mini-form">
+        <h3>Resgatar recompensa</h3>
+        <label>Recompensa
+          <select name="recompensa_id" required>
+            <option value="">Selecione</option>
+            {% for r in recompensas_fidelidade %}<option value="{{ r.id }}">{{ r.nome }} · {{ r.pontos_necessarios }} pts</option>{% endfor %}
+          </select>
+        </label>
+        <label>Observação<input name="observacoes" maxlength="300"></label>
+        <button class="btn btn-primary" type="submit" {% if not recompensas_fidelidade %}disabled{% endif %}>Confirmar resgate</button>
+        {% if not recompensas_fidelidade %}<small>Nenhuma recompensa disponível para o saldo atual.</small>{% endif %}
+      </form>
+    </div>
+
+    {% if movimentos_fidelidade %}
+    <div class="customer-loyalty-history">
+      <h3>Últimas movimentações</h3>
+      {% for m in movimentos_fidelidade %}
+      <div>
+        <span>{{ m.descricao or m.tipo|title }}</span>
+        <strong class="{{ 'points-positive' if m.quantidade > 0 else 'points-negative' }}">{{ '+' if m.quantidade > 0 else '' }}{{ m.quantidade }} pts</strong>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="customer-panel customer-history-panel">
+    <div class="customer-panel-header customer-panel-header-actions">
+      <div>
+        <span>Agenda e atendimentos</span>
+        <h2>Histórico do cliente</h2>
+      </div>
+      <strong>{{ historico|length }} registro(s)</strong>
+    </div>
+
+    <form method="get" class="customer-filters">
+      <label>Status<select name="status"><option value="todos">Todos</option>{% for valor,rotulo in [('agendado','Agendado'),('confirmado','Confirmado'),('concluido','Concluído'),('finalizado','Finalizado'),('cancelado','Cancelado'),('faltou','Faltou')] %}<option value="{{ valor }}" {% if filtros.status==valor %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></label>
+      <label>Serviço<select name="servico_id"><option value="">Todos</option>{% for item in servicos %}<option value="{{ item.id }}" {% if filtros.servico_id==item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
+      <label>Profissional<select name="funcionario_id"><option value="">Todos</option>{% for item in profissionais %}<option value="{{ item.id }}" {% if filtros.funcionario_id==item.id %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
+      <label>De<input type="date" name="data_inicio" value="{{ filtros.data_inicio }}"></label>
+      <label>Até<input type="date" name="data_fim" value="{{ filtros.data_fim }}"></label>
+      <div class="customer-filter-actions"><a class="btn btn-secondary" href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}">Limpar</a><button class="btn btn-primary" type="submit">Filtrar</button></div>
+    </form>
+
+    {% if historico %}
+    <div class="customer-timeline">
+      {% for item in historico %}
+      <article class="customer-timeline-item">
+        <div class="customer-timeline-marker"></div>
+        <div class="customer-timeline-card">
+          <div class="customer-timeline-top">
+            <div>
+              <strong>{{ item.servicos_nomes or 'Serviço não informado' }}</strong>
+              <span>{{ data_br(item.data) }} às {{ item.hora }}</span>
+            </div>
+            <span class="customer-status customer-status-{{ item.status }}">{{ item.status|replace('_',' ')|title }}</span>
+          </div>
+          <div class="customer-timeline-meta">
+            <span>Profissional <b>{{ item.profissional_nome or 'Não definido' }}</b></span>
+            <span>Duração <b>{{ item.duracao_total or 0 }} min</b></span>
+            <span>Valor <b>R$ {{ '%.2f'|format(item.valor_total or 0)|replace('.', ',') }}</b></span>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="customer-empty">
+      <div>📅</div>
+      <strong>Nenhum registro encontrado</strong>
+      <span>Ajuste os filtros ou crie o primeiro agendamento deste cliente.</span>
+    </div>
+    {% endif %}
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/cliente-perfil-premium.js') }}"></script>
 {% endblock %}

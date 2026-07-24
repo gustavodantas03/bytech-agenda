@@ -1,0 +1,24 @@
+BYTECH AGENDA — SPRINT 1.2
+PERFIL PREMIUM DO CLIENTE
+
+IMPLEMENTADO
+- Cabeçalho com identidade, classificação e ações rápidas.
+- Botão direto para WhatsApp.
+- KPIs de atendimentos, total gasto, ticket, frequência e fidelidade.
+- Resumo completo do relacionamento.
+- Card de próximo passo para retorno ou próximo agendamento.
+- Observações internas com melhor hierarquia visual.
+- Gráfico de evolução sem Jinja dentro de style inline.
+- Fidelidade integrada: saldo, ajuste, resgate e movimentações.
+- Histórico completo com filtros e timeline responsiva.
+- CSS e JavaScript separados.
+
+ARQUIVOS ALTERADOS/CRIADOS
+- templates/admin/cliente_perfil.html
+- static/css/cliente-perfil-premium.css
+- static/js/cliente-perfil-premium.js
+
+VALIDAÇÃO
+- Execute VERIFICAR-SISTEMA-WINDOWS.bat.
+- Abra CRM > Clientes > Ver perfil.
+- Atualize com Ctrl + F5.
