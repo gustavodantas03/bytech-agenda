@@ -6,13 +6,14 @@
 
 <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/agenda-premium.css') }}?v=3"
+    href="{{ url_for('static', filename='css/agenda-premium.css') }}?v=4"
 >
 
 <header class="page-header agenda-premium-header">
     <div>
         <span>Organização</span>
         <h1>Agenda</h1>
+        <p class="agenda-selected-date">{{ data_extenso|capitalize }}</p>
         <p class="page-subtitle">
             Acompanhe o movimento do dia e atualize os atendimentos sem recarregar a página.
         </p>
@@ -102,8 +103,9 @@
     <article class="agenda-kpi agenda-kpi-neutral">
         <div class="agenda-kpi-icon">◷</div>
         <div>
-            <span>Agendados</span>
-            <strong data-kpi="agendados">{{ resumo.agendados }}</strong>
+            <span>Total do dia</span>
+            <strong data-kpi="total">{{ resumo.total }}</strong>
+            <small>{{ resumo.agendados }} aguardando confirmação</small>
         </div>
     </article>
 
@@ -132,20 +134,20 @@
     </article>
 
     <article class="agenda-kpi agenda-kpi-danger">
-        <div class="agenda-kpi-icon">×</div>
+        <div class="agenda-kpi-icon">⌁</div>
         <div>
-            <span>Cancelados</span>
-            <strong data-kpi="cancelados">{{ resumo.cancelados }}</strong>
+            <span>Horários livres</span>
+            <strong data-kpi="horarios_livres">{{ resumo.horarios_livres }}</strong>
+            <small>de {{ resumo.capacidade_total }} horários</small>
         </div>
     </article>
 
     <article class="agenda-kpi agenda-kpi-money">
-        <div class="agenda-kpi-icon">R$</div>
+        <div class="agenda-kpi-icon">%</div>
         <div>
-            <span>Previsão do dia</span>
-            <strong data-kpi="previsao">
-                R$ {{ '%.2f'|format(resumo.previsao)|replace('.', ',') }}
-            </strong>
+            <span>Taxa de ocupação</span>
+            <strong data-kpi="taxa_ocupacao">{{ resumo.taxa_ocupacao }}%</strong>
+            <small>Previsão R$ {{ '%.2f'|format(resumo.previsao)|replace('.', ',') }}</small>
         </div>
     </article>
 </section>
@@ -170,6 +172,15 @@
                 autocomplete="off"
             >
         </div>
+    </div>
+
+    <div class="agenda-status-filters" aria-label="Filtrar por status">
+        <button type="button" class="agenda-status-filter active" data-status-filter="todos">Todos</button>
+        <button type="button" class="agenda-status-filter" data-status-filter="agendado">Agendados</button>
+        <button type="button" class="agenda-status-filter" data-status-filter="confirmado">Confirmados</button>
+        <button type="button" class="agenda-status-filter" data-status-filter="em_atendimento">Em atendimento</button>
+        <button type="button" class="agenda-status-filter" data-status-filter="finalizado">Finalizados</button>
+        <button type="button" class="agenda-status-filter" data-status-filter="cancelado">Cancelados</button>
     </div>
 
     <div id="agendaFeedback" class="agenda-feedback" role="status"></div>
@@ -300,6 +311,61 @@
     {% endif %}
 </section>
 
+<section class="agenda-insights-grid">
+    <article class="panel agenda-insight-card">
+        <div class="agenda-insight-header">
+            <div>
+                <span>Agora</span>
+                <h2>Próximos clientes</h2>
+            </div>
+            <a href="{{ url_for('novo_agendamento') }}">Adicionar</a>
+        </div>
+
+        {% if proximos %}
+            <div class="agenda-next-list">
+                {% for item in proximos %}
+                    <div class="agenda-next-item">
+                        <div class="agenda-next-time">{{ item.hora }}</div>
+                        <div>
+                            <strong>{{ item.cliente_nome }}</strong>
+                            <span>{{ item.servico_nome }} · {{ item.funcionario_nome or 'Sem profissional' }}</span>
+                        </div>
+                        <span class="status status-{{ item.status }}">{{ item.status|replace('_', ' ')|title }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="agenda-insight-empty">Nenhum próximo atendimento nesta data.</div>
+        {% endif %}
+    </article>
+
+    <article class="panel agenda-insight-card">
+        <div class="agenda-insight-header">
+            <div>
+                <span>Equipe</span>
+                <h2>Ocupação por profissional</h2>
+            </div>
+        </div>
+
+        {% if ocupacao_profissionais %}
+            <div class="agenda-occupancy-list">
+                {% for profissional in ocupacao_profissionais %}
+                    <div class="agenda-occupancy-item" data-percent="{{ profissional.percentual }}">
+                        <div class="agenda-occupancy-row">
+                            <strong>{{ profissional.nome }}</strong>
+                            <span>{{ profissional.percentual }}%</span>
+                        </div>
+                        <div class="agenda-occupancy-track"><span></span></div>
+                        <small>{{ profissional.ocupados }} ocupados · {{ profissional.livres }} livres</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="agenda-insight-empty">Cadastre profissionais para acompanhar a ocupação.</div>
+        {% endif %}
+    </article>
+</section>
+
 
 <div id="clientDrawerBackdrop" class="client-drawer-backdrop" hidden></div>
 
@@ -416,7 +482,7 @@
 
 
 <script
-    src="{{ url_for('static', filename='js/agenda.js') }}?v=8"
+    src="{{ url_for('static', filename='js/agenda.js') }}?v=9"
     defer
 ></script>
 

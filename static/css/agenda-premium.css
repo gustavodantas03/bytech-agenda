@@ -652,3 +652,205 @@ body.client-drawer-open { overflow: hidden; }
 .client-drawer-backdrop[hidden] {
     display: none !important;
 }
+
+/* Sprint 2.1 — leitura operacional da agenda */
+.agenda-selected-date {
+    margin: 4px 0 2px;
+    color: var(--primary, #2563eb);
+    font-size: .92rem;
+    font-weight: 800;
+}
+
+.agenda-kpi small {
+    display: block;
+    margin-top: 5px;
+    color: #98a2b3;
+    font-size: .7rem;
+    font-weight: 600;
+}
+
+.agenda-status-filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0 0 16px;
+    scrollbar-width: thin;
+}
+
+.agenda-status-filter {
+    flex: 0 0 auto;
+    min-height: 35px;
+    padding: 7px 12px;
+    border: 1px solid #e4e9f1;
+    border-radius: 999px;
+    background: #fff;
+    color: #667085;
+    font-size: .76rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.agenda-status-filter:hover,
+.agenda-status-filter.active {
+    border-color: rgba(37, 99, 235, .24);
+    background: rgba(37, 99, 235, .09);
+    color: var(--primary, #2563eb);
+}
+
+.agenda-insights-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.agenda-insight-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.agenda-insight-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 19px 20px 15px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.agenda-insight-header span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--primary, #2563eb);
+    font-size: .69rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.agenda-insight-header h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 1rem;
+}
+
+.agenda-insight-header a {
+    color: var(--primary, #2563eb);
+    font-size: .77rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.agenda-next-list,
+.agenda-occupancy-list {
+    display: grid;
+    padding: 7px 20px 13px;
+}
+
+.agenda-next-item {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.agenda-next-item:last-child {
+    border-bottom: 0;
+}
+
+.agenda-next-time {
+    color: var(--primary, #2563eb);
+    font-size: .9rem;
+    font-weight: 900;
+}
+
+.agenda-next-item strong {
+    display: block;
+    color: #172033;
+    font-size: .84rem;
+}
+
+.agenda-next-item > div:nth-child(2) span {
+    display: block;
+    margin-top: 3px;
+    color: #667085;
+    font-size: .72rem;
+}
+
+.agenda-occupancy-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.agenda-occupancy-item:last-child {
+    border-bottom: 0;
+}
+
+.agenda-occupancy-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.agenda-occupancy-row strong {
+    color: #172033;
+    font-size: .82rem;
+}
+
+.agenda-occupancy-row span {
+    color: var(--primary, #2563eb);
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.agenda-occupancy-track {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #edf1f5;
+}
+
+.agenda-occupancy-track span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary, #2563eb), #60a5fa);
+    transition: width .4s ease;
+}
+
+.agenda-occupancy-item small {
+    display: block;
+    margin-top: 7px;
+    color: #98a2b3;
+    font-size: .69rem;
+}
+
+.agenda-insight-empty {
+    padding: 30px 20px;
+    color: #98a2b3;
+    font-size: .8rem;
+    text-align: center;
+}
+
+@media (max-width: 980px) {
+    .agenda-insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .agenda-next-item {
+        grid-template-columns: 46px minmax(0, 1fr);
+    }
+
+    .agenda-next-item > .status {
+        grid-column: 2;
+        justify-self: start;
+    }
+}

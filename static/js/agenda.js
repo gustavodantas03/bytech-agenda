@@ -5,6 +5,8 @@
     const pesquisa = document.getElementById("agendaSearch");
     const vazioPesquisa = document.getElementById("agendaSearchEmpty");
     const feedback = document.getElementById("agendaFeedback");
+    const filtrosStatus = [...document.querySelectorAll("[data-status-filter]")];
+    let statusAtivo = "todos";
 
     const drawer = document.getElementById("clientDrawer");
     const drawerBackdrop = document.getElementById("clientDrawerBackdrop");
@@ -64,9 +66,13 @@
         Object.entries(resumo).forEach(([chave, valor]) => {
             const elemento = document.querySelector(`[data-kpi="${chave}"]`);
             if (!elemento) return;
-            elemento.textContent = chave === "previsao"
-                ? formatarMoeda(valor)
-                : valor;
+            if (chave === "previsao") {
+                elemento.textContent = formatarMoeda(valor);
+            } else if (chave === "taxa_ocupacao") {
+                elemento.textContent = `${valor}%`;
+            } else {
+                elemento.textContent = valor;
+            }
         });
     }
 
@@ -289,15 +295,25 @@
     }
 
     function filtrarAgenda() {
-        if (!lista || !pesquisa) return;
-        const termo = normalizarTexto(pesquisa.value);
+        if (!lista) return;
+        const termo = normalizarTexto(pesquisa ? pesquisa.value : "");
         let visiveis = 0;
         lista.querySelectorAll("[data-search]").forEach((card) => {
-            const mostrar = !termo || normalizarTexto(card.dataset.search).includes(termo);
+            const correspondeBusca = !termo || normalizarTexto(card.dataset.search).includes(termo);
+            const correspondeStatus = statusAtivo === "todos" || card.dataset.status === statusAtivo;
+            const mostrar = correspondeBusca && correspondeStatus;
             card.hidden = !mostrar;
             if (mostrar) visiveis += 1;
         });
         if (vazioPesquisa) vazioPesquisa.hidden = visiveis !== 0;
+    }
+
+    function aplicarBarrasOcupacao() {
+        document.querySelectorAll(".agenda-occupancy-item[data-percent]").forEach((item) => {
+            const percentual = Math.max(0, Math.min(100, Number(item.dataset.percent || 0)));
+            const barra = item.querySelector(".agenda-occupancy-track span");
+            if (barra) barra.style.width = `${percentual}%`;
+        });
     }
 
     document.addEventListener("click", (evento) => {
@@ -337,4 +353,14 @@
     });
 
     if (pesquisa) pesquisa.addEventListener("input", filtrarAgenda);
+
+    filtrosStatus.forEach((botao) => {
+        botao.addEventListener("click", () => {
+            statusAtivo = botao.dataset.statusFilter || "todos";
+            filtrosStatus.forEach((item) => item.classList.toggle("active", item === botao));
+            filtrarAgenda();
+        });
+    });
+
+    aplicarBarrasOcupacao();
 })();

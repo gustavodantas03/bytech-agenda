@@ -1,6 +1,6 @@
 """Rotas do módulo agenda."""
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from flask import jsonify
 
@@ -122,9 +122,53 @@ def admin_agenda():
         data_filtro,
         funcionario_id,
     )
+
+    # Capacidade diária baseada nos horários padrão atualmente oferecidos
+    # pelo sistema (09:00 às 18:00, intervalos de 40 minutos).
+    total_slots_por_profissional = len(gerar_horarios())
+    profissionais_considerados = 1 if funcionario_id else max(len(funcionarios), 1)
+    capacidade_total = total_slots_por_profissional * profissionais_considerados
+    ocupados_validos = sum(
+        1 for item in agendamentos
+        if item["status"] not in ("cancelado", "faltou")
+    )
+    horarios_livres = max(capacidade_total - ocupados_validos, 0)
+    taxa_ocupacao = round((ocupados_validos / capacidade_total) * 100) if capacidade_total else 0
+
+    resumo["capacidade_total"] = capacidade_total
+    resumo["horarios_livres"] = horarios_livres
+    resumo["taxa_ocupacao"] = taxa_ocupacao
+
+    ocupacao_profissionais = []
+    for profissional in funcionarios:
+        itens_profissional = [
+            item for item in agendamentos
+            if item["funcionario_id"] == profissional["id"]
+            and item["status"] not in ("cancelado", "faltou")
+        ]
+        ocupados = len(itens_profissional)
+        percentual = round((ocupados / total_slots_por_profissional) * 100) if total_slots_por_profissional else 0
+        ocupacao_profissionais.append({
+            "id": profissional["id"],
+            "nome": profissional["nome"],
+            "ocupados": ocupados,
+            "livres": max(total_slots_por_profissional - ocupados, 0),
+            "percentual": min(percentual, 100),
+        })
+
+    agora_hora = datetime.now().strftime("%H:%M") if data_selecionada == date.today() else "00:00"
+    proximos = [
+        item for item in agendamentos
+        if item["status"] not in ("finalizado", "cancelado", "faltou")
+        and item["hora"] >= agora_hora
+    ][:4]
+
     conn.close()
 
     hoje = date.today()
+    nomes_dias = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
+    nomes_meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
+    data_extenso = f"{nomes_dias[data_selecionada.weekday()]}, {data_selecionada.day} de {nomes_meses[data_selecionada.month - 1]}"
 
     return render_template(
         "admin/agenda.html",
@@ -137,6 +181,9 @@ def admin_agenda():
         data_seguinte=(data_selecionada + timedelta(days=1)).isoformat(),
         data_hoje=hoje.isoformat(),
         data_amanha=(hoje + timedelta(days=1)).isoformat(),
+        data_extenso=data_extenso,
+        ocupacao_profissionais=ocupacao_profissionais,
+        proximos=proximos,
     )
 
 
@@ -199,6 +246,16 @@ def atualizar_status_agendamento(agendamento_id):
         agendamento["data"],
         funcionario_id,
     )
+
+    total_profissionais = 1 if funcionario_id else conn.execute(
+        "SELECT COUNT(*) AS total FROM funcionarios WHERE empresa_id = ? AND ativo = 1",
+        (empresa_id,),
+    ).fetchone()["total"] or 1
+    capacidade_total = len(gerar_horarios()) * total_profissionais
+    ocupados_validos = resumo["total"] - resumo["cancelados"] - resumo["faltaram"]
+    resumo["capacidade_total"] = capacidade_total
+    resumo["horarios_livres"] = max(capacidade_total - ocupados_validos, 0)
+    resumo["taxa_ocupacao"] = round((ocupados_validos / capacidade_total) * 100) if capacidade_total else 0
     conn.close()
 
     return jsonify(

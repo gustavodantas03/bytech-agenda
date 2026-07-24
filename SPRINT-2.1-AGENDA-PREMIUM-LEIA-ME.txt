@@ -1,0 +1,41 @@
+BYTECH AGENDA — SPRINT 2.1 AGENDA PREMIUM
+
+Base utilizada:
+- bytech_agenda_crm_perfil_cliente_premium.zip
+
+Implementações desta entrega:
+- Data selecionada exibida por extenso no cabeçalho.
+- Indicadores de total do dia, confirmados, em atendimento, finalizados,
+  horários livres e taxa de ocupação.
+- Previsão financeira mantida dentro do indicador de ocupação.
+- Filtros rápidos por status sem recarregar a página.
+- Pesquisa combinada com o filtro de status.
+- Painel de próximos clientes.
+- Painel de ocupação por profissional.
+- Barras de ocupação sem Jinja dentro do atributo style.
+- Correção da repetição do telefone nos cards da agenda.
+- Atualização dos indicadores após mudança de status.
+- CSS e JavaScript mantidos separados do template.
+- Ajustes responsivos para computador, tablet e telemóvel.
+
+Como testar:
+1. Extraia o ZIP.
+2. Faça backup de database/bytech_agenda.db antes de substituir a versão atual.
+3. Execute VERIFICAR-SISTEMA-WINDOWS.bat, caso esteja disponível no projeto.
+4. Inicie o sistema normalmente.
+5. Abra Agenda e pressione Ctrl + F5.
+6. Teste a pesquisa, os filtros de status e as mudanças de status.
+
+Observação técnica:
+A capacidade diária usa os horários padrão atualmente definidos no sistema:
+09:00 às 18:00, em intervalos de 40 minutos. Quando o módulo de horários
+personalizados for implementado, esse cálculo deverá utilizar a configuração
+individual de cada profissional.
+
+Validações executadas:
+- Compilação sintática dos arquivos Python: aprovada.
+- Validação sintática do JavaScript com Node: aprovada.
+- Integridade do ZIP: aprovada.
+
+Não foi possível executar o Flask completo neste ambiente porque as
+bibliotecas Python do projeto não estavam disponíveis para instalação offline.
