@@ -1,0 +1,38 @@
+BYTECH AGENDA — SPRINT COMUNICAÇÃO 1.0
+=====================================
+
+ENTREGUE
+- Módulo Comunicação → WhatsApp no painel administrativo.
+- Configuração por empresa: URL, API Key, instância e timeout.
+- Criação/conexão da instância e QR Code via Evolution API v2.
+- Consulta de estado da conexão.
+- Envio de mensagem de teste.
+- Modelos personalizáveis com variáveis.
+- Automações configuráveis por empresa.
+- Histórico de envios e erros.
+- Confirmação automática no agendamento público.
+- Opção "Enviar confirmação" no agendamento administrativo.
+- Falhas da API não impedem o salvamento do agendamento.
+
+ENDPOINTS EVOLUTION UTILIZADOS
+- POST /instance/create
+- GET /instance/connect/{instance}
+- GET /instance/connectionState/{instance}
+- POST /message/sendText/{instance}
+
+CONFIGURAÇÃO
+1. Instale e publique a Evolution API.
+2. No Bytech Agenda, acesse Comunicação → WhatsApp → Configurações.
+3. Informe a URL externa da Evolution, API Key e nome da instância.
+4. Clique em Conectar WhatsApp e escaneie o QR Code.
+5. Use "Testar envio" antes de liberar os lembretes.
+
+SEGURANÇA
+- A API Key não é exibida novamente no formulário.
+- Em produção, proteja o banco de dados e use HTTPS.
+- Recomenda-se futuramente criptografar a API Key em repouso.
+
+PRÓXIMA ETAPA
+- Worker/agendador para lembretes de 24h e 2h.
+- Webhooks para status entregue/lido e desconexão.
+- Retentativas automáticas.

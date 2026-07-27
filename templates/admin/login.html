@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acesso administrativo</title>
+    <title>Bytech Agenda | Acesso administrativo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="admin-login-page">
     <main class="login-card">
         <div class="logo-mark">B</div>
         <h1>Bytech Agenda</h1>
-        <p>Acesse o painel da barbearia.</p>
+        <p>Acesse o painel administrativo da sua empresa.</p>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}

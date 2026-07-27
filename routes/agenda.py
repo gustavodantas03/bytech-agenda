@@ -704,8 +704,19 @@ def novo_agendamento():
                 (cursor.lastrowid, servico_id),
             )
 
+            agendamento_id = cursor.lastrowid
+            enviar_confirmacao = request.form.get("enviar_confirmacao") == "1"
             conn.commit()
             conn.close()
+
+            if enviar_confirmacao:
+                try:
+                    from services.evolution_api import enviar_mensagem_agendamento
+                    resultado_whatsapp = enviar_mensagem_agendamento(empresa_id, agendamento_id, "confirmacao")
+                    if not resultado_whatsapp.ok and resultado_whatsapp.error != "Automação desativada.":
+                        flash("Agendamento salvo, mas a confirmação do WhatsApp não foi enviada. Consulte Comunicação → Histórico.", "alerta")
+                except Exception:
+                    flash("Agendamento salvo, mas ocorreu uma falha isolada no módulo WhatsApp.", "alerta")
 
             flash("Agendamento cadastrado com sucesso.", "sucesso")
 

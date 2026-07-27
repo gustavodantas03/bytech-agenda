@@ -1,0 +1,24 @@
+BYTECH AGENDA — AJUSTE DEFINITIVO DO CRM E ASSISTENTE WHATSAPP
+
+O que foi corrigido
+1. O CSS específico da Inteligência CRM agora é carregado dentro do <head> da página.
+2. O JavaScript específico agora é carregado no final do documento pelo bloco page_scripts.
+3. As versões dos arquivos estáticos foram alteradas para evitar que o navegador reutilize CSS antigo em cache.
+4. O assistente da Evolution API aparece automaticamente quando URL ou API Key ainda não estão cadastradas.
+5. Mesmo depois de configurado, o assistente pode ser aberto pelo botão "Configurar integração".
+
+Como testar
+1. Extraia esta versão em uma pasta nova.
+2. Feche todas as janelas antigas do sistema.
+3. Inicie o projeto.
+4. No navegador, pressione Ctrl+F5 uma vez.
+5. Abra CRM > Inteligência CRM.
+6. Abra Comunicação > WhatsApp.
+
+Configuração da Evolution API
+- URL: endereço da Evolution API, por exemplo https://evolution.bytechce.com.br
+- API Key: chave global definida na instalação da Evolution API
+- Nome da instância: identificador do WhatsApp da empresa, sem espaços ou acentos
+
+Importante
+O QR Code só poderá ser gerado quando a Evolution API estiver instalada e acessível. No computador local, use uma Evolution API local apenas se ela realmente estiver rodando. Na VPS, recomendamos usar um subdomínio HTTPS.

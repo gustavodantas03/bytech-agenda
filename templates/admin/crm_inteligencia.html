@@ -1,86 +1,218 @@
 {% extends 'admin/base.html' %}
-{% block title %}CRM Inteligente | Bytech Agenda{% endblock %}
+{% block title %}Inteligência CRM | Bytech Agenda{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/crm-inteligencia-premium.css') }}?v=3">{% endblock %}
 {% block content %}
-<section class="crm4-page">
-    <header class="crm4-header">
-        <div>
-            <span class="crm4-kicker">CRM Premium · Sprint 4</span>
-            <h1>Inteligência e campanhas</h1>
-            <p>Identifique oportunidades, antecipe o abandono e organize ações de relacionamento.</p>
+
+<section class="crm-intelligence-page" data-crm-intelligence>
+    <header class="crm-intelligence-hero">
+        <div class="crm-hero-copy">
+            <span class="crm-eyebrow">RELACIONAMENTO COM CLIENTES</span>
+            <h1>Inteligência CRM</h1>
+            <p>Transforme os dados da sua base em oportunidades de retorno, fidelização e novas campanhas.</p>
         </div>
-        <a class="btn btn-secondary" href="{{ url_for('admin_crm_dashboard') }}">Voltar ao CRM</a>
+        <div class="crm-hero-actions">
+            <a class="crm-btn crm-btn-light" href="{{ url_for('admin_crm_dashboard') }}">
+                <span aria-hidden="true">←</span> Voltar ao CRM
+            </a>
+            <button class="crm-btn crm-btn-primary" type="button" data-scroll-campaign>
+                <span aria-hidden="true">＋</span> Nova campanha
+            </button>
+        </div>
     </header>
 
-    <div class="crm4-kpis">
-        <article><span>Clientes ativos</span><strong>{{ indicadores.total }}</strong><small>base monitorada</small></article>
-        <article><span>Clientes VIP</span><strong>{{ indicadores.vips }}</strong><small>alto relacionamento</small></article>
-        <article><span>Em risco</span><strong>{{ indicadores.risco }}</strong><small>precisam de atenção</small></article>
-        <article><span>Inativos</span><strong>{{ indicadores.inativos }}</strong><small>fora da frequência</small></article>
-        <article><span>Aniversariantes</span><strong>{{ indicadores.aniversariantes }}</strong><small>{{ janela }}</small></article>
-        <article><span>Campanhas ativas</span><strong>{{ indicadores.campanhas_ativas }}</strong><small>prontas para uso</small></article>
-    </div>
-
-    <div class="crm4-grid crm4-grid-main">
-        <section class="panel crm4-panel">
-            <div class="crm4-panel-head">
-                <div><span>Alertas</span><h2>Oportunidades do relacionamento</h2></div>
+    <section class="crm-kpi-grid" aria-label="Indicadores do CRM">
+        <article class="crm-kpi-card crm-kpi-total">
+            <div class="crm-kpi-icon" aria-hidden="true">👥</div>
+            <div class="crm-kpi-content">
+                <span>Clientes ativos</span>
+                <strong>{{ indicadores.total }}</strong>
+                <small>base monitorada</small>
             </div>
-            <div class="crm4-alerts">
-                <article class="crm4-alert warning"><strong>{{ indicadores.risco }} clientes em risco</strong><span>Estão há {{ config.dias_risco }} dias ou mais sem retornar.</span></article>
-                <article class="crm4-alert danger"><strong>{{ indicadores.inativos }} clientes inativos</strong><span>Ultrapassaram {{ config.dias_inatividade }} dias sem atendimento.</span></article>
-                <article class="crm4-alert success"><strong>{{ indicadores.vips }} clientes VIP</strong><span>Ótimo público para benefícios e campanhas exclusivas.</span></article>
+        </article>
+        <article class="crm-kpi-card crm-kpi-vip">
+            <div class="crm-kpi-icon" aria-hidden="true">★</div>
+            <div class="crm-kpi-content">
+                <span>Clientes VIP</span>
+                <strong>{{ indicadores.vips }}</strong>
+                <small>alto relacionamento</small>
+            </div>
+        </article>
+        <article class="crm-kpi-card crm-kpi-risk">
+            <div class="crm-kpi-icon" aria-hidden="true">!</div>
+            <div class="crm-kpi-content">
+                <span>Em risco</span>
+                <strong>{{ indicadores.risco }}</strong>
+                <small>precisam de atenção</small>
+            </div>
+        </article>
+        <article class="crm-kpi-card crm-kpi-inactive">
+            <div class="crm-kpi-icon" aria-hidden="true">↻</div>
+            <div class="crm-kpi-content">
+                <span>Inativos</span>
+                <strong>{{ indicadores.inativos }}</strong>
+                <small>fora da frequência</small>
+            </div>
+        </article>
+        <article class="crm-kpi-card crm-kpi-birthday">
+            <div class="crm-kpi-icon" aria-hidden="true">🎂</div>
+            <div class="crm-kpi-content">
+                <span>Aniversariantes</span>
+                <strong>{{ indicadores.aniversariantes }}</strong>
+                <small>{{ 'hoje' if janela == 'hoje' else 'nos próximos 7 dias' if janela == 'semana' else 'nos próximos 30 dias' }}</small>
+            </div>
+        </article>
+        <article class="crm-kpi-card crm-kpi-campaign">
+            <div class="crm-kpi-icon" aria-hidden="true">✦</div>
+            <div class="crm-kpi-content">
+                <span>Campanhas ativas</span>
+                <strong>{{ indicadores.campanhas_ativas }}</strong>
+                <small>prontas para uso</small>
+            </div>
+        </article>
+    </section>
+
+    <div class="crm-main-grid">
+        <section class="crm-card crm-opportunities-card">
+            <div class="crm-card-heading">
+                <div>
+                    <span class="crm-section-label">OPORTUNIDADES</span>
+                    <h2>Onde agir agora</h2>
+                    <p>Prioridades identificadas automaticamente com base nos seus critérios.</p>
+                </div>
+                <span class="crm-heading-badge">Atualizado agora</span>
+            </div>
+
+            <div class="crm-opportunity-list">
+                <article class="crm-opportunity crm-opportunity-risk">
+                    <div class="crm-opportunity-icon" aria-hidden="true">!</div>
+                    <div>
+                        <strong>{{ indicadores.risco }} cliente{{ '' if indicadores.risco == 1 else 's' }} em risco</strong>
+                        <span>Sem retornar há {{ config.dias_risco }} dias ou mais.</span>
+                    </div>
+                    <button type="button" data-open-segment="risco">Ver clientes</button>
+                </article>
+                <article class="crm-opportunity crm-opportunity-inactive">
+                    <div class="crm-opportunity-icon" aria-hidden="true">↻</div>
+                    <div>
+                        <strong>{{ indicadores.inativos }} cliente{{ '' if indicadores.inativos == 1 else 's' }} inativo{{ '' if indicadores.inativos == 1 else 's' }}</strong>
+                        <span>Ultrapassaram {{ config.dias_inatividade }} dias sem atendimento.</span>
+                    </div>
+                    <button type="button" data-open-segment="inativos">Recuperar</button>
+                </article>
+                <article class="crm-opportunity crm-opportunity-vip">
+                    <div class="crm-opportunity-icon" aria-hidden="true">★</div>
+                    <div>
+                        <strong>{{ indicadores.vips }} cliente{{ '' if indicadores.vips == 1 else 's' }} VIP</strong>
+                        <span>Público ideal para benefícios e ações exclusivas.</span>
+                    </div>
+                    <button type="button" data-open-segment="vip">Explorar</button>
+                </article>
+                <article class="crm-opportunity crm-opportunity-birthday">
+                    <div class="crm-opportunity-icon" aria-hidden="true">🎁</div>
+                    <div>
+                        <strong>{{ indicadores.aniversariantes }} aniversariante{{ '' if indicadores.aniversariantes == 1 else 's' }}</strong>
+                        <span>Uma boa oportunidade para fortalecer o relacionamento.</span>
+                    </div>
+                    <button type="button" data-open-segment="aniversarios">Visualizar</button>
+                </article>
             </div>
         </section>
 
-        <section class="panel crm4-panel">
-            <div class="crm4-panel-head"><div><span>Critérios</span><h2>Configuração da inteligência</h2></div></div>
-            <form class="crm4-form-grid" method="post" action="{{ url_for('admin_crm_configuracoes') }}">
-                <label>Dias para considerar em risco<input type="number" min="7" name="dias_risco" value="{{ config.dias_risco }}" required></label>
-                <label>Dias para considerar inativo<input type="number" min="15" name="dias_inatividade" value="{{ config.dias_inatividade }}" required></label>
-                <label>Gasto mínimo para VIP<input type="number" min="0" step="0.01" name="vip_valor_minimo" value="{{ '%.2f'|format(config.vip_valor_minimo) }}" required></label>
-                <label>Visitas mínimas para VIP<input type="number" min="1" name="vip_visitas_minimas" value="{{ config.vip_visitas_minimas }}" required></label>
-                <button class="btn btn-primary crm4-full" type="submit">Salvar critérios</button>
+        <section class="crm-card crm-settings-card">
+            <div class="crm-card-heading">
+                <div>
+                    <span class="crm-section-label">CRITÉRIOS</span>
+                    <h2>Configuração da inteligência</h2>
+                    <p>Defina quando um cliente muda de segmento.</p>
+                </div>
+                <button class="crm-icon-button" type="button" data-toggle-settings aria-expanded="true" aria-label="Recolher configurações">⌃</button>
+            </div>
+
+            <form class="crm-settings-form" method="post" action="{{ url_for('admin_crm_configuracoes') }}" data-settings-form>
+                <label class="crm-field">
+                    <span>Dias para considerar em risco</span>
+                    <div class="crm-input-suffix"><input type="number" min="7" name="dias_risco" value="{{ config.dias_risco }}" required><em>dias</em></div>
+                </label>
+                <label class="crm-field">
+                    <span>Dias para considerar inativo</span>
+                    <div class="crm-input-suffix"><input type="number" min="15" name="dias_inatividade" value="{{ config.dias_inatividade }}" required><em>dias</em></div>
+                </label>
+                <label class="crm-field">
+                    <span>Gasto mínimo para VIP</span>
+                    <div class="crm-input-prefix"><em>R$</em><input type="number" min="0" step="0.01" name="vip_valor_minimo" value="{{ '%.2f'|format(config.vip_valor_minimo) }}" required></div>
+                </label>
+                <label class="crm-field">
+                    <span>Visitas mínimas para VIP</span>
+                    <div class="crm-input-suffix"><input type="number" min="1" name="vip_visitas_minimas" value="{{ config.vip_visitas_minimas }}" required><em>visitas</em></div>
+                </label>
+                <div class="crm-settings-footer">
+                    <small>O risco deve ser menor que o período de inatividade.</small>
+                    <button class="crm-btn crm-btn-primary" type="submit">Salvar critérios</button>
+                </div>
             </form>
         </section>
     </div>
 
-    <div class="crm4-tabs" role="tablist">
-        <button class="active" type="button" data-crm4-tab="risco">Em risco <span>{{ indicadores.risco }}</span></button>
-        <button type="button" data-crm4-tab="inativos">Inativos <span>{{ indicadores.inativos }}</span></button>
-        <button type="button" data-crm4-tab="vip">VIP <span>{{ indicadores.vips }}</span></button>
-        <button type="button" data-crm4-tab="aniversarios">Aniversários <span>{{ indicadores.aniversariantes }}</span></button>
-    </div>
-
-    {% macro cliente_lista(lista, tipo) %}
-    <div class="crm4-client-list">
-        {% for cliente in lista %}
-        <article class="crm4-client">
-            <div class="crm4-avatar">{{ cliente.nome[:1]|upper }}</div>
-            <div class="crm4-client-main">
-                <strong>{{ cliente.nome }}</strong>
-                <span>{{ cliente.telefone }}</span>
+    <section class="crm-card crm-segments-card" data-segments-section>
+        <div class="crm-card-heading crm-segments-heading">
+            <div>
+                <span class="crm-section-label">SEGMENTAÇÃO</span>
+                <h2>Clientes por oportunidade</h2>
+                <p>Selecione um grupo para visualizar e iniciar o relacionamento.</p>
             </div>
-            <div><span>Visitas</span><strong>{{ cliente.visitas or 0 }}</strong></div>
-            <div><span>Total gasto</span><strong>R$ {{ '%.2f'|format(cliente.total_gasto or 0)|replace('.', ',') }}</strong></div>
-            {% if tipo in ['risco','inativos'] %}<div><span>Sem retornar</span><strong>{{ cliente.dias_sem_visita }} dias</strong></div>{% endif %}
-            {% if tipo == 'aniversarios' %}<div><span>Aniversário</span><strong>{% if cliente.aniversario_em == 0 %}Hoje{% else %}Em {{ cliente.aniversario_em }} dias{% endif %}</strong></div>{% endif %}
-            <div class="crm4-actions">
-                <a href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}">Ver perfil</a>
-                <a target="_blank" rel="noopener" href="https://wa.me/55{{ cliente.telefone }}">WhatsApp</a>
-            </div>
-        </article>
-        {% else %}
-        <div class="empty-state">Nenhum cliente encontrado neste grupo.</div>
-        {% endfor %}
-    </div>
-    {% endmacro %}
+        </div>
 
-    <section class="panel crm4-segments">
-        <div data-crm4-panel="risco">{{ cliente_lista(risco, 'risco') }}</div>
-        <div data-crm4-panel="inativos" hidden>{{ cliente_lista(inativos, 'inativos') }}</div>
-        <div data-crm4-panel="vip" hidden>{{ cliente_lista(vips, 'vip') }}</div>
-        <div data-crm4-panel="aniversarios" hidden>
-            <div class="crm4-birthday-filter">
+        <div class="crm-tabs" role="tablist" aria-label="Segmentos de clientes">
+            <button class="active" type="button" role="tab" aria-selected="true" data-crm4-tab="risco">
+                Em risco <span>{{ indicadores.risco }}</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-crm4-tab="inativos">
+                Inativos <span>{{ indicadores.inativos }}</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-crm4-tab="vip">
+                VIP <span>{{ indicadores.vips }}</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-crm4-tab="aniversarios">
+                Aniversários <span>{{ indicadores.aniversariantes }}</span>
+            </button>
+        </div>
+
+        {% macro cliente_lista(lista, tipo) %}
+        <div class="crm-client-list">
+            {% for cliente in lista %}
+            <article class="crm-client-row">
+                <div class="crm-client-identity">
+                    <div class="crm-avatar">{{ cliente.nome[:1]|upper }}</div>
+                    <div>
+                        <strong>{{ cliente.nome }}</strong>
+                        <span>{{ cliente.telefone }}</span>
+                    </div>
+                </div>
+                <div class="crm-client-metric"><span>Visitas</span><strong>{{ cliente.visitas or 0 }}</strong></div>
+                <div class="crm-client-metric"><span>Total gasto</span><strong>R$ {{ '%.2f'|format(cliente.total_gasto or 0)|replace('.', ',') }}</strong></div>
+                {% if tipo in ['risco','inativos'] %}<div class="crm-client-metric"><span>Sem retornar</span><strong>{{ cliente.dias_sem_visita }} dias</strong></div>{% endif %}
+                {% if tipo == 'aniversarios' %}<div class="crm-client-metric"><span>Aniversário</span><strong>{% if cliente.aniversario_em == 0 %}Hoje{% else %}Em {{ cliente.aniversario_em }} dias{% endif %}</strong></div>{% endif %}
+                <div class="crm-client-actions">
+                    <a class="crm-action-link" href="{{ url_for('admin_perfil_cliente', cliente_id=cliente.id) }}">Ver perfil</a>
+                    <a class="crm-whatsapp-link" target="_blank" rel="noopener" href="https://wa.me/55{{ cliente.telefone }}">WhatsApp</a>
+                </div>
+            </article>
+            {% else %}
+            <div class="crm-empty-state">
+                <div class="crm-empty-icon" aria-hidden="true">⌕</div>
+                <strong>Nenhum cliente neste grupo</strong>
+                <span>Os clientes aparecerão aqui conforme os dados de atendimento forem registrados.</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endmacro %}
+
+        <div class="crm-segment-panel" data-crm4-panel="risco">{{ cliente_lista(risco, 'risco') }}</div>
+        <div class="crm-segment-panel" data-crm4-panel="inativos" hidden>{{ cliente_lista(inativos, 'inativos') }}</div>
+        <div class="crm-segment-panel" data-crm4-panel="vip" hidden>{{ cliente_lista(vips, 'vip') }}</div>
+        <div class="crm-segment-panel" data-crm4-panel="aniversarios" hidden>
+            <div class="crm-birthday-filter">
+                <span>Período:</span>
                 <a class="{{ 'active' if janela=='hoje' }}" href="?janela=hoje">Hoje</a>
                 <a class="{{ 'active' if janela=='semana' }}" href="?janela=semana">7 dias</a>
                 <a class="{{ 'active' if janela=='mes' }}" href="?janela=mes">30 dias</a>
@@ -89,50 +221,105 @@
         </div>
     </section>
 
-    <div class="crm4-grid crm4-grid-campaigns">
-        <section class="panel crm4-panel">
-            <div class="crm4-panel-head"><div><span>Campanhas</span><h2>Nova ação de relacionamento</h2></div></div>
-            <form class="crm4-form-grid" method="post" action="{{ url_for('admin_crm_nova_campanha') }}">
-                <label class="crm4-full">Nome da campanha<input name="nome" maxlength="120" required placeholder="Ex.: Volte e ganhe 10%"></label>
-                <label>Público-alvo<select name="publico_alvo"><option value="todos">Todos</option><option value="vip">Clientes VIP</option><option value="risco">Em risco</option><option value="inativos">Inativos</option><option value="aniversariantes">Aniversariantes</option></select></label>
-                <label>Status<select name="status"><option value="rascunho">Rascunho</option><option value="pronta">Pronta/ativa</option></select></label>
-                <label>Início<input type="date" name="data_inicio"></label>
-                <label>Fim<input type="date" name="data_fim"></label>
-                <label class="crm4-full">Mensagem<textarea name="mensagem" rows="5" maxlength="1000" required placeholder="Olá, {nome}! Preparamos uma condição especial para você..."></textarea><small>Use {nome} como marcador para personalização futura.</small></label>
-                <button class="btn btn-primary crm4-full" type="submit">Cadastrar campanha</button>
-            </form>
-        </section>
-
-        <section class="panel crm4-panel">
-            <div class="crm4-panel-head"><div><span>Histórico</span><h2>Campanhas cadastradas</h2></div></div>
-            <div class="crm4-campaign-list">
-                {% for campanha in campanhas %}
-                <article class="crm4-campaign">
-                    <div>
-                        <span class="status {{ 'status-finalizado' if campanha.ativo else 'status-agendado' }}">{{ 'Ativa' if campanha.ativo else 'Rascunho' }}</span>
-                        <strong>{{ campanha.nome }}</strong>
-                        <small>{{ campanha.publico_alvo|capitalize }} · {{ campanha.data_inicio or 'Sem início' }} até {{ campanha.data_fim or 'sem término' }}</small>
-                        <p>{{ campanha.mensagem }}</p>
-                    </div>
-                    <div class="crm4-actions">
-                        <form method="post" action="{{ url_for('admin_crm_status_campanha', campanha_id=campanha.id) }}"><button type="submit">{{ 'Pausar' if campanha.ativo else 'Ativar' }}</button></form>
-                        <form method="post" action="{{ url_for('admin_crm_excluir_campanha', campanha_id=campanha.id) }}" onsubmit="return confirm('Excluir esta campanha?')"><button class="danger" type="submit">Excluir</button></form>
-                    </div>
-                </article>
-                {% else %}<div class="empty-state">Nenhuma campanha cadastrada.</div>{% endfor %}
+    <section class="crm-campaign-area" id="nova-campanha" data-campaign-section>
+        <div class="crm-campaign-header">
+            <div>
+                <span class="crm-section-label">CAMPANHAS</span>
+                <h2>Ações de relacionamento</h2>
+                <p>Crie mensagens personalizadas para públicos estratégicos.</p>
             </div>
-        </section>
-    </div>
+        </div>
+
+        <div class="crm-campaign-grid">
+            <section class="crm-card crm-new-campaign-card">
+                <div class="crm-card-heading">
+                    <div>
+                        <span class="crm-step-badge">NOVA CAMPANHA</span>
+                        <h3>Planeje sua próxima ação</h3>
+                    </div>
+                </div>
+                <form class="crm-campaign-form" method="post" action="{{ url_for('admin_crm_nova_campanha') }}">
+                    <label class="crm-field crm-field-full">
+                        <span>Nome da campanha</span>
+                        <input name="nome" maxlength="120" required placeholder="Ex.: Volte e ganhe 10%">
+                    </label>
+                    <label class="crm-field">
+                        <span>Público-alvo</span>
+                        <select name="publico_alvo">
+                            <option value="todos">Todos os clientes</option>
+                            <option value="vip">Clientes VIP</option>
+                            <option value="risco">Clientes em risco</option>
+                            <option value="inativos">Clientes inativos</option>
+                            <option value="aniversariantes">Aniversariantes</option>
+                        </select>
+                    </label>
+                    <label class="crm-field">
+                        <span>Status inicial</span>
+                        <select name="status">
+                            <option value="rascunho">Salvar como rascunho</option>
+                            <option value="pronta">Pronta para uso</option>
+                        </select>
+                    </label>
+                    <label class="crm-field">
+                        <span>Data de início</span>
+                        <input type="date" name="data_inicio">
+                    </label>
+                    <label class="crm-field">
+                        <span>Data de término</span>
+                        <input type="date" name="data_fim">
+                    </label>
+                    <label class="crm-field crm-field-full">
+                        <span>Mensagem</span>
+                        <textarea name="mensagem" rows="6" maxlength="1000" required placeholder="Olá, {nome}! Preparamos uma condição especial para você..."></textarea>
+                        <small><b>{nome}</b> será substituído automaticamente pelo nome do cliente em uma integração futura.</small>
+                    </label>
+                    <div class="crm-message-tools crm-field-full">
+                        <button type="button" data-insert-variable="{nome}">{nome}</button>
+                        <span data-character-count>0/1000 caracteres</span>
+                    </div>
+                    <button class="crm-btn crm-btn-primary crm-field-full" type="submit">Cadastrar campanha</button>
+                </form>
+            </section>
+
+            <section class="crm-card crm-campaign-history-card">
+                <div class="crm-card-heading">
+                    <div>
+                        <span class="crm-section-label">HISTÓRICO</span>
+                        <h3>Campanhas cadastradas</h3>
+                        <p>{{ campanhas|length }} campanha{{ '' if campanhas|length == 1 else 's' }} registrada{{ '' if campanhas|length == 1 else 's' }}</p>
+                    </div>
+                </div>
+                <div class="crm-campaign-list">
+                    {% for campanha in campanhas %}
+                    <article class="crm-campaign-item">
+                        <div class="crm-campaign-topline">
+                            <span class="crm-status-pill {{ 'is-active' if campanha.ativo else 'is-draft' }}">{{ 'Ativa' if campanha.ativo else 'Rascunho' }}</span>
+                            <span class="crm-audience-pill">{{ campanha.publico_alvo|capitalize }}</span>
+                        </div>
+                        <strong>{{ campanha.nome }}</strong>
+                        <small>{{ campanha.data_inicio or 'Sem início definido' }} · {{ campanha.data_fim or 'Sem término definido' }}</small>
+                        <p>{{ campanha.mensagem }}</p>
+                        <div class="crm-campaign-actions">
+                            <form method="post" action="{{ url_for('admin_crm_status_campanha', campanha_id=campanha.id) }}">
+                                <button class="crm-action-button" type="submit">{{ 'Pausar' if campanha.ativo else 'Ativar' }}</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin_crm_excluir_campanha', campanha_id=campanha.id) }}" onsubmit="return confirm('Excluir esta campanha?')">
+                                <button class="crm-action-button danger" type="submit">Excluir</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% else %}
+                    <div class="crm-empty-state crm-empty-campaigns">
+                        <div class="crm-empty-icon" aria-hidden="true">✦</div>
+                        <strong>Nenhuma campanha cadastrada</strong>
+                        <span>Crie sua primeira ação de relacionamento usando o formulário ao lado.</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </section>
 </section>
-<script>
-document.querySelectorAll('[data-crm4-tab]').forEach(function(button){
-  button.addEventListener('click', function(){
-    document.querySelectorAll('[data-crm4-tab]').forEach(function(item){item.classList.remove('active')});
-    document.querySelectorAll('[data-crm4-panel]').forEach(function(panel){panel.hidden=true});
-    button.classList.add('active');
-    const panel=document.querySelector('[data-crm4-panel="'+button.dataset.crm4Tab+'"]');
-    if(panel) panel.hidden=false;
-  });
-});
-</script>
+
 {% endblock %}
+{% block page_scripts %}<script src="{{ url_for('static', filename='js/crm-inteligencia-premium.js') }}?v=3"></script>{% endblock %}

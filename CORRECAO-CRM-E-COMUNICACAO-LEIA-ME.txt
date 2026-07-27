@@ -1,0 +1,14 @@
+CORREÇÃO CRM + COMUNICAÇÃO
+
+1. Inteligência CRM
+- Criadas automaticamente as tabelas crm_configuracoes e crm_campanhas.
+- O botão Inteligência CRM agora abre a rota /admin/crm/inteligencia sem erro de tabela inexistente.
+
+2. Comunicação / WhatsApp
+- O recurso WhatsApp foi incluído também no plano Essencial.
+- Empresas de teste no plano Essencial passam a visualizar o menu Comunicação após iniciar o sistema.
+
+IMPORTANTE
+- Feche o sistema antigo.
+- Extraia este ZIP em uma pasta nova.
+- Execute normalmente. Na primeira requisição, o banco será atualizado pelo init_db().

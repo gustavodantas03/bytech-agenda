@@ -1,0 +1,19 @@
+BYTECH AGENDA — AJUSTE DOS LOGINS
+
+Alterações realizadas:
+
+1. Login do painel administrativo
+   Antes: Acesse o painel da barbearia.
+   Agora: Acesse o painel administrativo da sua empresa.
+
+2. Login do Bytech Master
+   Antes: Gerenciamento das barbearias.
+   Agora: Gerencie empresas, planos, usuários e configurações da plataforma.
+
+3. Título da aba do navegador
+   Agora: Bytech Agenda | Acesso administrativo
+
+Objetivo:
+Remover referências fixas a barbearias e preparar as telas para empresas de qualquer segmento.
+
+Após atualizar o projeto, reinicie o Flask e use Ctrl + F5 no navegador.

@@ -1,0 +1,25 @@
+BYTECH AGENDA — SPRINT COMUNICAÇÃO 2.0
+
+ENTREGUE
+- Fila persistente whatsapp_fila.
+- Confirmações passam pela fila e não bloqueiam o agendamento.
+- Lembretes automáticos de 24h e 2h.
+- Proteção contra mensagens duplicadas.
+- Até 3 tentativas com intervalos progressivos.
+- Histórico final de sucesso ou falha.
+- Processador leve para VPS KVM 1.
+- Botão "Processar agora" no painel para testes.
+
+TESTE LOCAL
+1. Inicie o sistema normalmente.
+2. Configure a Evolution API em Comunicação > WhatsApp.
+3. Crie um agendamento com confirmação marcada.
+4. Execute: python processar_comunicacao.py --once
+5. Confira a fila e o histórico no painel.
+
+PRODUÇÃO
+Execute o Flask/Gunicorn e mantenha também este processo ativo:
+python processar_comunicacao.py
+
+Na VPS, recomenda-se criar um serviço systemd separado para o processador.
+O intervalo padrão é 60 segundos e pode ser alterado com --intervalo.

@@ -137,6 +137,13 @@ Novo agendamento
 
         </select>
 
+        {% if tem_recurso and tem_recurso('whatsapp') %}
+        <label style="display:flex;align-items:center;gap:10px;margin:14px 0 18px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;">
+            <input type="checkbox" name="enviar_confirmacao" value="1" checked style="width:auto;">
+            <span><strong>Enviar confirmação pelo WhatsApp</strong><br><small style="color:#64748b;">A mensagem será enviada após salvar o agendamento.</small></span>
+        </label>
+        {% endif %}
+
         <button
             class="btn btn-primary full"
             type="submit"

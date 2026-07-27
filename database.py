@@ -206,6 +206,130 @@ def init_db():
                 FOREIGN KEY (pagamento_id) REFERENCES pagamentos(id)
             );
 
+            CREATE TABLE IF NOT EXISTS whatsapp_configuracoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL UNIQUE,
+                base_url TEXT,
+                api_key TEXT,
+                instance_name TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'desconectado',
+                numero_conectado TEXT,
+                qr_code TEXT,
+                timeout_segundos INTEGER NOT NULL DEFAULT 15,
+                max_tentativas INTEGER NOT NULL DEFAULT 3,
+                ultima_sincronizacao TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS whatsapp_automacoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL UNIQUE,
+                confirmacao_ativa INTEGER NOT NULL DEFAULT 1,
+                lembrete_24h_ativo INTEGER NOT NULL DEFAULT 1,
+                lembrete_2h_ativo INTEGER NOT NULL DEFAULT 1,
+                cancelamento_ativo INTEGER NOT NULL DEFAULT 1,
+                pos_atendimento_ativo INTEGER NOT NULL DEFAULT 0,
+                aniversario_ativo INTEGER NOT NULL DEFAULT 0,
+                cliente_inativo_ativo INTEGER NOT NULL DEFAULT 0,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS whatsapp_modelos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                tipo TEXT NOT NULL,
+                nome TEXT NOT NULL,
+                mensagem TEXT NOT NULL,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
+                UNIQUE (empresa_id, tipo)
+            );
+
+            CREATE TABLE IF NOT EXISTS whatsapp_historico (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                agendamento_id INTEGER,
+                cliente_id INTEGER,
+                tipo TEXT NOT NULL,
+                telefone TEXT NOT NULL,
+                mensagem TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pendente',
+                erro TEXT,
+                resposta_api TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                enviado_em TEXT,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
+                FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id) ON DELETE SET NULL,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_whatsapp_historico_empresa_data
+                ON whatsapp_historico (empresa_id, criado_em);
+
+
+            CREATE TABLE IF NOT EXISTS whatsapp_fila (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                agendamento_id INTEGER,
+                cliente_id INTEGER,
+                tipo TEXT NOT NULL,
+                telefone TEXT NOT NULL,
+                mensagem TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pendente',
+                tentativas INTEGER NOT NULL DEFAULT 0,
+                max_tentativas INTEGER NOT NULL DEFAULT 3,
+                agendado_para TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                proxima_tentativa_em TEXT,
+                ultimo_erro TEXT,
+                resposta_api TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                enviado_em TEXT,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
+                FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id) ON DELETE CASCADE,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL,
+                UNIQUE (empresa_id, agendamento_id, tipo)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_whatsapp_fila_processamento
+                ON whatsapp_fila (status, agendado_para, proxima_tentativa_em);
+            CREATE INDEX IF NOT EXISTS idx_whatsapp_fila_empresa
+                ON whatsapp_fila (empresa_id, criado_em);
+
+            CREATE TABLE IF NOT EXISTS crm_configuracoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL UNIQUE,
+                dias_inatividade INTEGER NOT NULL DEFAULT 60,
+                dias_risco INTEGER NOT NULL DEFAULT 30,
+                vip_valor_minimo REAL NOT NULL DEFAULT 500,
+                vip_visitas_minimas INTEGER NOT NULL DEFAULT 8,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS crm_campanhas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                nome TEXT NOT NULL,
+                publico_alvo TEXT NOT NULL DEFAULT 'todos',
+                mensagem TEXT NOT NULL,
+                data_inicio TEXT,
+                data_fim TEXT,
+                status TEXT NOT NULL DEFAULT 'rascunho',
+                ativo INTEGER NOT NULL DEFAULT 0,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_crm_campanhas_empresa
+                ON crm_campanhas (empresa_id, criado_em);
+
             CREATE TABLE IF NOT EXISTS configuracoes_financeiras (
                 id INTEGER PRIMARY KEY CHECK (id = 1),
                 dia_vencimento_padrao INTEGER NOT NULL DEFAULT 10,
@@ -342,7 +466,7 @@ def init_db():
         )
 
         planos_padrao = [
-            ("Essencial", "Para começar a organizar os agendamentos.", 49.90, 2, 2, 150),
+            ("Essencial", "Agenda, CRM e lembretes pelo WhatsApp para começar.", 49.90, 2, 2, 150),
             ("Profissional", "CRM, fidelidade, financeiro e relatórios.", 99.90, None, None, None),
             ("Premium", "Todos os recursos e integrações avançadas.", 149.90, None, None, None),
         ]
@@ -356,7 +480,7 @@ def init_db():
         )
 
         mapa_recursos = {
-            "Essencial": ("agenda", "crm"),
+            "Essencial": ("agenda", "crm", "whatsapp"),
             "Profissional": ("agenda", "crm", "financeiro", "fidelidade", "relatorios", "whatsapp"),
             "Premium": ("agenda", "crm", "financeiro", "fidelidade", "relatorios", "whatsapp", "api"),
         }

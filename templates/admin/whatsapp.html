@@ -1,0 +1,159 @@
+{% extends 'admin/base.html' %}
+{% block title %}Comunicação | WhatsApp{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/whatsapp.css') }}?v=5">{% endblock %}
+{% block content %}
+
+<header class="page-header whatsapp-header">
+  <div>
+    <span>Comunicação</span>
+    <h1>WhatsApp</h1>
+    <p>Confirmações e lembretes automáticos pela Evolution API.</p>
+  </div>
+  <div class="wa-header-actions">
+    {% if configurado %}
+    <a class="btn btn-secondary" href="{{ url_for('admin_whatsapp', configurar=1) }}#configuracao-inicial">Configurar integração</a>
+    <button class="btn btn-secondary" id="btnAtualizarStatus" type="button">Atualizar status</button>
+    {% endif %}
+  </div>
+</header>
+
+{% set mostrar_assistente = (not configurado) or request.args.get('configurar') == '1' %}
+{% if mostrar_assistente %}
+<section class="wa-onboarding" id="configuracao-inicial">
+  <div class="wa-onboarding-copy">
+    <span class="wa-step-badge">Primeira configuração</span>
+    <h2>Conecte o WhatsApp da empresa</h2>
+    <p>Informe os dados da Evolution API. Depois de salvar, o sistema liberará a geração do QR Code.</p>
+
+    <ol class="wa-steps">
+      <li class="active"><span>1</span><div><strong>Configurar integração</strong><small>URL, chave e nome da instância</small></div></li>
+      <li><span>2</span><div><strong>Gerar QR Code</strong><small>Conectar pelo aplicativo WhatsApp</small></div></li>
+      <li><span>3</span><div><strong>Enviar teste</strong><small>Validar a comunicação</small></div></li>
+    </ol>
+
+    <div class="wa-onboarding-note">
+      <strong>Onde encontro esses dados?</strong>
+      <p>A URL e a API Key são definidas na instalação da Evolution API. Na VPS, a URL poderá ser um subdomínio como <code>https://evolution.bytechce.com.br</code>.</p>
+    </div>
+  </div>
+
+  <article class="panel wa-panel wa-setup-card">
+    <div class="panel-header">
+      <div><span>Passo 1 de 3</span><h2>Dados da integração</h2><p>As credenciais ficam armazenadas no servidor e a chave não será exibida depois.</p></div>
+    </div>
+    <form method="post" action="{{ url_for('salvar_whatsapp_configuracoes') }}" class="wa-setup-form">
+      <label>URL da Evolution API
+        <input name="base_url" type="url" value="{{ config.base_url or '' }}" placeholder="https://evolution.bytechce.com.br" required>
+        <small>Durante testes locais, pode ser <code>http://127.0.0.1:8080</code>.</small>
+      </label>
+      <label>API Key
+        <input name="api_key" type="password" placeholder="Cole a chave global da Evolution API" required autocomplete="new-password">
+      </label>
+      <label>Nome da instância
+        <input name="instance_name" value="{{ config.instance_name }}" required>
+        <small>Identifica o WhatsApp desta empresa. Evite espaços e acentos.</small>
+      </label>
+      <input name="timeout_segundos" type="hidden" value="{{ config.timeout_segundos or 15 }}">
+      <button class="btn btn-primary full" type="submit">Salvar e continuar</button>
+    </form>
+  </article>
+</section>
+{% else %}
+<section class="wa-kpis">
+  <article class="wa-card wa-status-card">
+    <span class="wa-eyebrow">Conexão</span>
+    <div class="wa-status-line"><i class="wa-dot {{ 'online' if config.status == 'conectado' else '' }}" id="statusDot"></i><strong id="statusText">{{ config.status|replace('_',' ')|capitalize }}</strong></div>
+    <small>Instância: {{ config.instance_name }}</small>
+  </article>
+  <article class="wa-card"><span class="wa-eyebrow">Mensagens hoje</span><strong class="wa-number">{{ resumo.total or 0 }}</strong><small>{{ resumo.enviados or 0 }} enviadas</small></article>
+  <article class="wa-card"><span class="wa-eyebrow">Erros hoje</span><strong class="wa-number">{{ resumo.erros or 0 }}</strong><small>Verifique o histórico</small></article>
+  <article class="wa-card"><span class="wa-eyebrow">Fila de envio</span><strong class="wa-number">{{ fila.pendentes or 0 }}</strong><small>{{ fila.erros or 0 }} falha(s) definitiva(s)</small></article>
+</section>
+
+<nav class="wa-tabs">
+  <a href="#conexao">Conexão</a><a href="#automacoes">Automações</a><a href="#modelos">Modelos</a><a href="#historico">Histórico</a><a href="#configuracoes">Configurações</a>
+</nav>
+
+<section class="wa-grid" id="conexao">
+  <article class="panel wa-panel">
+    <div class="panel-header"><div><span>Passo 2 de 3</span><h2>Conectar WhatsApp</h2></div></div>
+    {% if config.qr_code and config.status != 'conectado' %}
+    <div class="wa-qr"><img src="{{ config.qr_code if config.qr_code.startswith('data:') else 'data:image/png;base64,' ~ config.qr_code }}" alt="QR Code do WhatsApp"><p>No WhatsApp, acesse <strong>Aparelhos conectados → Conectar aparelho</strong>.</p></div>
+    {% else %}
+    <div class="wa-empty"><div>⌁</div><strong>{{ 'WhatsApp conectado' if config.status == 'conectado' else 'Configuração concluída' }}</strong><p>{{ 'A integração está disponível para envios.' if config.status == 'conectado' else 'Agora gere o QR Code e conecte o número da empresa.' }}</p></div>
+    {% endif %}
+    <form method="post" action="{{ url_for('conectar_whatsapp') }}"><button class="btn btn-primary full" type="submit">{{ 'Gerar novo QR Code' if config.qr_code else 'Gerar QR Code' }}</button></form>
+  </article>
+
+  <article class="panel wa-panel">
+    <div class="panel-header"><div><span>Passo 3 de 3</span><h2>Enviar mensagem de teste</h2></div></div>
+    <form method="post" action="{{ url_for('testar_whatsapp') }}" class="wa-form">
+      <label>Número com DDD</label>
+      <input name="numero" placeholder="(85) 99999-9999" required>
+      <button class="btn btn-secondary full">Testar envio</button>
+    </form>
+    <div class="wa-security"><strong>🔐 Credenciais protegidas</strong><p>A chave não é enviada ao navegador e permanece armazenada no servidor.</p></div>
+  </article>
+</section>
+
+<section class="panel wa-panel" id="automacoes">
+ <div class="panel-header"><div><span>Fluxos automáticos</span><h2>Automações</h2><p>Escolha quais mensagens o sistema enviará.</p></div></div>
+ <form method="post" action="{{ url_for('salvar_whatsapp_automacoes') }}">
+  <div class="wa-switch-grid">
+  {% set itens=[('confirmacao','Confirmação imediata','Envia assim que o agendamento é criado',automacoes.confirmacao_ativa),('lembrete_24h','Lembrete 24 horas','Reduz esquecimentos no dia anterior',automacoes.lembrete_24h_ativo),('lembrete_2h','Lembrete 2 horas','Reforço próximo ao atendimento',automacoes.lembrete_2h_ativo),('cancelamento','Aviso de cancelamento','Informa o cliente automaticamente',automacoes.cancelamento_ativo),('pos_atendimento','Pós-atendimento','Agradecimento após finalizar',automacoes.pos_atendimento_ativo),('aniversario','Aniversário','Mensagem para aniversariantes',automacoes.aniversario_ativo),('cliente_inativo','Cliente inativo','Campanha futura de recuperação',automacoes.cliente_inativo_ativo)] %}
+  {% for campo,titulo,descricao,ativo in itens %}<label class="wa-switch-card"><div><strong>{{ titulo }}</strong><small>{{ descricao }}</small></div><input type="checkbox" name="{{ campo }}" {% if ativo %}checked{% endif %}><span class="wa-switch"></span></label>{% endfor %}
+  </div><button class="btn btn-primary">Salvar automações</button>
+ </form>
+</section>
+
+<section class="panel wa-panel" id="modelos">
+ <div class="panel-header"><div><span>Personalização</span><h2>Modelos de mensagem</h2><p>Variáveis: {{ '{{nome}}' }}, {{ '{{empresa}}' }}, {{ '{{servico}}' }}, {{ '{{profissional}}' }}, {{ '{{data}}' }}, {{ '{{hora}}' }}.</p></div></div>
+ <form method="post" action="{{ url_for('salvar_whatsapp_modelos') }}"><div class="wa-modelos">{% for modelo in modelos %}<details {% if loop.first %}open{% endif %}><summary><strong>{{ modelo.nome }}</strong><span>{{ modelo.tipo|replace('_',' ')|capitalize }}</span></summary><textarea name="mensagem_{{ modelo.id }}" rows="7">{{ modelo.mensagem }}</textarea></details>{% endfor %}</div><button class="btn btn-primary">Salvar modelos</button></form>
+</section>
+
+<section class="panel wa-panel" id="historico">
+ <div class="panel-header"><div><span>Auditoria</span><h2>Histórico de mensagens</h2><p>A confirmação e os lembretes passam por uma fila com tentativas automáticas.</p></div><form method="post" action="{{ url_for('processar_whatsapp_manual') }}"><button class="btn btn-secondary" type="submit">Processar agora</button></form></div>
+ <div class="table-responsive"><table><thead><tr><th>Data</th><th>Cliente</th><th>Tipo</th><th>Telefone</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>{% for item in historico %}<tr><td>{{ item.criado_em }}</td><td>{{ item.cliente_nome or 'Envio de teste' }}</td><td>{{ item.tipo|replace('_',' ')|capitalize }}</td><td>{{ item.telefone }}</td><td><span class="wa-badge {{ item.status }}">{{ item.status|capitalize }}</span></td><td title="{{ item.erro or item.mensagem }}">{{ item.erro or item.mensagem|truncate(55) }}</td></tr>{% else %}<tr><td colspan="6" class="wa-table-empty">Nenhuma mensagem registrada.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+
+<section class="panel wa-panel" id="configuracoes">
+ <div class="panel-header"><div><span>Integração</span><h2>Configurações técnicas</h2><p>Altere os dados somente quando mudar a instalação da Evolution API.</p></div></div>
+ <form method="post" action="{{ url_for('salvar_whatsapp_configuracoes') }}" class="wa-config-grid">
+  <label>URL da Evolution API<input name="base_url" type="url" value="{{ config.base_url or '' }}" placeholder="https://evolution.bytechce.com.br" required></label>
+  <label>Nome da instância<input name="instance_name" value="{{ config.instance_name }}" required></label>
+  <label>API Key<input name="api_key" type="password" placeholder="Chave já cadastrada — deixe vazio para manter"></label>
+  <label>Timeout (segundos)<input name="timeout_segundos" type="number" min="3" max="60" value="{{ config.timeout_segundos or 15 }}"></label>
+  <button class="btn btn-primary">Salvar alterações</button>
+ </form>
+</section>
+
+<script>
+const statusButton = document.getElementById('btnAtualizarStatus');
+if (statusButton) {
+  statusButton.addEventListener('click', async () => {
+    statusButton.disabled = true;
+    statusButton.textContent = 'Consultando...';
+    try {
+      const response = await fetch('{{ url_for("status_whatsapp") }}');
+      const data = await response.json();
+      const text = document.getElementById('statusText');
+      const dot = document.getElementById('statusDot');
+      if (!data.configurado && data.status === 'nao_configurado') {
+        text.textContent = 'Não configurado';
+        dot.classList.remove('online');
+        return;
+      }
+      text.textContent = (data.status || 'desconectado').replace('_', ' ');
+      dot.classList.toggle('online', data.status === 'conectado');
+    } catch (_) {
+      document.getElementById('statusText').textContent = 'Falha ao consultar';
+      document.getElementById('statusDot').classList.remove('online');
+    } finally {
+      statusButton.disabled = false;
+      statusButton.textContent = 'Atualizar status';
+    }
+  });
+}
+</script>
+{% endif %}
+{% endblock %}

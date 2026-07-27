@@ -14,8 +14,10 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=20"
+    href="{{ url_for('static', filename='css/style.css') }}?v=21"
 >
+
+    {% block page_styles %}{% endblock %}
 
     <style>
         .admin-sidebar {
@@ -239,6 +241,16 @@
 
                 <span>Serviços</span>
             </a>
+
+            {% if tem_recurso and tem_recurso('whatsapp') %}
+            <a
+                class="admin-nav-link {% if request.endpoint and ('whatsapp' in request.endpoint) %}active{% endif %}"
+                href="{{ url_for('admin_whatsapp') }}"
+            >
+                <span class="admin-nav-icon">◉</span>
+                <span>Comunicação</span>
+            </a>
+            {% endif %}
 
             <a
                 class="admin-nav-link {% if request.endpoint and request.endpoint.startswith('admin_relatorios') %}active{% endif %}"
@@ -725,6 +737,8 @@ document.addEventListener(
 );
 
 </script>
+
+{% block page_scripts %}{% endblock %}
 
 </body>
 </html>

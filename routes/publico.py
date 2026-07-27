@@ -289,6 +289,13 @@ def criar_agendamento(slug):
     nomes_servicos = [servico["nome"] for servico in servicos]
     conn.close()
 
+    try:
+        from services.evolution_api import enviar_mensagem_agendamento
+        enviar_mensagem_agendamento(empresa["id"], agendamento_id, "confirmacao")
+    except Exception:
+        # A indisponibilidade do WhatsApp nunca impede o agendamento público.
+        pass
+
     mensagem = (
         f"Olá! Meu nome é {dados['cliente_nome']}. "
         f"Agendei os serviços: {', '.join(nomes_servicos)} "
