@@ -11,7 +11,7 @@ import os
 import re
 from dataclasses import dataclass
 from datetime import datetime
-from urllib import error, parse, request
+from urllib import error, request
 
 from database import get_connection
 
@@ -101,10 +101,6 @@ class EvolutionClient:
     def estado(self, instance_name: str) -> EvolutionResult:
         return self._call("GET", f"/instance/connectionState/{instance_name}")
 
-    def detalhes_instancia(self, instance_name: str) -> EvolutionResult:
-        nome = parse.quote(instance_name, safe="")
-        return self._call("GET", f"/instance/fetchInstances?instanceName={nome}")
-
     def logout(self, instance_name: str) -> EvolutionResult:
         return self._call("DELETE", f"/instance/logout/{instance_name}")
 
@@ -115,38 +111,6 @@ class EvolutionClient:
             {"number": number, "text": text},
         )
 
-
-
-def extrair_perfil_instancia(data: dict, instance_name: str = "") -> dict:
-    """Normaliza os dados de perfil retornados por diferentes builds da Evolution v2."""
-    itens = data if isinstance(data, list) else data.get("instances", data.get("data", data))
-    if isinstance(itens, dict):
-        itens = [itens]
-    if not isinstance(itens, list):
-        itens = []
-
-    escolhido = {}
-    for item in itens:
-        if not isinstance(item, dict):
-            continue
-        instancia = item.get("instance") if isinstance(item.get("instance"), dict) else item
-        nome = instancia.get("instanceName") or instancia.get("name") or item.get("name")
-        if not instance_name or nome == instance_name:
-            escolhido = item
-            break
-    if not escolhido and itens:
-        escolhido = itens[0] if isinstance(itens[0], dict) else {}
-
-    instancia = escolhido.get("instance") if isinstance(escolhido.get("instance"), dict) else escolhido
-    numero = (instancia.get("ownerJid") or instancia.get("number") or instancia.get("phone")
-              or escolhido.get("ownerJid") or escolhido.get("number") or "")
-    numero = str(numero).split("@")[0].split(":")[0]
-    return {
-        "numero": numero,
-        "nome": instancia.get("profileName") or instancia.get("name") or escolhido.get("profileName") or "",
-        "foto": instancia.get("profilePicUrl") or instancia.get("profilePictureUrl")
-                or escolhido.get("profilePicUrl") or escolhido.get("profilePictureUrl") or "",
-    }
 
 def obter_configuracao_global() -> tuple[str, str, int]:
     """Retorna as credenciais da Evolution mantidas pela infraestrutura Bytech.

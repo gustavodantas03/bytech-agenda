@@ -620,6 +620,15 @@ def init_db():
                     f"ALTER TABLE empresas ADD COLUMN {coluna} {definicao}"
                 )
 
+        campos_whatsapp = {
+            "nome_perfil": "TEXT",
+            "foto_perfil": "TEXT",
+            "conectado_em": "TEXT",
+        }
+        for coluna, definicao in campos_whatsapp.items():
+            if not _column_exists(conn, "whatsapp_configuracoes", coluna):
+                conn.execute(f"ALTER TABLE whatsapp_configuracoes ADD COLUMN {coluna} {definicao}")
+
         campos_cobranca = {
             "desconto": "REAL NOT NULL DEFAULT 0",
             "acrescimo": "REAL NOT NULL DEFAULT 0",

@@ -10,6 +10,7 @@
     <title>
         {% block title %}Bytech Master{% endblock %}
     </title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
 
     <link
         rel="stylesheet"
@@ -33,7 +34,7 @@
         class="master-sidebar"
     >
         <div class="master-brand">
-            <div class="master-brand-mark">B</div>
+            <img class="master-brand-mark bytech-system-logo" src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
 
             <div>
                 <strong>Bytech</strong>

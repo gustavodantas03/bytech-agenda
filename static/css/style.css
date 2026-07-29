@@ -4840,3 +4840,57 @@ body.modal-open{overflow:hidden}.payment-modal-card{width:min(620px,100%)}.payme
 .timeline-points.negative{
     color:#dc2626;
 }
+/* RC2.3.2 — identidade oficial Bytech Agenda */
+.bytech-system-logo,
+.logo-mark.bytech-system-logo,
+.admin-brand-logo.bytech-system-logo,
+.admin-mobile-logo.bytech-system-logo,
+.master-brand-mark.bytech-system-logo,
+.booking-system-logo {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    object-fit: contain;
+}
+
+.logo-mark.bytech-system-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+}
+
+.admin-brand-logo.bytech-system-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+}
+
+.admin-mobile-logo.bytech-system-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+}
+
+.master-brand-mark.bytech-system-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+}
+
+.booking-logo.booking-system-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+}
+
+.booking-hero-logo.booking-system-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 24px;
+}
+
+button.booking-back {
+    cursor: pointer;
+    font: inherit;
+}

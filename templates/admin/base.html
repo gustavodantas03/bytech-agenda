@@ -11,13 +11,14 @@
     <title>
         {% block title %}Bytech Agenda{% endblock %}
     </title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=22"
+    href="{{ url_for('static', filename='css/style.css') }}?v=23"
 >
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}?v=rc1-2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}?v=rc2-3-2">
 
     {% block page_styles %}{% endblock %}
 
@@ -141,9 +142,7 @@
 
             <div class="brand admin-brand">
 
-                <div class="admin-brand-logo">
-                    B
-                </div>
+                <img class="admin-brand-logo bytech-system-logo" src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
 
                 <div class="admin-brand-text">
                     <strong>Bytech</strong>
@@ -384,9 +383,7 @@
 
             <div class="admin-mobile-brand">
 
-                <div class="admin-mobile-logo">
-                    B
-                </div>
+                <img class="admin-mobile-logo bytech-system-logo" src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
 
                 <div>
                     <strong>Bytech</strong>

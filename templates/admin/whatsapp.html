@@ -1,113 +1,65 @@
 {% extends 'admin/base.html' %}
 {% block title %}Comunicação | WhatsApp{% endblock %}
-{% block page_scripts %}
-<script src="{{ url_for('static', filename='js/whatsapp.js') }}?v=rc1-1"></script>
-{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/whatsapp.css') }}?v=rc1-1">{% endblock %}
+{% block page_scripts %}<script src="{{ url_for('static', filename='js/whatsapp.js') }}?v=rc2-4"></script>{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/whatsapp.css') }}?v=rc2-4">{% endblock %}
 {% block content %}
-
 <main class="whatsapp-page" data-status-url="{{ url_for('status_whatsapp') }}">
 <header class="page-header whatsapp-header">
-  <div>
-    <span>Comunicação</span>
-    <h1>WhatsApp</h1>
-    <p>Confirmações e lembretes automáticos pela Evolution API.</p>
-  </div>
-  <div class="wa-header-actions">
-    {% if configurado %}
-    <a class="btn btn-secondary" href="{{ url_for('admin_whatsapp', configurar=1) }}#configuracao-inicial">Configurar integração</a>
-    <button class="btn btn-secondary" id="btnAtualizarStatus" type="button">Atualizar status</button>
-    {% endif %}
-  </div>
+  <div><span>Comunicação</span><h1>WhatsApp</h1><p>Conecte o número da empresa e automatize confirmações e lembretes.</p></div>
+  {% if configurado %}<button class="btn btn-secondary" id="btnAtualizarStatus" type="button">Atualizar status</button>{% endif %}
 </header>
 
-{% set mostrar_assistente = (not configurado) or request.args.get('configurar') == '1' %}
-{% if mostrar_assistente %}
-<section class="wa-onboarding" id="configuracao-inicial">
-  <div class="wa-onboarding-copy">
-    <span class="wa-step-badge">Primeira configuração</span>
-    <h2>Conecte o WhatsApp da empresa</h2>
-    <p>A Bytech configura a Evolution API uma única vez no servidor. Depois, cada empresa conecta o próprio número lendo o QR Code.</p>
-
-    <ol class="wa-steps">
-      <li class="active"><span>1</span><div><strong>Configurar integração</strong><small>URL, chave e nome da instância</small></div></li>
-      <li><span>2</span><div><strong>Gerar QR Code</strong><small>Conectar pelo aplicativo WhatsApp</small></div></li>
-      <li><span>3</span><div><strong>Enviar teste</strong><small>Validar a comunicação</small></div></li>
-    </ol>
-
-    <div class="wa-onboarding-note">
-      <strong>Configuração técnica da Bytech</strong>
-      <p>A URL e a API Key serão criadas durante a instalação na VPS. O cliente final não precisa conhecer essas credenciais: ele apenas escaneia o QR Code.</p>
-    </div>
-  </div>
-
-  <article class="panel wa-panel wa-setup-card">
-    <div class="panel-header">
-      <div><span>Passo 1 de 3</span><h2>Dados da integração</h2><p>As credenciais ficam armazenadas no servidor e a chave não será exibida depois.</p></div>
-    </div>
-    <form method="post" action="{{ url_for('salvar_whatsapp_configuracoes') }}" class="wa-setup-form">
-      <label>URL da Evolution API
-        <input name="base_url" type="url" value="{{ config.base_url or '' }}" placeholder="https://evolution.bytechce.com.br" required>
-        <small>Durante testes locais, pode ser <code>http://127.0.0.1:8080</code>.</small>
-      </label>
-      <label>API Key
-        <input name="api_key" type="password" placeholder="Cole a chave global da Evolution API" required autocomplete="new-password">
-      </label>
-      <label>Nome da instância
-        <input name="instance_name" value="{{ config.instance_name }}" required>
-        <small>Identifica o WhatsApp desta empresa. Evite espaços e acentos.</small>
-      </label>
-      <input name="timeout_segundos" type="hidden" value="{{ config.timeout_segundos or 15 }}">
-      <button class="btn btn-primary full" type="submit">Salvar e continuar</button>
-    </form>
-  </article>
+{% if not configurado %}
+<section class="panel wa-panel wa-infra-alert">
+  <div class="wa-empty"><div>⚙</div><strong>Infraestrutura indisponível</strong><p>A Evolution API precisa ser configurada nas variáveis <code>EVOLUTION_BASE_URL</code> e <code>EVOLUTION_API_KEY</code> do servidor. O cliente não precisa informar credenciais.</p></div>
 </section>
 {% else %}
 <section class="wa-kpis">
-  <article class="wa-card wa-status-card">
-    <span class="wa-eyebrow">Conexão</span>
-    <div class="wa-status-line"><i class="wa-dot {{ 'online' if config.status == 'conectado' else '' }}" id="statusDot"></i><strong id="statusText">{{ config.status|replace('_',' ')|capitalize }}</strong></div>
-    <small>Instância: {{ config.instance_name }}</small>
-  </article>
+  <article class="wa-card wa-status-card"><span class="wa-eyebrow">Conexão</span><div class="wa-status-line"><i class="wa-dot {{ 'online' if config.status == 'conectado' else '' }}" id="statusDot"></i><strong id="statusText">{{ config.status|replace('_',' ')|capitalize }}</strong></div><small id="lastSyncText">Última sincronização: {{ config.ultima_sincronizacao or 'ainda não realizada' }}</small></article>
   <article class="wa-card"><span class="wa-eyebrow">Mensagens hoje</span><strong class="wa-number">{{ resumo.total or 0 }}</strong><small>{{ resumo.enviados or 0 }} enviadas</small></article>
-  <article class="wa-card"><span class="wa-eyebrow">Erros hoje</span><strong class="wa-number">{{ resumo.erros or 0 }}</strong><small>Verifique o histórico</small></article>
+  <article class="wa-card"><span class="wa-eyebrow">Erros hoje</span><strong class="wa-number">{{ resumo.erros or 0 }}</strong><small>Consulte o histórico</small></article>
   <article class="wa-card"><span class="wa-eyebrow">Fila de envio</span><strong class="wa-number">{{ fila.pendentes or 0 }}</strong><small>{{ fila.erros or 0 }} falha(s) definitiva(s)</small></article>
 </section>
 
-<nav class="wa-tabs">
-  <a href="#conexao">Conexão</a><a href="#automacoes">Automações</a><a href="#modelos">Modelos</a><a href="#historico">Histórico</a><a href="#configuracoes">Configurações</a>
-</nav>
+<nav class="wa-tabs"><a href="#conexao">Conexão</a><a href="#automacoes">Automações</a><a href="#modelos">Modelos</a><a href="#historico">Histórico</a></nav>
 
 <section class="wa-grid" id="conexao">
   <article class="panel wa-panel">
-    <div class="panel-header"><div><span>Passo 2 de 3</span><h2>Conectar WhatsApp</h2></div></div>
+    <div class="panel-header"><div><span>Conexão segura</span><h2>Conectar WhatsApp</h2><p>O QR Code é criado automaticamente para esta empresa.</p></div></div>
+    <div class="wa-profile" id="waProfile" {% if config.status != 'conectado' %}hidden{% endif %}>
+      <div class="wa-profile-avatar">
+        {% if config.foto_perfil %}<img id="waProfilePhoto" src="{{ config.foto_perfil }}" alt="Foto do WhatsApp">{% else %}<span id="waProfileFallback">WA</span>{% endif %}
+      </div>
+      <div><small>Número conectado</small><strong id="waProfileName">{{ config.nome_perfil or 'WhatsApp da empresa' }}</strong><span id="waProfileNumber">{{ config.numero_conectado or 'Sincronizando número...' }}</span></div>
+    </div>
     {% if config.qr_code and config.status != 'conectado' %}
-    <div class="wa-qr"><img src="{{ config.qr_code if config.qr_code.startswith('data:') else 'data:image/png;base64,' ~ config.qr_code }}" alt="QR Code do WhatsApp"><p>No WhatsApp, acesse <strong>Aparelhos conectados → Conectar aparelho</strong>.</p></div>
+      <div class="wa-qr"><img src="{{ config.qr_code if config.qr_code.startswith('data:') else 'data:image/png;base64,' ~ config.qr_code }}" alt="QR Code do WhatsApp"><p>No WhatsApp, acesse <strong>Aparelhos conectados → Conectar aparelho</strong>.</p></div>
     {% else %}
-    <div class="wa-empty"><div>⌁</div><strong>{{ 'WhatsApp conectado' if config.status == 'conectado' else 'Configuração concluída' }}</strong><p>{{ 'A integração está disponível para envios.' if config.status == 'conectado' else 'Agora gere o QR Code e conecte o número da empresa.' }}</p></div>
+      <div class="wa-empty"><div>{{ '✓' if config.status == 'conectado' else '⌁' }}</div><strong>{{ 'WhatsApp conectado' if config.status == 'conectado' else 'Número ainda não conectado' }}</strong><p>{{ 'A integração está disponível para envios e automações.' if config.status == 'conectado' else 'Clique abaixo para gerar o QR Code.' }}</p></div>
     {% endif %}
-    <form method="post" action="{{ url_for('conectar_whatsapp') }}"><button class="btn btn-primary full" type="submit">{{ 'Gerar novo QR Code' if config.qr_code else 'Gerar QR Code' }}</button></form>
+    {% if config.status == 'conectado' %}
+      <form method="post" action="{{ url_for('desconectar_whatsapp') }}" onsubmit="return confirm('Desconectar este WhatsApp?');"><button class="btn btn-danger full" type="submit">Desconectar WhatsApp</button></form>
+    {% else %}
+      <form method="post" action="{{ url_for('conectar_whatsapp') }}"><button class="btn btn-primary full" type="submit">{{ 'Gerar novo QR Code' if config.qr_code else 'Conectar WhatsApp' }}</button></form>
+    {% endif %}
   </article>
 
   <article class="panel wa-panel">
-    <div class="panel-header"><div><span>Passo 3 de 3</span><h2>Enviar mensagem de teste</h2></div></div>
+    <div class="panel-header"><div><span>Validação</span><h2>Enviar mensagem de teste</h2><p>Disponível após o status ficar conectado.</p></div></div>
     <form method="post" action="{{ url_for('testar_whatsapp') }}" class="wa-form">
-      <label>Número com DDD</label>
-      <input name="numero" placeholder="(85) 99999-9999" required>
-      <button class="btn btn-secondary full">Testar envio</button>
+      <label>Número com DDD</label><input name="numero" placeholder="(85) 99999-9999" required>
+      <button class="btn btn-secondary full" {% if config.status != 'conectado' %}disabled title="Conecte o WhatsApp primeiro"{% endif %}>Testar envio</button>
     </form>
-    <div class="wa-security"><strong>🔐 Credenciais protegidas</strong><p>A chave não é enviada ao navegador e permanece armazenada no servidor.</p></div>
+    <div class="wa-security"><strong>🔐 Configuração protegida</strong><p>A URL, a chave e o nome técnico da instância não são exibidos ao cliente.</p></div>
   </article>
 </section>
 
 <section class="panel wa-panel" id="automacoes">
  <div class="panel-header"><div><span>Fluxos automáticos</span><h2>Automações</h2><p>Escolha quais mensagens o sistema enviará.</p></div></div>
- <form method="post" action="{{ url_for('salvar_whatsapp_automacoes') }}">
-  <div class="wa-switch-grid">
-  {% set itens=[('confirmacao','Confirmação imediata','Envia assim que o agendamento é criado',automacoes.confirmacao_ativa),('lembrete_24h','Lembrete 24 horas','Reduz esquecimentos no dia anterior',automacoes.lembrete_24h_ativo),('lembrete_2h','Lembrete 2 horas','Reforço próximo ao atendimento',automacoes.lembrete_2h_ativo),('cancelamento','Aviso de cancelamento','Informa o cliente automaticamente',automacoes.cancelamento_ativo),('pos_atendimento','Pós-atendimento','Agradecimento após finalizar',automacoes.pos_atendimento_ativo),('aniversario','Aniversário','Mensagem para aniversariantes',automacoes.aniversario_ativo),('cliente_inativo','Cliente inativo','Campanha futura de recuperação',automacoes.cliente_inativo_ativo)] %}
-  {% for campo,titulo,descricao,ativo in itens %}<label class="wa-switch-card"><div><strong>{{ titulo }}</strong><small>{{ descricao }}</small></div><input type="checkbox" name="{{ campo }}" {% if ativo %}checked{% endif %}><span class="wa-switch"></span></label>{% endfor %}
-  </div><button class="btn btn-primary">Salvar automações</button>
- </form>
+ <form method="post" action="{{ url_for('salvar_whatsapp_automacoes') }}"><div class="wa-switch-grid">
+ {% set itens=[('confirmacao','Confirmação imediata','Envia assim que o agendamento é criado',automacoes.confirmacao_ativa),('lembrete_24h','Lembrete 24 horas','Reduz esquecimentos no dia anterior',automacoes.lembrete_24h_ativo),('lembrete_2h','Lembrete 2 horas','Reforço próximo ao atendimento',automacoes.lembrete_2h_ativo),('cancelamento','Aviso de cancelamento','Informa o cliente automaticamente',automacoes.cancelamento_ativo),('pos_atendimento','Pós-atendimento','Agradecimento após finalizar',automacoes.pos_atendimento_ativo),('aniversario','Aniversário','Mensagem para aniversariantes',automacoes.aniversario_ativo),('cliente_inativo','Cliente inativo','Campanha futura de recuperação',automacoes.cliente_inativo_ativo)] %}
+ {% for campo,titulo,descricao,ativo in itens %}<label class="wa-switch-card"><div><strong>{{ titulo }}</strong><small>{{ descricao }}</small></div><input type="checkbox" name="{{ campo }}" {% if ativo %}checked{% endif %}><span class="wa-switch"></span></label>{% endfor %}
+ </div><button class="btn btn-primary">Salvar automações</button></form>
 </section>
 
 <section class="panel wa-panel" id="modelos">
@@ -119,19 +71,6 @@
  <div class="panel-header"><div><span>Auditoria</span><h2>Histórico de mensagens</h2><p>A confirmação e os lembretes passam por uma fila com tentativas automáticas.</p></div><form method="post" action="{{ url_for('processar_whatsapp_manual') }}"><button class="btn btn-secondary" type="submit">Processar agora</button></form></div>
  <div class="table-responsive"><table><thead><tr><th>Data</th><th>Cliente</th><th>Tipo</th><th>Telefone</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>{% for item in historico %}<tr><td>{{ item.criado_em }}</td><td>{{ item.cliente_nome or 'Envio de teste' }}</td><td>{{ item.tipo|replace('_',' ')|capitalize }}</td><td>{{ item.telefone }}</td><td><span class="wa-badge {{ item.status }}">{{ item.status|capitalize }}</span></td><td title="{{ item.erro or item.mensagem }}">{{ item.erro or item.mensagem|truncate(55) }}</td></tr>{% else %}<tr><td colspan="6" class="wa-table-empty">Nenhuma mensagem registrada.</td></tr>{% endfor %}</tbody></table></div>
 </section>
-
-<section class="panel wa-panel" id="configuracoes">
- <div class="panel-header"><div><span>Integração</span><h2>Configurações técnicas</h2><p>Altere os dados somente quando mudar a instalação da Evolution API.</p></div></div>
- <form method="post" action="{{ url_for('salvar_whatsapp_configuracoes') }}" class="wa-config-grid">
-  <label>URL da Evolution API<input name="base_url" type="url" value="{{ config.base_url or '' }}" placeholder="https://evolution.bytechce.com.br" required></label>
-  <label>Nome da instância<input name="instance_name" value="{{ config.instance_name }}" required></label>
-  <label>API Key<input name="api_key" type="password" placeholder="Chave já cadastrada — deixe vazio para manter"></label>
-  <label>Timeout (segundos)<input name="timeout_segundos" type="number" min="3" max="60" value="{{ config.timeout_segundos or 15 }}"></label>
-  <button class="btn btn-primary">Salvar alterações</button>
- </form>
-</section>
-
-
-</main>
 {% endif %}
+</main>
 {% endblock %}

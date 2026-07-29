@@ -10,19 +10,15 @@
 
     <title>Agendar | {{ empresa.nome }}</title>
 
-    {% if empresa.logo %}
-        <link
-            rel="icon"
-            href="{{ url_for(
-                'static',
-                filename='uploads/logos/' + empresa.logo
-            ) }}"
-        >
-    {% endif %}
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='img/favicon.png') }}"
+    >
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=24"
+    href="{{ url_for('static', filename='css/style.css') }}?v=25"
     >
 </head>
 
@@ -40,16 +36,15 @@
 
         <header class="booking-header">
 
-            <a
+            <button
+                id="bookingBackButton"
                 class="booking-back"
-                href="{{ url_for(
-                    'landing',
-                    slug=empresa.slug
-                ) }}"
-                aria-label="Voltar"
+                type="button"
+                aria-label="Voltar para a etapa anterior"
+                onclick="voltarEtapa()"
             >
                 ←
-            </a>
+            </button>
 
             <div class="booking-brand">
 
@@ -66,9 +61,11 @@
 
                 {% else %}
 
-                    <div class="booking-header-mark">
-                        B
-                    </div>
+                    <img
+                        class="booking-logo booking-system-logo"
+                        src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}"
+                        alt="Bytech Agenda"
+                    >
 
                 {% endif %}
 
@@ -105,9 +102,11 @@
 
                 {% else %}
 
-                    <div class="booking-hero-mark">
-                        B
-                    </div>
+                    <img
+                        class="booking-hero-logo booking-system-logo"
+                        src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}"
+                        alt="Bytech Agenda"
+                    >
 
                 {% endif %}
 
@@ -646,13 +645,14 @@
             segmento: "{{ empresa.segmento or 'barbearia' }}",
             profissionalSingular: "{{ ui.profissional_singular if ui else 'profissional' }}",
             profissionalPlural: "{{ ui.profissional_plural if ui else 'profissionais' }}",
-            nomeEmpresa: "{{ ui.nome_empresa if ui else 'empresa' }}"
+            nomeEmpresa: "{{ ui.nome_empresa if ui else 'empresa' }}",
+            landingUrl: "{{ url_for('landing', slug=empresa.slug) }}"
         };
     </script>
 
     <script
         type="module"
-        src="{{ url_for('static', filename='js/main.js') }}?v=1"
+        src="{{ url_for('static', filename='js/main.js') }}?v=2"
     ></script>
 
 </body>

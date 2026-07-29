@@ -11,6 +11,7 @@
     >
 
     <title>{{ empresa.nome }}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
 
     {% if empresa.logo %}
         <link
@@ -76,7 +77,7 @@
                         alt="Logo da {{ empresa.nome }}"
                     >
                 {% else %}
-                    <div class="logo-mark">B</div>
+                    <img class="logo-mark bytech-system-logo" src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
                 {% endif %}
 
                 <span class="hero-badge">

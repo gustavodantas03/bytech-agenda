@@ -255,11 +255,12 @@ def admin_dashboard():
         and empresa["endereco"]
         and empresa["horario_texto"]
     )
+    from services.evolution_api import infraestrutura_evolution_configurada
     whatsapp_configurado = bool(
         whatsapp_config
-        and whatsapp_config["base_url"]
-        and whatsapp_config["api_key"]
         and whatsapp_config["instance_name"]
+        and whatsapp_config["status"] == "conectado"
+        and infraestrutura_evolution_configurada()
     )
 
     onboarding_etapas = [

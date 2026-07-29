@@ -11,7 +11,10 @@ const etapas = {
     sucesso: 6,
 };
 
-export function mostrarEtapa(nome) {
+const historicoEtapas = ["nome"];
+let etapaAtualNome = "nome";
+
+function exibirEtapa(nome) {
     selecionarTodos(".step").forEach((step) => {
         step.classList.remove("active");
     });
@@ -19,10 +22,11 @@ export function mostrarEtapa(nome) {
     const etapaAtual = document.querySelector(`[data-step="${nome}"]`);
     if (!etapaAtual) {
         console.error(`A etapa "${nome}" não foi encontrada.`);
-        return;
+        return false;
     }
 
     etapaAtual.classList.add("active");
+    etapaAtualNome = nome;
     atualizarProgresso(nome);
 
     setTimeout(() => {
@@ -31,6 +35,43 @@ export function mostrarEtapa(nome) {
             block: "start",
         });
     }, 100);
+
+    return true;
+}
+
+export function mostrarEtapa(nome, opcoes = {}) {
+    const { registrarHistorico = true } = opcoes;
+    if (!exibirEtapa(nome)) return;
+
+    if (registrarHistorico) {
+        const ultima = historicoEtapas.at(-1);
+        if (ultima !== nome) historicoEtapas.push(nome);
+    }
+}
+
+export function voltarEtapa() {
+    if (etapaAtualNome === "sucesso") {
+        window.location.href = window.APP_CONFIG?.landingUrl || "/";
+        return;
+    }
+
+    if (historicoEtapas.length <= 1) {
+        window.location.href = window.APP_CONFIG?.landingUrl || "/";
+        return;
+    }
+
+    historicoEtapas.pop();
+    const etapaAnterior = historicoEtapas.at(-1) || "nome";
+    exibirEtapa(etapaAnterior);
+
+    const campoFoco = {
+        nome: "nome",
+        telefone: "telefone",
+    }[etapaAnterior];
+
+    if (campoFoco) {
+        setTimeout(() => document.getElementById(campoFoco)?.focus(), 250);
+    }
 }
 
 export function atualizarProgresso(nome) {
@@ -40,9 +81,7 @@ export function atualizarProgresso(nome) {
 
     const barra = document.getElementById("bookingProgressBar");
     const texto = document.getElementById("bookingProgressText");
-    const percentualTexto = document.getElementById(
-        "bookingProgressPercent"
-    );
+    const percentualTexto = document.getElementById("bookingProgressPercent");
 
     if (barra) barra.style.width = `${percentual}%`;
     if (texto) {
@@ -59,11 +98,22 @@ export function adicionarBolha(texto, tipo = "user") {
     const chat = document.getElementById("chat");
     if (!chat) return;
 
+    const etapaAtiva = chat.querySelector(".step.active");
+    const origem = etapaAtiva?.dataset.step || "desconhecida";
+    const existente = chat.querySelector(`.bubble[data-origin-step="${origem}"]`);
+
+    if (existente) {
+        existente.textContent = texto;
+        existente.className = `bubble ${tipo}`;
+        existente.dataset.originStep = origem;
+        return;
+    }
+
     const bolha = document.createElement("div");
     bolha.className = `bubble ${tipo}`;
     bolha.textContent = texto;
+    bolha.dataset.originStep = origem;
 
-    const etapaAtiva = chat.querySelector(".step.active");
     etapaAtiva
         ? chat.insertBefore(bolha, etapaAtiva)
         : chat.appendChild(bolha);

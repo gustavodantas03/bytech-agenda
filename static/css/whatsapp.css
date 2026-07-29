@@ -20,3 +20,13 @@
 .wa-setup-form label small{font-weight:500;color:#64748b;line-height:1.4}
 .wa-setup-form input{min-height:48px}
 @media(max-width:900px){.wa-onboarding{grid-template-columns:1fr}.wa-onboarding-copy{padding:8px 0}.wa-setup-card{min-width:0}}
+.wa-infra-alert{max-width:760px}.wa-empty code{background:#e2e8f0;padding:2px 6px;border-radius:6px}.btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}.btn-danger:hover{background:#b91c1c;border-color:#b91c1c}.wa-form button:disabled{opacity:.55;cursor:not-allowed}
+
+
+/* RC2.4 — perfil da conexão WhatsApp */
+.wa-profile{display:flex;align-items:center;gap:14px;padding:14px;margin-bottom:18px;border:1px solid var(--border-color,#e5e7eb);border-radius:16px;background:#f8fafc}
+.wa-profile[hidden]{display:none}
+.wa-profile-avatar{width:52px;height:52px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#dcfce7;color:#166534;font-weight:800;flex:0 0 52px}
+.wa-profile-avatar img{width:100%;height:100%;object-fit:cover}
+.wa-profile div:last-child{display:flex;flex-direction:column;min-width:0}
+.wa-profile small{color:#64748b}.wa-profile strong{font-size:1rem}.wa-profile span{color:#475569;font-size:.92rem}

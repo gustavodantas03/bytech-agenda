@@ -16,7 +16,7 @@ import {
     selecionarHora,
 } from "./horarios.js";
 import { confirmarAgendamento } from "./api.js";
-import { mostrarEtapa } from "./interface.js";
+import { mostrarEtapa, voltarEtapa } from "./interface.js";
 
 /*
  * Os templates atuais usam onclick no HTML.
@@ -33,6 +33,7 @@ Object.assign(window, {
     selecionarHora,
     confirmarAgendamento,
     mostrarEtapa,
+    voltarEtapa,
 });
 
 document.addEventListener("DOMContentLoaded", () => {
