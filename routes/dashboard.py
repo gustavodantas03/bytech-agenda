@@ -229,7 +229,76 @@ def admin_dashboard():
         (empresa_id,),
     ).fetchone()
 
+    total_servicos = conn.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM servicos
+        WHERE empresa_id = ? AND ativo = 1
+        """,
+        (empresa_id,),
+    ).fetchone()["total"]
+
+    whatsapp_config = conn.execute(
+        """
+        SELECT base_url, api_key, instance_name, status
+        FROM whatsapp_configuracoes
+        WHERE empresa_id = ?
+        """,
+        (empresa_id,),
+    ).fetchone()
+
     conn.close()
+
+    perfil_completo = bool(
+        empresa
+        and empresa["telefone"]
+        and empresa["endereco"]
+        and empresa["horario_texto"]
+    )
+    whatsapp_configurado = bool(
+        whatsapp_config
+        and whatsapp_config["base_url"]
+        and whatsapp_config["api_key"]
+        and whatsapp_config["instance_name"]
+    )
+
+    onboarding_etapas = [
+        {
+            "titulo": "Complete os dados da empresa",
+            "descricao": "Telefone, endereço e horário de funcionamento.",
+            "concluido": perfil_completo,
+            "endpoint": "admin_meu_espaco",
+            "acao": "Completar cadastro",
+            "icone": "🏢",
+        },
+        {
+            "titulo": "Cadastre os profissionais",
+            "descricao": "Adicione quem realizará os atendimentos.",
+            "concluido": total_funcionarios > 0,
+            "endpoint": "admin_funcionarios",
+            "acao": "Cadastrar profissional",
+            "icone": "👤",
+        },
+        {
+            "titulo": "Cadastre os serviços",
+            "descricao": "Defina preço, duração e serviços disponíveis.",
+            "concluido": total_servicos > 0,
+            "endpoint": "admin_servicos",
+            "acao": "Cadastrar serviço",
+            "icone": "✦",
+        },
+        {
+            "titulo": "Conecte o WhatsApp",
+            "descricao": "Prepare confirmações e lembretes automáticos.",
+            "concluido": whatsapp_configurado,
+            "endpoint": "admin_whatsapp",
+            "acao": "Configurar WhatsApp",
+            "icone": "💬",
+        },
+    ]
+    onboarding_concluidas = sum(1 for etapa in onboarding_etapas if etapa["concluido"])
+    onboarding_percentual = round(onboarding_concluidas / len(onboarding_etapas) * 100)
+    onboarding_completo = onboarding_concluidas == len(onboarding_etapas)
 
     hora_atual = datetime.now().hour
     if hora_atual < 12:
@@ -279,4 +348,10 @@ def admin_dashboard():
         data_extenso=data_extenso,
         hoje=hoje_iso,
         mensagem_dia=mensagem_dia,
+        total_servicos=total_servicos,
+        onboarding_etapas=onboarding_etapas,
+        onboarding_concluidas=onboarding_concluidas,
+        onboarding_percentual=onboarding_percentual,
+        onboarding_completo=onboarding_completo,
+        whatsapp_configurado=whatsapp_configurado,
     )

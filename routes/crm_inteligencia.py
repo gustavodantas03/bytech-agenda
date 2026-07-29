@@ -107,8 +107,8 @@ def admin_crm_inteligencia():
 
     campanhas = conn.execute(
         """SELECT *,
-                  CASE WHEN ativo=1 AND (data_inicio IS NULL OR data_inicio<=date('now'))
-                              AND (data_fim IS NULL OR data_fim>=date('now')) THEN 1 ELSE 0 END em_andamento
+                  CASE WHEN ativo=1 AND (data_inicio IS NULL OR data_inicio<=CURRENT_DATE)
+                              AND (data_fim IS NULL OR data_fim>=CURRENT_DATE) THEN 1 ELSE 0 END em_andamento
            FROM crm_campanhas WHERE empresa_id=?
            ORDER BY ativo DESC, criado_em DESC""",
         (empresa_id,),

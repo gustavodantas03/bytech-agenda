@@ -43,13 +43,13 @@ def admin_fidelidade():
         (empresa_id,),
     ).fetchone()['total']
     recompensas = conn.execute(
-        "SELECT * FROM fidelidade_recompensas WHERE empresa_id=? ORDER BY ativo DESC, pontos_necessarios, nome COLLATE NOCASE",
+        "SELECT * FROM fidelidade_recompensas WHERE empresa_id=? ORDER BY ativo DESC, pontos_necessarios, nome",
         (empresa_id,),
     ).fetchall()
     ranking = conn.execute(
         """SELECT id,nome,telefone,pontos_fidelidade FROM clientes
            WHERE empresa_id=? AND COALESCE(ativo,1)=1
-           ORDER BY pontos_fidelidade DESC,nome COLLATE NOCASE LIMIT 10""",
+           ORDER BY pontos_fidelidade DESC,nome LIMIT 10""",
         (empresa_id,),
     ).fetchall()
     movimentos = conn.execute(

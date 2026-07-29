@@ -2,7 +2,6 @@
 
 from core import *  # noqa: F401,F403
 from io import BytesIO
-import sqlite3
 
 try:
     from reportlab.lib.pagesizes import A4
@@ -30,12 +29,15 @@ def master_dashboard():
     """).fetchone()
     recebido_mes = conn.execute("""
         SELECT COALESCE(SUM(valor),0) total FROM pagamentos
-        WHERE substr(data_pagamento,1,7)=strftime('%Y-%m','now','localtime')
+        WHERE substr(data_pagamento,1,7)=TO_CHAR(CURRENT_DATE, 'YYYY-MM')
     """).fetchone()["total"]
     historico = conn.execute("""
-        WITH RECURSIVE meses(n, competencia) AS (
-            SELECT 5, strftime('%Y-%m','now','localtime','-5 months')
-            UNION ALL SELECT n-1, strftime('%Y-%m','now','localtime', printf('-%d months', n-1)) FROM meses WHERE n>0
+        WITH meses AS (
+            SELECT TO_CHAR(generate_series(
+                DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months',
+                DATE_TRUNC('month', CURRENT_DATE),
+                INTERVAL '1 month'
+            ), 'YYYY-MM') AS competencia
         )
         SELECT competencia,
           COALESCE((SELECT SUM(valor) FROM cobrancas WHERE cobrancas.competencia=meses.competencia),0) previsto,
@@ -93,7 +95,7 @@ def master_empresas():
             (SELECT id FROM cobrancas c WHERE c.empresa_id=e.id AND c.status!='paga' ORDER BY c.vencimento LIMIT 1) cobranca_aberta_id
         FROM empresas e LEFT JOIN usuarios u ON u.empresa_id=e.id
         WHERE {' AND '.join(condicoes)}
-        ORDER BY CASE e.status_pagamento WHEN 'inadimplente' THEN 1 WHEN 'pendente' THEN 2 ELSE 3 END, e.ativo DESC,e.nome COLLATE NOCASE
+        ORDER BY CASE e.status_pagamento WHEN 'inadimplente' THEN 1 WHEN 'pendente' THEN 2 ELSE 3 END, e.ativo DESC,e.nome
     """, tuple(parametros)).fetchall()
     resumo = conn.execute("""
         SELECT COUNT(*) total,COALESCE(SUM(CASE WHEN ativo=1 THEN 1 ELSE 0 END),0) ativas,
@@ -103,8 +105,8 @@ def master_empresas():
         COALESCE(SUM(CASE WHEN status_pagamento='inadimplente' THEN 1 ELSE 0 END),0) inadimplentes,
         COALESCE(SUM(mensalidade),0) receita_prevista FROM empresas
     """).fetchone()
-    recebido_mes = conn.execute("SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=strftime('%Y-%m','now','localtime')").fetchone()["total"]
-    historico = conn.execute("""WITH RECURSIVE meses(n, competencia) AS (SELECT 5,strftime('%Y-%m','now','localtime','-5 months') UNION ALL SELECT n-1,strftime('%Y-%m','now','localtime',printf('-%d months',n-1)) FROM meses WHERE n>0) SELECT competencia,COALESCE((SELECT SUM(valor) FROM cobrancas WHERE cobrancas.competencia=meses.competencia),0) previsto,COALESCE((SELECT SUM(valor) FROM pagamentos WHERE substr(data_pagamento,1,7)=meses.competencia),0) recebido FROM meses ORDER BY competencia""").fetchall()
+    recebido_mes = conn.execute("SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=TO_CHAR(CURRENT_DATE, 'YYYY-MM')").fetchone()["total"]
+    historico = conn.execute("""WITH meses AS (SELECT TO_CHAR(generate_series(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months', DATE_TRUNC('month', CURRENT_DATE), INTERVAL '1 month'), 'YYYY-MM') AS competencia) SELECT competencia,COALESCE((SELECT SUM(valor) FROM cobrancas WHERE cobrancas.competencia=meses.competencia),0) previsto,COALESCE((SELECT SUM(valor) FROM pagamentos WHERE substr(data_pagamento,1,7)=meses.competencia),0) recebido FROM meses ORDER BY competencia""").fetchall()
     conn.close()
     return render_template("master/empresas.html", empresas=empresas,resumo=resumo,recebido_mes=recebido_mes,historico=historico,segmentos=SEGMENTOS,busca=busca,segmento_filtro=segmento_filtro,status_filtro=status_filtro)
 
@@ -277,7 +279,7 @@ def master_nova_empresa():
 
             conn.commit()
 
-        except sqlite3.Error as erro:
+        except DatabaseError as erro:
             conn.rollback()
             print(
                 "Erro ao criar empresa:",
@@ -654,7 +656,7 @@ def master_editar_empresa(empresa_id):
 
             conn.commit()
 
-        except sqlite3.Error as erro:
+        except DatabaseError as erro:
             conn.rollback()
             print("Erro ao editar empresa:", erro)
             conn.close()
@@ -802,7 +804,7 @@ def master_excluir_empresa(empresa_id):
 
         conn.commit()
 
-    except sqlite3.Error as erro:
+    except DatabaseError as erro:
         conn.rollback()
         print("Erro ao excluir empresa:", erro)
         conn.close()
@@ -868,7 +870,7 @@ def master_novo_plano():
             for recurso_id in request.form.getlist("recursos"):
                 conn.execute("INSERT OR IGNORE INTO plano_recursos (plano_id,recurso_id) VALUES (?,?)",(plano_id,recurso_id))
             conn.commit(); conn.close(); flash("Plano criado com sucesso.","sucesso"); return redirect(url_for("master_planos"))
-        except sqlite3.IntegrityError:
+        except DatabaseIntegrityError:
             conn.rollback(); conn.close(); flash("Já existe um plano com este nome.","erro"); return redirect(url_for("master_novo_plano"))
     conn.close()
     return render_template("master/plano_form.html", plano=None, recursos=recursos, selecionados=set())
@@ -893,7 +895,7 @@ def master_editar_plano(plano_id):
                 conn.execute("INSERT OR IGNORE INTO plano_recursos (plano_id,recurso_id) VALUES (?,?)",(plano_id,recurso_id))
             conn.execute("UPDATE empresas SET plano=?, mensalidade=CASE WHEN mensalidade<=0 THEN ? ELSE mensalidade END WHERE plano_id=?",(nome,valor,plano_id))
             conn.commit(); conn.close(); flash("Plano atualizado com sucesso.","sucesso"); return redirect(url_for("master_planos"))
-        except sqlite3.IntegrityError:
+        except DatabaseIntegrityError:
             conn.rollback(); conn.close(); flash("Já existe outro plano com este nome.","erro"); return redirect(url_for("master_editar_plano",plano_id=plano_id))
     selecionados={item["recurso_id"] for item in conn.execute("SELECT recurso_id FROM plano_recursos WHERE plano_id=?",(plano_id,)).fetchall()}
     conn.close(); return render_template("master/plano_form.html",plano=plano,recursos=recursos,selecionados=selecionados)
@@ -950,7 +952,7 @@ def master_financeiro():
         JOIN empresas e ON e.id = c.empresa_id
         LEFT JOIN planos p ON p.id = e.plano_id
         WHERE {where_sql}
-        ORDER BY c.competencia DESC, c.vencimento DESC, e.nome COLLATE NOCASE
+        ORDER BY c.competencia DESC, c.vencimento DESC, e.nome
         """,
         tuple(params),
     ).fetchall()
@@ -986,10 +988,10 @@ def master_financeiro():
     ).fetchall()
 
     empresas = conn.execute(
-        "SELECT id, nome FROM empresas ORDER BY nome COLLATE NOCASE"
+        "SELECT id, nome FROM empresas ORDER BY nome"
     ).fetchall()
     planos = conn.execute(
-        "SELECT id, nome FROM planos ORDER BY nome COLLATE NOCASE"
+        "SELECT id, nome FROM planos ORDER BY nome"
     ).fetchall()
     conn.close()
 
@@ -1040,7 +1042,7 @@ def master_registrar_pagamento(cobranca_id):
             desconto=desconto, acrescimo=acrescimo,
         )
         conn.commit(); flash("Pagamento registrado, próxima mensalidade gerada e acesso atualizado.","sucesso")
-    except (ValueError,sqlite3.Error) as erro:
+    except (ValueError,DatabaseError) as erro:
         conn.rollback(); conn.close(); flash(str(erro),"erro"); return redirect(request.referrer or url_for("master_financeiro"))
     conn.close(); return redirect(url_for("master_recibo",pagamento_id=pagamento_id))
 
@@ -1055,7 +1057,7 @@ def master_estornar_pagamento(pagamento_id):
     conn=get_connection()
     try:
         estornar_pagamento(conn,pagamento_id,motivo); conn.commit(); flash("Pagamento estornado e cobrança reaberta.","sucesso")
-    except (ValueError,sqlite3.Error) as erro:
+    except (ValueError,DatabaseError) as erro:
         conn.rollback(); flash(str(erro),"erro")
     conn.close(); return redirect(request.referrer or url_for("master_financeiro"))
 
@@ -1096,7 +1098,7 @@ def master_financeiro_dashboard():
     conn=get_connection(); atualizar_todas_empresas(conn); conn.commit()
     kpis=conn.execute("""
       SELECT
-       COALESCE(SUM(CASE WHEN status='paga' AND competencia=strftime('%Y-%m','now','localtime') THEN valor_final ELSE 0 END),0) recebido_mes,
+       COALESCE(SUM(CASE WHEN status='paga' AND competencia=TO_CHAR(CURRENT_DATE, 'YYYY-MM') THEN valor_final ELSE 0 END),0) recebido_mes,
        COALESCE(SUM(CASE WHEN status IN ('aberta','vencida') THEN valor_final ELSE 0 END),0) a_receber,
        COALESCE(SUM(CASE WHEN status='vencida' THEN valor_final ELSE 0 END),0) vencido,
        COALESCE(SUM(CASE WHEN status='paga' THEN valor_final ELSE 0 END),0) recebido_total,
@@ -1105,9 +1107,8 @@ def master_financeiro_dashboard():
     """).fetchone()
     inad=conn.execute("SELECT COUNT(*) qtd, COALESCE(SUM(mensalidade),0) valor FROM empresas WHERE status_pagamento='inadimplente'").fetchone()
     historico=conn.execute("""
-      WITH RECURSIVE meses(n, competencia) AS (
-       SELECT 5, strftime('%Y-%m','now','localtime','-5 months')
-       UNION ALL SELECT n-1, strftime('%Y-%m','now','localtime', printf('-%d months',n-1)) FROM meses WHERE n>0)
+      WITH meses AS (
+       SELECT TO_CHAR(generate_series(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months', DATE_TRUNC('month', CURRENT_DATE), INTERVAL '1 month'), 'YYYY-MM') AS competencia)
       SELECT competencia,
        COALESCE((SELECT SUM(valor_final) FROM cobrancas c WHERE c.competencia=meses.competencia),0) previsto,
        COALESCE((SELECT SUM(valor_final) FROM pagamentos p WHERE p.estornado=0 AND substr(p.data_pagamento,1,7)=meses.competencia),0) recebido

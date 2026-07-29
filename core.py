@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 
-from database import get_connection, init_db
+from database import get_connection, init_db, DatabaseError, DatabaseIntegrityError
 from config import Config
 
 
@@ -961,9 +961,16 @@ def contexto_admin_multissegmento():
 
 
 
+_db_initialized = False
+
+
 @app.before_request
 def setup():
-    init_db()
+    """Garante a estrutura uma única vez por processo do servidor."""
+    global _db_initialized
+    if not _db_initialized:
+        init_db()
+        _db_initialized = True
 
 
 

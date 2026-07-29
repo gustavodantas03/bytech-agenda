@@ -1,0 +1,176 @@
+/* Bytech Agenda Design System — RC1.1
+   Camada visual global. Mantém compatibilidade com as telas existentes. */
+:root {
+  --bt-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bt-bg: #f6f8fc;
+  --bt-surface: #ffffff;
+  --bt-surface-soft: #f8fafc;
+  --bt-text: #0f172a;
+  --bt-text-soft: #475569;
+  --bt-muted: #64748b;
+  --bt-border: #e2e8f0;
+  --bt-border-strong: #cbd5e1;
+  --bt-primary: var(--empresa-cor-botao, #2563eb);
+  --bt-radius-sm: 10px;
+  --bt-radius-md: 14px;
+  --bt-radius-lg: 20px;
+  --bt-radius-xl: 26px;
+  --bt-shadow-sm: 0 4px 14px rgba(15, 23, 42, .05);
+  --bt-shadow-md: 0 12px 34px rgba(15, 23, 42, .07);
+  --bt-shadow-lg: 0 22px 55px rgba(15, 23, 42, .10);
+  --bt-transition: .18s ease;
+}
+
+html { scroll-behavior: smooth; }
+body.admin-page { font-family: var(--bt-font); background: var(--bt-bg); color: var(--bt-text); }
+.admin-content { width: 100%; max-width: 1540px; margin-inline: auto; padding: 28px clamp(18px, 2.4vw, 38px) 52px; }
+
+/* Hero / cabeçalho de página */
+.page-header,
+.bt-page-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 30px;
+  margin: 0 0 22px;
+  border: 1px solid rgba(226, 232, 240, .95);
+  border-radius: var(--bt-radius-xl);
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--bt-primary) 14%, transparent), transparent 34%),
+    linear-gradient(135deg, #fff 0%, #f8fbff 65%, #f3f7ff 100%);
+  box-shadow: var(--bt-shadow-md);
+}
+.page-header::after,
+.bt-page-hero::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  bottom: -105px;
+  width: 260px;
+  height: 260px;
+  border: 36px solid color-mix(in srgb, var(--bt-primary) 7%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.page-header > *, .bt-page-hero > * { position: relative; z-index: 1; }
+.page-header span, .bt-eyebrow {
+  display: inline-flex;
+  color: var(--bt-primary);
+  font-size: .74rem;
+  font-weight: 850;
+  letter-spacing: .105em;
+  text-transform: uppercase;
+}
+.page-header h1, .bt-page-hero h1 { margin: 7px 0 7px; font-size: clamp(1.8rem, 3vw, 2.65rem); line-height: 1.03; letter-spacing: -.04em; }
+.page-header p, .bt-page-hero p { max-width: 720px; margin: 0; color: var(--bt-muted); line-height: 1.58; }
+
+/* Superfícies */
+.panel, .bt-card {
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius-lg);
+  background: var(--bt-surface);
+  box-shadow: var(--bt-shadow-sm);
+}
+.panel { padding: 22px; }
+.panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.panel-header h2, .panel-header h3 { margin: 5px 0 4px; color: var(--bt-text); letter-spacing: -.025em; }
+.panel-header p { color: var(--bt-muted); line-height: 1.5; }
+
+/* Botões */
+.btn, .bt-button {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 780;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--bt-transition), box-shadow var(--bt-transition), border-color var(--bt-transition), background var(--bt-transition);
+}
+.btn:hover, .bt-button:hover { transform: translateY(-1px); }
+.btn.btn-primary, .bt-button-primary { color: #fff; background: var(--bt-primary); border-color: var(--bt-primary); box-shadow: 0 9px 22px color-mix(in srgb, var(--bt-primary) 22%, transparent); }
+.btn.btn-secondary, .bt-button-secondary { color: #334155; background: #fff; border-color: var(--bt-border); box-shadow: 0 4px 12px rgba(15,23,42,.04); }
+.btn.btn-secondary:hover { border-color: color-mix(in srgb, var(--bt-primary) 35%, var(--bt-border)); color: var(--bt-primary); }
+.btn.full { width: 100%; }
+
+/* Campos */
+label { color: #334155; font-weight: 700; }
+input, select, textarea {
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid #d9e2ec;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--bt-text);
+  padding: 10px 12px;
+  font: inherit;
+  outline: none;
+  transition: border-color var(--bt-transition), box-shadow var(--bt-transition);
+}
+textarea { min-height: 112px; line-height: 1.5; }
+input:focus, select:focus, textarea:focus { border-color: var(--bt-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bt-primary) 12%, transparent); }
+label small { color: var(--bt-muted); font-weight: 500; }
+
+/* Tabelas */
+.table-responsive { overflow: auto; border: 1px solid var(--bt-border); border-radius: 15px; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+thead th { padding: 12px 14px; color: #64748b; background: #f8fafc; border-bottom: 1px solid var(--bt-border); font-size: .74rem; letter-spacing: .04em; text-transform: uppercase; text-align: left; }
+tbody td { padding: 13px 14px; border-bottom: 1px solid #edf2f7; color: #334155; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: #fbfdff; }
+
+/* Indicadores reutilizáveis */
+.bt-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 15px; }
+.bt-kpi { min-width: 0; display: grid; gap: 7px; padding: 19px; border: 1px solid var(--bt-border); border-radius: 18px; background: #fff; box-shadow: var(--bt-shadow-sm); }
+.bt-kpi-label { color: var(--bt-muted); font-size: .78rem; font-weight: 750; }
+.bt-kpi-value { color: var(--bt-text); font-size: 1.9rem; line-height: 1; letter-spacing: -.04em; }
+.bt-kpi-note { color: #94a3b8; font-size: .75rem; }
+
+/* Abas e badges */
+.bt-tabs { display: flex; gap: 8px; overflow-x: auto; }
+.bt-tab { white-space: nowrap; min-height: 39px; display: inline-flex; align-items: center; padding: 0 13px; border: 1px solid var(--bt-border); border-radius: 999px; color: #475569; background: #fff; text-decoration: none; font-size: .82rem; font-weight: 750; }
+.bt-tab:hover, .bt-tab.active { color: #fff; border-color: var(--bt-primary); background: var(--bt-primary); }
+.bt-badge { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 999px; background: #eef2f7; color: #475569; font-size: .72rem; font-weight: 800; }
+
+/* Alertas */
+.alert { border: 1px solid #bfdbfe; border-radius: 13px; padding: 13px 15px; background: #eff6ff; color: #1e40af; box-shadow: var(--bt-shadow-sm); }
+.alert.success { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+.alert.error, .alert.danger { border-color: #fecaca; background: #fef2f2; color: #991b1b; }
+.alert.warning { border-color: #fde68a; background: #fffbeb; color: #92400e; }
+
+/* Sidebar refinada */
+.admin-sidebar { box-shadow: 16px 0 42px rgba(2, 6, 23, .12); }
+.admin-nav-link { border-radius: 12px; transition: background var(--bt-transition), transform var(--bt-transition); }
+.admin-nav-link:hover { transform: translateX(2px); }
+.admin-nav-link.active { box-shadow: 0 8px 20px rgba(0,0,0,.14); }
+.admin-version-badge { border: 1px solid rgba(255,255,255,.08); }
+
+/* Ajustes de compatibilidade para módulos já existentes */
+.crm-intelligence-page, .whatsapp-page { --crm-primary: var(--bt-primary); }
+.crm-intelligence-hero { border-radius: var(--bt-radius-xl) !important; box-shadow: var(--bt-shadow-md) !important; }
+.crm-card, .crm-kpi-card, .wa-card, .wa-panel, .wa-setup-card { border-color: var(--bt-border) !important; box-shadow: var(--bt-shadow-sm) !important; }
+.crm-card, .wa-panel { border-radius: var(--bt-radius-lg) !important; }
+.wa-onboarding { max-width: none !important; }
+.wa-tabs { top: 8px !important; padding: 10px !important; border: 1px solid var(--bt-border); border-radius: 16px; background: rgba(246,248,252,.92) !important; }
+.wa-tabs a { min-height: 39px; display: inline-flex; align-items: center; }
+
+@media (max-width: 980px) {
+  .admin-content { padding: 20px 16px 40px; }
+  .page-header, .bt-page-hero { align-items: flex-start; flex-direction: column; padding: 23px 21px; }
+  .bt-kpi-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 560px) {
+  .page-header, .bt-page-hero { border-radius: 19px; }
+  .panel { padding: 17px; border-radius: 16px; }
+  .panel-header { flex-direction: column; }
+  .bt-kpi-grid { grid-template-columns: 1fr; }
+  .btn, .bt-button { width: 100%; }
+}

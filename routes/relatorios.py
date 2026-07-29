@@ -96,7 +96,7 @@ def _buscar_dados(empresa_id, filtros):
         """
         SELECT COUNT(*) AS total,
                SUM(CASE WHEN COALESCE(ativo,1)=1 THEN 1 ELSE 0 END) AS ativos,
-               SUM(CASE WHEN criado_em BETWEEN ? AND datetime(?, '+1 day') THEN 1 ELSE 0 END) AS novos
+               SUM(CASE WHEN SUBSTR(criado_em, 1, 10) BETWEEN ? AND ? THEN 1 ELSE 0 END) AS novos
         FROM clientes WHERE empresa_id=?
         """,
         (filtros["inicio"], filtros["fim"], empresa_id),

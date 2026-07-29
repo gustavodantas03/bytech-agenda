@@ -1,0 +1,22 @@
+BYTECH AGENDA — CRM INTELIGÊNCIA PREMIUM
+
+Ajustes realizados:
+- Reformulação completa do visual da tela Inteligência CRM.
+- Hero com ações rápidas.
+- Seis indicadores em cards responsivos.
+- Oportunidades com atalhos para cada segmento.
+- Configurações em duas colunas e campos compactos.
+- Abas modernas para risco, inativos, VIP e aniversários.
+- Lista de clientes responsiva.
+- Formulário premium para campanhas.
+- Histórico de campanhas com status e ações.
+- CSS e JavaScript separados do HTML.
+- Rolagem rápida para nova campanha e segmentos.
+- Contador de caracteres e inserção da variável {nome}.
+
+Arquivos principais:
+- templates/admin/crm_inteligencia.html
+- static/css/crm-inteligencia-premium.css
+- static/js/crm-inteligencia-premium.js
+
+Nenhuma regra de negócio ou rota foi removida.

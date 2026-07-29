@@ -15,3 +15,5 @@ static/uploads/logos/*
 
 .DS_Store
 Thumbs.db
+# Evolution API
+/docker/evolution/.env.evolution

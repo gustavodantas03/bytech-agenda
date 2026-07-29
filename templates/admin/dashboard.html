@@ -1,6 +1,10 @@
 {% extends 'admin/base.html' %}
 {% block title %}Dashboard{% endblock %}
 
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-onboarding.css') }}?v=rc1-2">
+{% endblock %}
+
 {% block content %}
 
 <section class="dashboard-welcome">
@@ -47,6 +51,70 @@
             Ver página
         </a>
     </div>
+</section>
+
+{% if not onboarding_completo %}
+<section class="setup-card" aria-labelledby="setupTitle">
+    <div class="setup-card-main">
+        <div class="setup-card-heading">
+            <div class="setup-card-icon">🚀</div>
+            <div>
+                <span>Primeiros passos</span>
+                <h2 id="setupTitle">Prepare sua empresa para receber agendamentos</h2>
+                <p>Conclua a configuração básica. Você pode continuar usando o sistema enquanto avança.</p>
+            </div>
+        </div>
+
+        <div class="setup-progress" aria-label="{{ onboarding_percentual }}% concluído">
+            <div class="setup-progress-copy">
+                <strong>{{ onboarding_concluidas }} de {{ onboarding_etapas|length }} etapas concluídas</strong>
+                <span>{{ onboarding_percentual }}%</span>
+            </div>
+            <div class="setup-progress-track">
+                <span style="width: {{ onboarding_percentual }}%"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="setup-steps">
+        {% for etapa in onboarding_etapas %}
+        <article class="setup-step {% if etapa.concluido %}is-complete{% endif %}">
+            <div class="setup-step-status">
+                {% if etapa.concluido %}✓{% else %}{{ loop.index }}{% endif %}
+            </div>
+            <div class="setup-step-copy">
+                <div class="setup-step-title">
+                    <span>{{ etapa.icone }}</span>
+                    <strong>{{ etapa.titulo }}</strong>
+                </div>
+                <p>{{ etapa.descricao }}</p>
+            </div>
+            {% if etapa.concluido %}
+                <span class="setup-done-badge">Concluído</span>
+            {% else %}
+                <a class="btn btn-secondary setup-step-action" href="{{ url_for(etapa.endpoint) }}">
+                    {{ etapa.acao }}
+                </a>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="dashboard-quick-actions" aria-label="Ações rápidas">
+    <a href="{{ url_for('novo_agendamento') }}" class="dashboard-quick-action">
+        <span>＋</span><div><strong>Novo agendamento</strong><small>Registrar um horário</small></div>
+    </a>
+    <a href="{{ url_for('admin_clientes') }}" class="dashboard-quick-action">
+        <span>👥</span><div><strong>Novo cliente</strong><small>Ampliar sua base</small></div>
+    </a>
+    <a href="{{ url_for('admin_agenda') }}" class="dashboard-quick-action">
+        <span>◷</span><div><strong>Ver agenda</strong><small>Organizar o dia</small></div>
+    </a>
+    <a href="{{ url_for('landing', slug=empresa.slug) }}" target="_blank" rel="noopener" class="dashboard-quick-action">
+        <span>↗</span><div><strong>Página pública</strong><small>Visualizar como cliente</small></div>
+    </a>
 </section>
 
 <section class="dashboard-metrics-grid">

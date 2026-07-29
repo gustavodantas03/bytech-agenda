@@ -127,7 +127,7 @@ def gerar_lembretes(agora: datetime | None = None) -> dict:
                     SELECT id FROM agendamentos
                     WHERE empresa_id=?
                       AND status NOT IN ('cancelado','concluido','faltou')
-                      AND datetime(data || ' ' || hora) BETWEEN ? AND ?
+                      AND CAST(data || ' ' || hora AS timestamp) BETWEEN ? AND ?
                     """,
                     (empresa_id, inicio.strftime("%Y-%m-%d %H:%M:%S"), fim.strftime("%Y-%m-%d %H:%M:%S")),
                 ).fetchall()
@@ -151,8 +151,8 @@ def processar_fila(limite: int = 30, agora: datetime | None = None) -> dict:
             """
             SELECT * FROM whatsapp_fila
             WHERE status IN ('pendente','tentando')
-              AND datetime(agendado_para) <= datetime(?)
-              AND (proxima_tentativa_em IS NULL OR datetime(proxima_tentativa_em) <= datetime(?))
+              AND CAST(agendado_para AS timestamp) <= CAST(? AS timestamp)
+              AND (proxima_tentativa_em IS NULL OR CAST(proxima_tentativa_em AS timestamp) <= CAST(? AS timestamp))
               AND tentativas < max_tentativas
             ORDER BY id LIMIT ?
             """,

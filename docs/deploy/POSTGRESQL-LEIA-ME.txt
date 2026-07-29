@@ -1,0 +1,18 @@
+BYTECH AGENDA — RC1.3.0 PostgreSQL
+
+O sistema agora usa PostgreSQL quando DATABASE_URL está definida.
+O SQLite antigo permanece apenas como fonte para a migração e fallback local.
+
+TESTE LOCAL COM DOCKER
+1. Copie .env.example para .env e troque as senhas.
+2. Execute: docker compose -f docker/docker-compose.postgres.yml up -d
+3. No Windows PowerShell:
+   $env:DATABASE_URL="postgresql://bytech:bytech123@127.0.0.1:5432/bytech_agenda"
+4. Instale: py -m pip install -r requirements.txt
+5. Migre: py scripts/database/migrar_sqlite_para_postgresql.py
+6. Inicie: py app.py
+
+IMPORTANTE
+- Faça uma cópia de database/bytech_agenda.db antes da migração.
+- Nunca apague o SQLite até conferir clientes, empresas, serviços, profissionais e agendamentos.
+- Na VPS, DATABASE_URL deverá ficar no arquivo de ambiente do serviço, não no código.

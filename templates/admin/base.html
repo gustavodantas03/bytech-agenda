@@ -14,8 +14,10 @@
 
     <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}?v=21"
+    href="{{ url_for('static', filename='css/style.css') }}?v=22"
 >
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}?v=rc1-2">
 
     {% block page_styles %}{% endblock %}
 
@@ -67,6 +69,17 @@
 
         .admin-plan-card strong {
             color: #fff;
+        }
+
+        .admin-version-badge {
+            margin: auto 14px 14px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            color: rgba(255,255,255,.62);
+            background: rgba(255,255,255,.06);
+            font-size: .72rem;
+            text-align: center;
+            letter-spacing: .03em;
         }
     </style>
 
@@ -349,7 +362,12 @@
 
         </div>
 
-    </aside>
+    
+        <div class="admin-version-badge" title="Versão instalada">
+            Bytech Agenda · {{ app_version }}
+        </div>
+
+</aside>
 
     <div class="admin-layout">
 

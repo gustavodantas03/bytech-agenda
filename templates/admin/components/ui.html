@@ -1,0 +1,23 @@
+{# Componentes reutilizáveis do Design System Bytech #}
+{% macro page_hero(eyebrow, title, description='') -%}
+<header class="bt-page-hero">
+  <div>
+    <span class="bt-eyebrow">{{ eyebrow }}</span>
+    <h1>{{ title }}</h1>
+    {% if description %}<p>{{ description }}</p>{% endif %}
+  </div>
+  {% if caller %}<div>{{ caller() }}</div>{% endif %}
+</header>
+{%- endmacro %}
+
+{% macro kpi(label, value, note='') -%}
+<article class="bt-kpi">
+  <span class="bt-kpi-label">{{ label }}</span>
+  <strong class="bt-kpi-value">{{ value }}</strong>
+  {% if note %}<small class="bt-kpi-note">{{ note }}</small>{% endif %}
+</article>
+{%- endmacro %}
+
+{% macro badge(text, extra_class='') -%}
+<span class="bt-badge {{ extra_class }}">{{ text }}</span>
+{%- endmacro %}

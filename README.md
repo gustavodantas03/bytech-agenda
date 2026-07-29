@@ -1,37 +1,39 @@
-# Bytech Agenda V2
+# Bytech Agenda
 
-Projeto básico de agendamento para barbearias.
+Sistema SaaS de agendamento, CRM, financeiro, fidelidade e comunicação.
 
-## Funcionalidades
+## Estrutura principal
 
-- Landing page da barbearia
-- Serviços, valores, horário e localização
-- Fluxo de agendamento
-- Seleção de barbeiro
-- Agenda separada por barbeiro
-- Bloqueio de horário ocupado por profissional
-- Painel administrativo
-- Cadastro, edição, ativação e exclusão de serviços
-- Cadastro, edição, ativação e exclusão de funcionários
-- Edição dos dados da barbearia
-- Filtro da agenda por data e barbeiro
-- Cancelamento de agendamento
-
-## Como executar
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
+```text
+app.py                     Entrada da aplicação
+core.py                    Configuração do Flask e registro de rotas
+config.py                  Configurações gerais
+database.py                Camada compatível com PostgreSQL/SQLite
+routes/                     Rotas da aplicação
+services/                   Regras de negócio e integrações
+templates/                  Telas HTML
+static/                     CSS, JavaScript, sons e uploads
+database/                   Banco SQLite de origem e arquivos legados
+docker/                     Ambiente PostgreSQL local
+docs/                       Documentação organizada
+scripts/                    Migração, diagnóstico e manutenção
 ```
 
-## Acessos de desenvolvimento
+## PostgreSQL local
 
-- Site: http://127.0.0.1:5000/demo
-- Painel: http://127.0.0.1:5000/admin/login
+```powershell
+docker compose -f docker/docker-compose.postgres.yml up -d
+$env:DATABASE_URL="postgresql://bytech:bytech123@127.0.0.1:5432/bytech_agenda"
+py -m pip install -r requirements.txt
+py scripts/database/migrar_sqlite_para_postgresql.py
+py app.py
+```
 
-Usuário inicial: admin  
-Senha inicial: admin123
+Para recriar somente o PostgreSQL de teste:
 
-As credenciais não aparecem mais na tela de login.
+```powershell
+docker compose -f docker/docker-compose.postgres.yml down -v
+docker compose -f docker/docker-compose.postgres.yml up -d
+```
+
+O SQLite em `database/bytech_agenda.db` deve ser preservado até a conferência completa dos dados migrados.

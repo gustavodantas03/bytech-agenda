@@ -1,0 +1,15 @@
+CORREÇÃO DOS BOTÕES DA AGENDA
+
+O Console mostrou erro 404 ao carregar agenda.js. Isso significa que o navegador não encontrou o arquivo JavaScript.
+
+Copie os arquivos mantendo exatamente estas pastas e nomes:
+
+1) templates/admin/agenda.html
+2) static/js/agenda.js
+
+IMPORTANTE:
+- O nome deve ser exatamente agenda.js, sem (1), espaços ou outro sufixo.
+- Depois de copiar, reinicie o Flask.
+- No navegador, pressione Ctrl+F5 para limpar o cache da página.
+
+O template foi atualizado para usar ?v=6 no carregamento do JavaScript.

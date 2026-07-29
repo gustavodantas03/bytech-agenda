@@ -329,7 +329,7 @@ def resumo_cliente_agenda(cliente_id):
           AND a.cliente_id = ?
           AND a.status IN ('finalizado', 'concluido')
         GROUP BY s.id, s.nome
-        ORDER BY quantidade DESC, s.nome COLLATE NOCASE
+        ORDER BY quantidade DESC, s.nome
         LIMIT 1
         """,
         (empresa_id, cliente_id),
@@ -344,7 +344,7 @@ def resumo_cliente_agenda(cliente_id):
           AND a.cliente_id = ?
           AND a.status IN ('finalizado', 'concluido')
         GROUP BY f.id, f.nome
-        ORDER BY quantidade DESC, f.nome COLLATE NOCASE
+        ORDER BY quantidade DESC, f.nome
         LIMIT 1
         """,
         (empresa_id, cliente_id),
@@ -728,7 +728,7 @@ def novo_agendamento():
                 )
             )
 
-        except sqlite3.IntegrityError:
+        except DatabaseIntegrityError:
             conn.close()
             flash("Este horário acabou de ser ocupado.", "erro")
             return redirect(url_for("novo_agendamento"))

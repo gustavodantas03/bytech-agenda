@@ -1,0 +1,63 @@
+services:
+  evolution-postgres:
+    image: postgres:16-alpine
+    container_name: bytech-evolution-postgres
+    restart: unless-stopped
+    env_file:
+      - evolution/.env.evolution
+    environment:
+      POSTGRES_DB: evolution
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: evolution_local_2026
+    volumes:
+      - bytech_evolution_postgres_data:/var/lib/postgresql/data
+    networks:
+      - bytech-evolution-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: bytech-evolution-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - bytech_evolution_redis_data:/data
+    networks:
+      - bytech-evolution-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.7
+    container_name: bytech-evolution-api
+    restart: unless-stopped
+    env_file:
+      - evolution/.env.evolution
+    depends_on:
+      evolution-postgres:
+        condition: service_healthy
+      evolution-redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - bytech_evolution_instances:/evolution/instances
+    networks:
+      - bytech-evolution-net
+
+volumes:
+  bytech_evolution_postgres_data:
+  bytech_evolution_redis_data:
+  bytech_evolution_instances:
+
+networks:
+  bytech-evolution-net:
+    name: bytech-evolution-net
+    driver: bridge

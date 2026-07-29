@@ -1,8 +1,12 @@
 {% extends 'admin/base.html' %}
 {% block title %}Comunicação | WhatsApp{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/whatsapp.css') }}?v=5">{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/whatsapp.js') }}?v=rc1-1"></script>
+{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/whatsapp.css') }}?v=rc1-1">{% endblock %}
 {% block content %}
 
+<main class="whatsapp-page" data-status-url="{{ url_for('status_whatsapp') }}">
 <header class="page-header whatsapp-header">
   <div>
     <span>Comunicação</span>
@@ -23,7 +27,7 @@
   <div class="wa-onboarding-copy">
     <span class="wa-step-badge">Primeira configuração</span>
     <h2>Conecte o WhatsApp da empresa</h2>
-    <p>Informe os dados da Evolution API. Depois de salvar, o sistema liberará a geração do QR Code.</p>
+    <p>A Bytech configura a Evolution API uma única vez no servidor. Depois, cada empresa conecta o próprio número lendo o QR Code.</p>
 
     <ol class="wa-steps">
       <li class="active"><span>1</span><div><strong>Configurar integração</strong><small>URL, chave e nome da instância</small></div></li>
@@ -32,8 +36,8 @@
     </ol>
 
     <div class="wa-onboarding-note">
-      <strong>Onde encontro esses dados?</strong>
-      <p>A URL e a API Key são definidas na instalação da Evolution API. Na VPS, a URL poderá ser um subdomínio como <code>https://evolution.bytechce.com.br</code>.</p>
+      <strong>Configuração técnica da Bytech</strong>
+      <p>A URL e a API Key serão criadas durante a instalação na VPS. O cliente final não precisa conhecer essas credenciais: ele apenas escaneia o QR Code.</p>
     </div>
   </div>
 
@@ -127,33 +131,7 @@
  </form>
 </section>
 
-<script>
-const statusButton = document.getElementById('btnAtualizarStatus');
-if (statusButton) {
-  statusButton.addEventListener('click', async () => {
-    statusButton.disabled = true;
-    statusButton.textContent = 'Consultando...';
-    try {
-      const response = await fetch('{{ url_for("status_whatsapp") }}');
-      const data = await response.json();
-      const text = document.getElementById('statusText');
-      const dot = document.getElementById('statusDot');
-      if (!data.configurado && data.status === 'nao_configurado') {
-        text.textContent = 'Não configurado';
-        dot.classList.remove('online');
-        return;
-      }
-      text.textContent = (data.status || 'desconectado').replace('_', ' ');
-      dot.classList.toggle('online', data.status === 'conectado');
-    } catch (_) {
-      document.getElementById('statusText').textContent = 'Falha ao consultar';
-      document.getElementById('statusDot').classList.remove('online');
-    } finally {
-      statusButton.disabled = false;
-      statusButton.textContent = 'Atualizar status';
-    }
-  });
-}
-</script>
+
+</main>
 {% endif %}
 {% endblock %}

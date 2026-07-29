@@ -1,33 +1,228 @@
+"""Camada de banco do Bytech Agenda.
+
+Produção: PostgreSQL quando DATABASE_URL estiver configurada.
+Desenvolvimento: SQLite como fallback para facilitar testes locais.
+"""
+
+from __future__ import annotations
+
+import os
+import re
 import sqlite3
 from pathlib import Path
-
+from typing import Any, Iterable
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_DIR = BASE_DIR / "database"
 DB_PATH = DATABASE_DIR / "bytech_agenda.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+USING_POSTGRES = DATABASE_URL.startswith(("postgresql://", "postgres://"))
+
+try:
+    import psycopg
+    DatabaseError = psycopg.Error
+    DatabaseIntegrityError = psycopg.IntegrityError
+except ImportError:
+    DatabaseError = sqlite3.Error
+    DatabaseIntegrityError = sqlite3.IntegrityError
+
+
+def _replace_qmarks(sql: str) -> str:
+    """Troca placeholders ? por %s sem alterar interrogações dentro de strings."""
+    out: list[str] = []
+    in_single = False
+    i = 0
+    while i < len(sql):
+        ch = sql[i]
+        if ch == "'":
+            out.append(ch)
+            if in_single and i + 1 < len(sql) and sql[i + 1] == "'":
+                out.append("'")
+                i += 2
+                continue
+            in_single = not in_single
+        elif ch == "?" and not in_single:
+            out.append("%s")
+        else:
+            out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _translate_sql(sql: str) -> str:
+    """Traduz construções SQL legadas do SQLite para PostgreSQL.
+
+    Esta função só é usada pela conexão PostgreSQL. Assim, as consultas
+    originais continuam compatíveis com o fallback SQLite.
+    """
+    sql = sql.replace("COLLATE NOCASE", "")
+    # SQLite usa GROUP_CONCAT; no PostgreSQL o equivalente é STRING_AGG.
+    # As consultas do projeto utilizam a mesma assinatura com expressão e
+    # separador, portanto a troca do nome preserva os parâmetros existentes.
+    sql = re.sub(r"\bGROUP_CONCAT\s*\(", "STRING_AGG(", sql, flags=re.I)
+    sql = re.sub(r"\bINSERT\s+OR\s+IGNORE\s+INTO\b", "INSERT INTO", sql, flags=re.I)
+    if re.search(r"^\s*INSERT\s+INTO\b", sql, flags=re.I) and " OR IGNORE " not in sql.upper():
+        # As consultas originalmente INSERT OR IGNORE já foram alteradas acima.
+        # Marca pelo texto original usando uma heurística segura.
+        pass
+    sql = _replace_qmarks(sql)
+    return sql
+
+
+def _split_sql_script(script: str) -> list[str]:
+    statements: list[str] = []
+    current: list[str] = []
+    in_single = False
+    in_double = False
+    for ch in script:
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+        if ch == ";" and not in_single and not in_double:
+            stmt = "".join(current).strip()
+            if stmt:
+                statements.append(stmt)
+            current = []
+        else:
+            current.append(ch)
+    tail = "".join(current).strip()
+    if tail:
+        statements.append(tail)
+    return statements
+
+
+class PostgresCursor:
+    def __init__(self, cursor, lastrowid: int | None = None):
+        self._cursor = cursor
+        self.lastrowid = lastrowid
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+    @property
+    def rowcount(self):
+        return self._cursor.rowcount
+
+    def __iter__(self):
+        return iter(self._cursor)
+
+
+class PostgresConnection:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql: str, params: Iterable[Any] | None = None):
+        original = sql
+        ignore_conflict = bool(re.search(r"\bINSERT\s+OR\s+IGNORE\s+INTO\b", original, re.I))
+        translated = _translate_sql(sql)
+        if ignore_conflict and "ON CONFLICT" not in translated.upper():
+            translated = translated.rstrip().rstrip(";") + " ON CONFLICT DO NOTHING"
+
+        cursor = self._conn.cursor()
+        cursor.execute(translated, tuple(params or ()))
+        lastrowid = None
+        if re.match(r"^\s*INSERT\s+INTO\b", translated, re.I):
+            try:
+                seq_cursor = self._conn.cursor()
+                seq_cursor.execute("SELECT LASTVAL() AS id")
+                row = seq_cursor.fetchone()
+                lastrowid = row["id"] if row else None
+                seq_cursor.close()
+            except Exception:
+                self._conn.rollback()
+                raise
+        return PostgresCursor(cursor, lastrowid)
+
+    def executemany(self, sql: str, seq_of_params: Iterable[Iterable[Any]]):
+        """Executa a mesma instrução para vários conjuntos de parâmetros.
+
+        Mantém a interface usada pelo sqlite3 e traduz placeholders/conflitos
+        para o psycopg 3.
+        """
+        original = sql
+        ignore_conflict = bool(re.search(r"\bINSERT\s+OR\s+IGNORE\s+INTO\b", original, re.I))
+        translated = _translate_sql(sql)
+        if ignore_conflict and "ON CONFLICT" not in translated.upper():
+            translated = translated.rstrip().rstrip(";") + " ON CONFLICT DO NOTHING"
+
+        cursor = self._conn.cursor()
+        cursor.executemany(translated, [tuple(params) for params in seq_of_params])
+        return PostgresCursor(cursor)
+
+    def executescript(self, script: str):
+        for statement in _split_sql_script(script):
+            statement = re.sub(
+                r"INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT",
+                "BIGSERIAL PRIMARY KEY",
+                statement,
+                flags=re.I,
+            )
+            self.execute(statement)
+        return self
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
+
+    def cursor(self):
+        return self._conn.cursor()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if exc_type:
+            self.rollback()
+        else:
+            self.commit()
+        self.close()
 
 
 def get_connection():
-    DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+    if USING_POSTGRES:
+        try:
+            import psycopg
+            from psycopg.rows import dict_row
+        except ImportError as exc:
+            raise RuntimeError(
+                "PostgreSQL configurado, mas o pacote psycopg não está instalado. "
+                "Execute: pip install -r requirements.txt"
+            ) from exc
+        conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
+        return PostgresConnection(conn)
 
+    DATABASE_DIR.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
-
     return conn
 
 
 def _column_exists(conn, table, column):
-    columns = conn.execute(
-        f"PRAGMA table_info({table})"
-    ).fetchall()
+    if USING_POSTGRES:
+        row = conn.execute(
+            """
+            SELECT 1
+              FROM information_schema.columns
+             WHERE table_schema = 'public'
+               AND table_name = ?
+               AND column_name = ?
+            """,
+            (table, column),
+        ).fetchone()
+        return bool(row)
 
-    return any(
-        item["name"] == column
-        for item in columns
-    )
-
-
+    columns = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    return any(item["name"] == column for item in columns)
 def init_db():
     conn = get_connection()
 

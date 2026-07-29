@@ -31,7 +31,7 @@ def _dados_modulo(conn, empresa_id):
                SUM(CASE WHEN status = 'enviado' THEN 1 ELSE 0 END) enviados,
                SUM(CASE WHEN status = 'erro' THEN 1 ELSE 0 END) erros
         FROM whatsapp_historico
-        WHERE empresa_id = ? AND date(criado_em) = date('now','localtime')
+        WHERE empresa_id = ? AND CAST(criado_em AS date) = CURRENT_DATE
         """,
         (empresa_id,),
     ).fetchone()

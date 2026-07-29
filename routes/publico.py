@@ -281,7 +281,7 @@ def criar_agendamento(slug):
             [(agendamento_id, servico_id) for servico_id in servico_ids],
         )
         conn.commit()
-    except sqlite3.IntegrityError:
+    except DatabaseIntegrityError:
         conn.rollback()
         conn.close()
         return jsonify({"erro": "Este horário acabou de ser ocupado. Escolha outro."}), 409

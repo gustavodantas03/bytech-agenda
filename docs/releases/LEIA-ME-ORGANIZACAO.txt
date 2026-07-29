@@ -1,0 +1,19 @@
+BYTECH AGENDA - ESTRUTURA ORGANIZADA
+
+Esta versão mantém os mesmos endpoints e templates, mas separa as rotas por módulo.
+
+Arquivos principais:
+- app.py: inicia o Flask e carrega os módulos.
+- core.py: configurações, constantes, utilitários e funções compartilhadas.
+- database.py: criação e migrações do SQLite.
+- routes/: rotas separadas por área.
+- services/: preparado para regras de negócio futuras.
+- utils/: preparado para utilitários futuros.
+
+Aplicação:
+1. Faça backup da pasta atual e do database/bytech_agenda.db.
+2. Copie app.py, core.py e as pastas routes, services e utils.
+3. Mantenha suas pastas templates, static e database.
+4. Reinicie o Flask com python app.py.
+
+Atenção: não copie um banco vazio por cima do seu banco atual.

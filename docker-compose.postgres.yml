@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bytech-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bytech_agenda
+      POSTGRES_USER: bytech
+      POSTGRES_PASSWORD: bytech123
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - bytech_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bytech -d bytech_agenda"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bytech_postgres_data:
