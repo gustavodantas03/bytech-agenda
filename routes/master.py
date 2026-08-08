@@ -10,6 +10,50 @@ except ImportError:  # O restante do sistema continua funcionando sem PDF.
     A4 = None
     canvas = None
 
+
+def _historico_financeiro(conn, coluna_previsto="valor", filtrar_estorno=False):
+    """Monta o histórico dos últimos 6 meses (previsto x recebido).
+
+    Calculado em Python + agregações simples, compatível com SQLite e
+    PostgreSQL (sem depender de DATE_TRUNC/generate_series/INTERVAL).
+    """
+
+    competencias = meses_recentes(6)
+    marcadores = ",".join("?" for _ in competencias)
+    filtro_estorno_sql = " AND estornado=0" if filtrar_estorno else ""
+
+    previsto_linhas = conn.execute(
+        f"""
+        SELECT competencia, COALESCE(SUM({coluna_previsto}),0) total
+        FROM cobrancas
+        WHERE competencia IN ({marcadores})
+        GROUP BY competencia
+        """,
+        tuple(competencias),
+    ).fetchall()
+    recebido_linhas = conn.execute(
+        f"""
+        SELECT substr(data_pagamento,1,7) AS competencia, COALESCE(SUM(valor),0) total
+        FROM pagamentos
+        WHERE substr(data_pagamento,1,7) IN ({marcadores}){filtro_estorno_sql}
+        GROUP BY substr(data_pagamento,1,7)
+        """,
+        tuple(competencias),
+    ).fetchall()
+
+    previsto_mapa = {linha["competencia"]: float(linha["total"] or 0) for linha in previsto_linhas}
+    recebido_mapa = {linha["competencia"]: float(linha["total"] or 0) for linha in recebido_linhas}
+
+    return [
+        {
+            "competencia": competencia,
+            "previsto": previsto_mapa.get(competencia, 0),
+            "recebido": recebido_mapa.get(competencia, 0),
+        }
+        for competencia in competencias
+    ]
+
+
 @app.route("/master")
 @master_login_required
 def master_dashboard():
@@ -27,23 +71,11 @@ def master_dashboard():
             COALESCE(SUM(mensalidade),0) receita_prevista
         FROM empresas
     """).fetchone()
-    recebido_mes = conn.execute("""
-        SELECT COALESCE(SUM(valor),0) total FROM pagamentos
-        WHERE substr(data_pagamento,1,7)=TO_CHAR(CURRENT_DATE, 'YYYY-MM')
-    """).fetchone()["total"]
-    historico = conn.execute("""
-        WITH meses AS (
-            SELECT TO_CHAR(generate_series(
-                DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months',
-                DATE_TRUNC('month', CURRENT_DATE),
-                INTERVAL '1 month'
-            ), 'YYYY-MM') AS competencia
-        )
-        SELECT competencia,
-          COALESCE((SELECT SUM(valor) FROM cobrancas WHERE cobrancas.competencia=meses.competencia),0) previsto,
-          COALESCE((SELECT SUM(valor) FROM pagamentos WHERE substr(data_pagamento,1,7)=meses.competencia),0) recebido
-        FROM meses ORDER BY competencia
-    """).fetchall()
+    recebido_mes = conn.execute(
+        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=?",
+        (mes_atual_competencia(),),
+    ).fetchone()["total"]
+    historico = _historico_financeiro(conn)
     empresas_recentes = conn.execute("""
         SELECT id,nome,segmento,plano,status_pagamento FROM empresas ORDER BY id DESC LIMIT 6
     """).fetchall()
@@ -105,8 +137,11 @@ def master_empresas():
         COALESCE(SUM(CASE WHEN status_pagamento='inadimplente' THEN 1 ELSE 0 END),0) inadimplentes,
         COALESCE(SUM(mensalidade),0) receita_prevista FROM empresas
     """).fetchone()
-    recebido_mes = conn.execute("SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=TO_CHAR(CURRENT_DATE, 'YYYY-MM')").fetchone()["total"]
-    historico = conn.execute("""WITH meses AS (SELECT TO_CHAR(generate_series(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months', DATE_TRUNC('month', CURRENT_DATE), INTERVAL '1 month'), 'YYYY-MM') AS competencia) SELECT competencia,COALESCE((SELECT SUM(valor) FROM cobrancas WHERE cobrancas.competencia=meses.competencia),0) previsto,COALESCE((SELECT SUM(valor) FROM pagamentos WHERE substr(data_pagamento,1,7)=meses.competencia),0) recebido FROM meses ORDER BY competencia""").fetchall()
+    recebido_mes = conn.execute(
+        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=?",
+        (mes_atual_competencia(),),
+    ).fetchone()["total"]
+    historico = _historico_financeiro(conn)
     conn.close()
     return render_template("master/empresas.html", empresas=empresas,resumo=resumo,recebido_mes=recebido_mes,historico=historico,segmentos=SEGMENTOS,busca=busca,segmento_filtro=segmento_filtro,status_filtro=status_filtro)
 
@@ -229,7 +264,7 @@ def master_nova_empresa():
                 (
                     empresa_id,
                     usuario,
-                    senha,
+                    gerar_hash_senha(senha),
                 ),
             )
 
@@ -304,6 +339,8 @@ def master_nova_empresa():
             "sucesso",
         )
 
+        session["senha_temporaria_exibicao"] = senha
+
         return redirect(
             url_for(
                 "master_empresa_criada",
@@ -330,8 +367,7 @@ def master_empresa_criada(empresa_id):
         """
         SELECT
             e.*,
-            u.usuario,
-            u.senha
+            u.usuario
         FROM empresas e
         LEFT JOIN usuarios u
             ON u.empresa_id = e.id
@@ -349,6 +385,7 @@ def master_empresa_criada(empresa_id):
     return render_template(
         "master/empresa_criada.html",
         empresa=empresa,
+        senha_temporaria=session.pop("senha_temporaria_exibicao", None),
     )
 
 
@@ -633,7 +670,7 @@ def master_editar_empresa(empresa_id):
                         WHERE id = ?
                         """,
                         (
-                            nova_senha,
+                            gerar_hash_senha(nova_senha),
                             empresa["usuario_id"],
                         ),
                     )
@@ -650,7 +687,7 @@ def master_editar_empresa(empresa_id):
                     (
                         empresa_id,
                         usuario,
-                        nova_senha or "trocar123",
+                        gerar_hash_senha(nova_senha or "trocar123"),
                     ),
                 )
 
@@ -1098,22 +1135,15 @@ def master_financeiro_dashboard():
     conn=get_connection(); atualizar_todas_empresas(conn); conn.commit()
     kpis=conn.execute("""
       SELECT
-       COALESCE(SUM(CASE WHEN status='paga' AND competencia=TO_CHAR(CURRENT_DATE, 'YYYY-MM') THEN valor_final ELSE 0 END),0) recebido_mes,
+       COALESCE(SUM(CASE WHEN status='paga' AND competencia=? THEN valor_final ELSE 0 END),0) recebido_mes,
        COALESCE(SUM(CASE WHEN status IN ('aberta','vencida') THEN valor_final ELSE 0 END),0) a_receber,
        COALESCE(SUM(CASE WHEN status='vencida' THEN valor_final ELSE 0 END),0) vencido,
        COALESCE(SUM(CASE WHEN status='paga' THEN valor_final ELSE 0 END),0) recebido_total,
        COALESCE(SUM(CASE WHEN status='paga' THEN 1 ELSE 0 END),0) qtd_pagas
       FROM cobrancas
-    """).fetchone()
+    """, (mes_atual_competencia(),)).fetchone()
     inad=conn.execute("SELECT COUNT(*) qtd, COALESCE(SUM(mensalidade),0) valor FROM empresas WHERE status_pagamento='inadimplente'").fetchone()
-    historico=conn.execute("""
-      WITH meses AS (
-       SELECT TO_CHAR(generate_series(DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months', DATE_TRUNC('month', CURRENT_DATE), INTERVAL '1 month'), 'YYYY-MM') AS competencia)
-      SELECT competencia,
-       COALESCE((SELECT SUM(valor_final) FROM cobrancas c WHERE c.competencia=meses.competencia),0) previsto,
-       COALESCE((SELECT SUM(valor_final) FROM pagamentos p WHERE p.estornado=0 AND substr(p.data_pagamento,1,7)=meses.competencia),0) recebido
-      FROM meses ORDER BY competencia
-    """).fetchall()
+    historico=_historico_financeiro(conn, coluna_previsto="valor_final", filtrar_estorno=True)
     ultimos=conn.execute("""SELECT p.*,e.nome empresa_nome,c.competencia FROM pagamentos p JOIN empresas e ON e.id=p.empresa_id JOIN cobrancas c ON c.id=p.cobranca_id ORDER BY p.data_pagamento DESC,p.id DESC LIMIT 8""").fetchall()
     proximos=conn.execute("""SELECT c.*,e.nome empresa_nome FROM cobrancas c JOIN empresas e ON e.id=c.empresa_id WHERE c.status='aberta' ORDER BY c.vencimento LIMIT 8""").fetchall()
     por_plano=conn.execute("""SELECT COALESCE(pl.nome,e.plano,'Sem plano') plano,COUNT(*) empresas,COALESCE(SUM(e.mensalidade),0) receita FROM empresas e LEFT JOIN planos pl ON pl.id=e.plano_id GROUP BY COALESCE(pl.nome,e.plano,'Sem plano') ORDER BY receita DESC""").fetchall()

@@ -44,7 +44,7 @@ def uso_do_plano(conn, empresa_id):
             (empresa_id,),
         ).fetchone()["total"],
         "usuarios": conn.execute(
-            "SELECT COUNT(*) total FROM usuarios WHERE empresa_id = ?",
+            "SELECT COUNT(*) total FROM usuarios WHERE empresa_id = ? AND ativo = 1",
             (empresa_id,),
         ).fetchone()["total"],
         "agendamentos_mes": conn.execute(

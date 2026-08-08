@@ -77,6 +77,10 @@ def admin_agenda():
 
     conn = get_connection()
 
+    empresa = conn.execute(
+        "SELECT * FROM empresas WHERE id = ?", (empresa_id,)
+    ).fetchone()
+
     funcionarios = conn.execute(
         """
         SELECT *
@@ -123,9 +127,9 @@ def admin_agenda():
         funcionario_id,
     )
 
-    # Capacidade diária baseada nos horários padrão atualmente oferecidos
-    # pelo sistema (09:00 às 18:00, intervalos de 40 minutos).
-    total_slots_por_profissional = len(gerar_horarios())
+    # Capacidade diária baseada no horário de funcionamento configurado
+    # pela empresa para o dia da semana em questão.
+    total_slots_por_profissional = len(gerar_horarios_do_dia(empresa, data_selecionada))
     profissionais_considerados = 1 if funcionario_id else max(len(funcionarios), 1)
     capacidade_total = total_slots_por_profissional * profissionais_considerados
     ocupados_validos = sum(
@@ -240,6 +244,11 @@ def atualizar_status_agendamento(agendamento_id):
     )
     conn.commit()
 
+    if novo_status in ("cancelado", "confirmado"):
+        from services.evolution_api import enviar_mensagem_agendamento
+        tipo_mensagem = "cancelamento" if novo_status == "cancelado" else "confirmacao"
+        enviar_mensagem_agendamento(empresa_id, agendamento_id, tipo_mensagem)
+
     resumo = _consultar_resumo_agenda(
         conn,
         empresa_id,
@@ -251,7 +260,11 @@ def atualizar_status_agendamento(agendamento_id):
         "SELECT COUNT(*) AS total FROM funcionarios WHERE empresa_id = ? AND ativo = 1",
         (empresa_id,),
     ).fetchone()["total"] or 1
-    capacidade_total = len(gerar_horarios()) * total_profissionais
+    empresa = conn.execute(
+        "SELECT * FROM empresas WHERE id = ?", (empresa_id,)
+    ).fetchone()
+    data_agendamento = date.fromisoformat(agendamento["data"])
+    capacidade_total = len(gerar_horarios_do_dia(empresa, data_agendamento)) * total_profissionais
     ocupados_validos = resumo["total"] - resumo["cancelados"] - resumo["faltaram"]
     resumo["capacidade_total"] = capacidade_total
     resumo["horarios_livres"] = max(capacidade_total - ocupados_validos, 0)
@@ -502,7 +515,85 @@ def cancelar_agendamento(agendamento_id):
     )
     conn.commit()
     conn.close()
+
+    from services.evolution_api import enviar_mensagem_agendamento
+    enviar_mensagem_agendamento(empresa_id, agendamento_id, "cancelamento")
+
     return redirect(request.referrer or url_for("admin_agenda"))
+
+
+@app.route("/admin/agendamentos/horarios-disponiveis")
+@login_required
+def admin_horarios_disponiveis():
+    """Usado pelo formulário de novo agendamento para recalcular os
+    horários disponíveis quando o admin muda a data (respeitando o
+    horário de funcionamento configurado para aquele dia da semana)."""
+
+    empresa_id = session["empresa_id"]
+    data = request.args.get("data", "")
+    funcionario_id = request.args.get("funcionario_id", type=int)
+    duracao_total = request.args.get("duracao_total", default=40, type=int)
+
+    try:
+        data_obj = date.fromisoformat(data)
+    except ValueError:
+        return jsonify({"erro": "Data inválida."}), 400
+
+    if duracao_total < 1 or duracao_total > 480:
+        duracao_total = 40
+
+    conn = get_connection()
+    empresa = conn.execute(
+        "SELECT * FROM empresas WHERE id = ?", (empresa_id,)
+    ).fetchone()
+
+    horarios_do_dia = gerar_horarios_do_dia(empresa, data_obj)
+    if not horarios_do_dia:
+        conn.close()
+        return jsonify({"horarios": []})
+
+    fechamento = datetime.strptime(
+        obter_horarios_funcionamento(empresa)[str(data_obj.weekday())]["fechamento"],
+        "%H:%M",
+    )
+
+    agendamentos_existentes = []
+    if funcionario_id:
+        agendamentos_existentes = conn.execute(
+            """
+            SELECT hora, COALESCE(duracao_total, 40) AS duracao_total
+            FROM agendamentos
+            WHERE empresa_id = ?
+              AND funcionario_id = ?
+              AND data = ?
+              AND status != 'cancelado'
+            """,
+            (empresa_id, funcionario_id, data),
+        ).fetchall()
+    conn.close()
+
+    livres = []
+    for hora in horarios_do_dia:
+        inicio_candidato = datetime.strptime(hora, "%H:%M")
+        fim_candidato = inicio_candidato + timedelta(minutes=duracao_total)
+
+        if fim_candidato > fechamento:
+            continue
+
+        tem_conflito = False
+        for existente in agendamentos_existentes:
+            inicio_existente = datetime.strptime(existente["hora"], "%H:%M")
+            fim_existente = inicio_existente + timedelta(
+                minutes=existente["duracao_total"] or 40
+            )
+            if inicio_candidato < fim_existente and fim_candidato > inicio_existente:
+                tem_conflito = True
+                break
+
+        if not tem_conflito:
+            livres.append(hora)
+
+    return jsonify({"horarios": livres})
 
 
 @app.route("/admin/agendamentos/novo", methods=["GET", "POST"])
@@ -511,6 +602,10 @@ def novo_agendamento():
     empresa_id = session["empresa_id"]
 
     conn = get_connection()
+
+    empresa = conn.execute(
+        "SELECT * FROM empresas WHERE id = ?", (empresa_id,)
+    ).fetchone()
 
     servicos = conn.execute(
         """
@@ -739,6 +834,6 @@ def novo_agendamento():
         "admin/agendamento_novo.html",
         servicos=servicos,
         funcionarios=funcionarios,
-        horarios=gerar_horarios(),
+        horarios=gerar_horarios_do_dia(empresa, date.today()),
         data_hoje=date.today().isoformat(),
     )

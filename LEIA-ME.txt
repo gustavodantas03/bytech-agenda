@@ -1,0 +1,19 @@
+PATCH RC2.6.1 — Correção PostgreSQL do status do WhatsApp
+
+Arquivos incluídos:
+- routes/whatsapp.py
+- database.py
+
+Correção aplicada:
+- Evita o erro "COALESCE types text and timestamp with time zone cannot be matched".
+- A coluna conectado_em permanece TEXT, compatível com a estrutura atual do projeto.
+- CURRENT_TIMESTAMP é convertido explicitamente para TEXT na atualização do status.
+
+Como aplicar:
+1. Pare o app.py e o worker.
+2. Substitua routes/whatsapp.py pelo arquivo deste patch.
+3. Substitua database.py pelo arquivo deste patch.
+4. Inicie o app novamente.
+5. Abra Comunicação > WhatsApp e clique em Atualizar status.
+
+Não é necessário alterar manualmente o banco para esta correção.

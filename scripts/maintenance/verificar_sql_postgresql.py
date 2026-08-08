@@ -18,6 +18,7 @@ PADROES = {
     "last_insert_rowid": re.compile(r"\blast_insert_rowid\s*\(", re.I),
     "INSERT OR REPLACE": re.compile(r"\bINSERT\s+OR\s+REPLACE\b", re.I),
     "LIMIT ?, ?": re.compile(r"\bLIMIT\s+\?\s*,\s*\?", re.I),
+    "COALESCE texto/timestamp": re.compile(r"COALESCE\s*\([^,]+,\s*CURRENT_TIMESTAMP\s*\)", re.I),
 }
 
 problemas: list[str] = []

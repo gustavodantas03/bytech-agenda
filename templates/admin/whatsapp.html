@@ -38,15 +38,18 @@
       <div class="wa-empty"><div>{{ '✓' if config.status == 'conectado' else '⌁' }}</div><strong>{{ 'WhatsApp conectado' if config.status == 'conectado' else 'Número ainda não conectado' }}</strong><p>{{ 'A integração está disponível para envios e automações.' if config.status == 'conectado' else 'Clique abaixo para gerar o QR Code.' }}</p></div>
     {% endif %}
     {% if config.status == 'conectado' %}
-      <form method="post" action="{{ url_for('desconectar_whatsapp') }}" onsubmit="return confirm('Desconectar este WhatsApp?');"><button class="btn btn-danger full" type="submit">Desconectar WhatsApp</button></form>
+      <form method="post" action="{{ url_for('desconectar_whatsapp') }}" onsubmit="return confirm('Desconectar este WhatsApp?');">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger full" type="submit">Desconectar WhatsApp</button></form>
     {% else %}
-      <form method="post" action="{{ url_for('conectar_whatsapp') }}"><button class="btn btn-primary full" type="submit">{{ 'Gerar novo QR Code' if config.qr_code else 'Conectar WhatsApp' }}</button></form>
+      <form method="post" action="{{ url_for('conectar_whatsapp') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="btn btn-primary full" type="submit">{{ 'Gerar novo QR Code' if config.qr_code else 'Conectar WhatsApp' }}</button></form>
     {% endif %}
   </article>
 
   <article class="panel wa-panel">
     <div class="panel-header"><div><span>Validação</span><h2>Enviar mensagem de teste</h2><p>Disponível após o status ficar conectado.</p></div></div>
     <form method="post" action="{{ url_for('testar_whatsapp') }}" class="wa-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <label>Número com DDD</label><input name="numero" placeholder="(85) 99999-9999" required>
       <button class="btn btn-secondary full" {% if config.status != 'conectado' %}disabled title="Conecte o WhatsApp primeiro"{% endif %}>Testar envio</button>
     </form>
@@ -56,7 +59,8 @@
 
 <section class="panel wa-panel" id="automacoes">
  <div class="panel-header"><div><span>Fluxos automáticos</span><h2>Automações</h2><p>Escolha quais mensagens o sistema enviará.</p></div></div>
- <form method="post" action="{{ url_for('salvar_whatsapp_automacoes') }}"><div class="wa-switch-grid">
+ <form method="post" action="{{ url_for('salvar_whatsapp_automacoes') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><div class="wa-switch-grid">
  {% set itens=[('confirmacao','Confirmação imediata','Envia assim que o agendamento é criado',automacoes.confirmacao_ativa),('lembrete_24h','Lembrete 24 horas','Reduz esquecimentos no dia anterior',automacoes.lembrete_24h_ativo),('lembrete_2h','Lembrete 2 horas','Reforço próximo ao atendimento',automacoes.lembrete_2h_ativo),('cancelamento','Aviso de cancelamento','Informa o cliente automaticamente',automacoes.cancelamento_ativo),('pos_atendimento','Pós-atendimento','Agradecimento após finalizar',automacoes.pos_atendimento_ativo),('aniversario','Aniversário','Mensagem para aniversariantes',automacoes.aniversario_ativo),('cliente_inativo','Cliente inativo','Campanha futura de recuperação',automacoes.cliente_inativo_ativo)] %}
  {% for campo,titulo,descricao,ativo in itens %}<label class="wa-switch-card"><div><strong>{{ titulo }}</strong><small>{{ descricao }}</small></div><input type="checkbox" name="{{ campo }}" {% if ativo %}checked{% endif %}><span class="wa-switch"></span></label>{% endfor %}
  </div><button class="btn btn-primary">Salvar automações</button></form>
@@ -64,11 +68,13 @@
 
 <section class="panel wa-panel" id="modelos">
  <div class="panel-header"><div><span>Personalização</span><h2>Modelos de mensagem</h2><p>Variáveis: {{ '{{nome}}' }}, {{ '{{empresa}}' }}, {{ '{{servico}}' }}, {{ '{{profissional}}' }}, {{ '{{data}}' }}, {{ '{{hora}}' }}.</p></div></div>
- <form method="post" action="{{ url_for('salvar_whatsapp_modelos') }}"><div class="wa-modelos">{% for modelo in modelos %}<details {% if loop.first %}open{% endif %}><summary><strong>{{ modelo.nome }}</strong><span>{{ modelo.tipo|replace('_',' ')|capitalize }}</span></summary><textarea name="mensagem_{{ modelo.id }}" rows="7">{{ modelo.mensagem }}</textarea></details>{% endfor %}</div><button class="btn btn-primary">Salvar modelos</button></form>
+ <form method="post" action="{{ url_for('salvar_whatsapp_modelos') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><div class="wa-modelos">{% for modelo in modelos %}<details {% if loop.first %}open{% endif %}><summary><strong>{{ modelo.nome }}</strong><span>{{ modelo.tipo|replace('_',' ')|capitalize }}</span></summary><textarea name="mensagem_{{ modelo.id }}" rows="7">{{ modelo.mensagem }}</textarea></details>{% endfor %}</div><button class="btn btn-primary">Salvar modelos</button></form>
 </section>
 
 <section class="panel wa-panel" id="historico">
- <div class="panel-header"><div><span>Auditoria</span><h2>Histórico de mensagens</h2><p>A confirmação e os lembretes passam por uma fila com tentativas automáticas.</p></div><form method="post" action="{{ url_for('processar_whatsapp_manual') }}"><button class="btn btn-secondary" type="submit">Processar agora</button></form></div>
+ <div class="panel-header"><div><span>Auditoria</span><h2>Histórico de mensagens</h2><p>A confirmação e os lembretes passam por uma fila com tentativas automáticas.</p></div><form method="post" action="{{ url_for('processar_whatsapp_manual') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="btn btn-secondary" type="submit">Processar agora</button></form></div>
  <div class="table-responsive"><table><thead><tr><th>Data</th><th>Cliente</th><th>Tipo</th><th>Telefone</th><th>Status</th><th>Detalhes</th></tr></thead><tbody>{% for item in historico %}<tr><td>{{ item.criado_em }}</td><td>{{ item.cliente_nome or 'Envio de teste' }}</td><td>{{ item.tipo|replace('_',' ')|capitalize }}</td><td>{{ item.telefone }}</td><td><span class="wa-badge {{ item.status }}">{{ item.status|capitalize }}</span></td><td title="{{ item.erro or item.mensagem }}">{{ item.erro or item.mensagem|truncate(55) }}</td></tr>{% else %}<tr><td colspan="6" class="wa-table-empty">Nenhuma mensagem registrada.</td></tr>{% endfor %}</tbody></table></div>
 </section>
 {% endif %}

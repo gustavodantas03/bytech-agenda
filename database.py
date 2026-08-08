@@ -12,6 +12,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any, Iterable
 
+from security import gerar_hash_senha
+
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_DIR = BASE_DIR / "database"
 DB_PATH = DATABASE_DIR / "bytech_agenda.db"
@@ -223,6 +225,50 @@ def _column_exists(conn, table, column):
 
     columns = conn.execute(f"PRAGMA table_info({table})").fetchall()
     return any(item["name"] == column for item in columns)
+
+MIGRATIONS = [
+    (
+        "20260729_001_hardening_indexes",
+        [
+            "CREATE INDEX IF NOT EXISTS idx_whatsapp_config_empresa_status ON whatsapp_configuracoes (empresa_id, status)",
+            "CREATE INDEX IF NOT EXISTS idx_whatsapp_historico_status ON whatsapp_historico (empresa_id, status, criado_em)",
+            "CREATE INDEX IF NOT EXISTS idx_agendamentos_empresa_data_status ON agendamentos (empresa_id, data, status)",
+            "CREATE INDEX IF NOT EXISTS idx_clientes_empresa_ativo ON clientes (empresa_id, ativo)",
+        ],
+    ),
+]
+
+
+def _apply_migrations(conn) -> None:
+    """Aplica migrações versionadas e idempotentes.
+
+    A tabela de controle evita repetir alterações em cada inicialização.
+    As migrações mantêm SQL compatível com PostgreSQL e SQLite sempre que
+    possível; alterações específicas de produção devem testar USING_POSTGRES.
+    """
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS schema_migrations (
+            version TEXT PRIMARY KEY,
+            applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    aplicadas = {
+        row["version"]
+        for row in conn.execute("SELECT version FROM schema_migrations").fetchall()
+    }
+    for version, statements in MIGRATIONS:
+        if version in aplicadas:
+            continue
+        for statement in statements:
+            conn.execute(statement)
+        conn.execute(
+            "INSERT INTO schema_migrations (version) VALUES (?)",
+            (version,),
+        )
+
+
 def init_db():
     conn = get_connection()
 
@@ -247,13 +293,17 @@ def init_db():
                 cor_botao TEXT DEFAULT '#d4af37',
                 cor_sidebar TEXT DEFAULT '#0f172a',
                 horario_texto TEXT,
+                horarios_funcionamento TEXT,
+                intervalo_agendamento_minutos INTEGER NOT NULL DEFAULT 40,
                 ativo INTEGER DEFAULT 1
             );
 
             CREATE TABLE IF NOT EXISTS usuarios_master (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usuario TEXT NOT NULL UNIQUE,
-                senha TEXT NOT NULL
+                senha TEXT NOT NULL,
+                tentativas_falhas INTEGER NOT NULL DEFAULT 0,
+                bloqueado_ate TEXT
             );
 
             CREATE TABLE IF NOT EXISTS clientes (
@@ -356,6 +406,13 @@ def init_db():
                 empresa_id INTEGER NOT NULL,
                 usuario TEXT NOT NULL UNIQUE,
                 senha TEXT NOT NULL,
+                nome TEXT,
+                papel TEXT NOT NULL DEFAULT 'proprietario',
+                permissoes TEXT,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                tentativas_falhas INTEGER NOT NULL DEFAULT 0,
+                bloqueado_ate TEXT,
                 FOREIGN KEY (empresa_id)
                     REFERENCES empresas(id)
             );
@@ -495,6 +552,34 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_whatsapp_fila_empresa
                 ON whatsapp_fila (empresa_id, criado_em);
 
+            CREATE TABLE IF NOT EXISTS whatsapp_sessoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER NOT NULL,
+                telefone TEXT NOT NULL,
+                agendamento_id INTEGER,
+                estado TEXT NOT NULL DEFAULT 'AGUARDANDO_CONFIRMACAO',
+                dados_json TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
+                FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id) ON DELETE SET NULL,
+                UNIQUE (empresa_id, telefone)
+            );
+
+            CREATE TABLE IF NOT EXISTS whatsapp_webhook_eventos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                empresa_id INTEGER,
+                event_id TEXT NOT NULL UNIQUE,
+                evento TEXT,
+                telefone TEXT,
+                payload_json TEXT,
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE SET NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_whatsapp_sessoes_empresa_telefone
+                ON whatsapp_sessoes (empresa_id, telefone);
+
             CREATE TABLE IF NOT EXISTS crm_configuracoes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 empresa_id INTEGER NOT NULL UNIQUE,
@@ -592,6 +677,33 @@ def init_db():
                     f"ALTER TABLE clientes ADD COLUMN {coluna} {definicao}"
                 )
 
+        campos_usuario = {
+            "nome": "TEXT",
+            "papel": "TEXT NOT NULL DEFAULT 'proprietario'",
+            "permissoes": "TEXT",
+            "ativo": "INTEGER NOT NULL DEFAULT 1",
+            "criado_em": "TEXT",
+            "tentativas_falhas": "INTEGER NOT NULL DEFAULT 0",
+            "bloqueado_ate": "TEXT",
+        }
+
+        for coluna, definicao in campos_usuario.items():
+            if not _column_exists(conn, "usuarios", coluna):
+                conn.execute(
+                    f"ALTER TABLE usuarios ADD COLUMN {coluna} {definicao}"
+                )
+
+        campos_usuario_master = {
+            "tentativas_falhas": "INTEGER NOT NULL DEFAULT 0",
+            "bloqueado_ate": "TEXT",
+        }
+
+        for coluna, definicao in campos_usuario_master.items():
+            if not _column_exists(conn, "usuarios_master", coluna):
+                conn.execute(
+                    f"ALTER TABLE usuarios_master ADD COLUMN {coluna} {definicao}"
+                )
+
         campos_empresa = {
             "segmento": "TEXT NOT NULL DEFAULT 'barbearia'",
             "template_admin": "TEXT NOT NULL DEFAULT 'barbearia'",
@@ -612,6 +724,8 @@ def init_db():
             "bloqueio_manual": "INTEGER NOT NULL DEFAULT 0",
             "financeiro_atualizado_em": "TEXT",
             "plano_id": "INTEGER",
+            "horarios_funcionamento": "TEXT",
+            "intervalo_agendamento_minutos": "INTEGER NOT NULL DEFAULT 40",
         }
 
         for coluna, definicao in campos_empresa.items():
@@ -1106,7 +1220,7 @@ def init_db():
                 (
                     empresa_id,
                     "admin",
-                    "admin123",
+                    gerar_hash_senha("admin123"),
                 ),
             )
         else:
@@ -1157,7 +1271,7 @@ def init_db():
                 """,
                 (
                     "bytech",
-                    "trocar123",
+                    gerar_hash_senha("trocar123"),
                 ),
             )
 
@@ -1217,6 +1331,7 @@ def init_db():
                 (empresa_item["id"],),
             )
 
+        _apply_migrations(conn)
         conn.commit()
 
     except Exception:

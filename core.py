@@ -1,15 +1,22 @@
 from datetime import date, datetime, timedelta
 from functools import wraps
+import json
 import os
+import secrets
+import time
 from uuid import uuid4
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 
 from database import get_connection, init_db, DatabaseError, DatabaseIntegrityError
 from config import Config
+from logging_config import configurar_logs
+
+configurar_logs()
 
 
 from werkzeug.utils import secure_filename
+from security import eh_hash_de_senha, gerar_hash_senha, senha_confere
 
 DIAS_SEMANA = [
     "Segunda-feira",
@@ -65,6 +72,122 @@ def normalizar_telefone(telefone):
         for caractere in str(telefone or "")
         if caractere.isdigit()
     )
+
+
+LIMITE_TENTATIVAS_LOGIN = 5
+BLOQUEIO_LOGIN_MINUTOS = 15
+
+# Tabelas cujo login usa o mecanismo de bloqueio por tentativas — nunca
+# vindas de entrada do usuário, sempre um destes dois literais fixos.
+_TABELAS_LOGIN_PERMITIDAS = {"usuarios", "usuarios_master"}
+
+
+def valor_linha(linha, chave, padrao=None):
+    """Lê uma coluna de qualquer linha do banco (usuário, empresa, etc.)
+    com segurança: nunca derruba a página se a coluna não existir na linha
+    (ex.: banco de dados que ainda não passou pela migração mais recente).
+    """
+
+    if not linha:
+        return padrao
+    try:
+        valor = linha[chave]
+    except (IndexError, KeyError):
+        return padrao
+    return padrao if valor is None else valor
+
+
+def minutos_bloqueio_restante(conta):
+    """Se a conta estiver temporariamente bloqueada por tentativas erradas,
+    devolve quantos minutos faltam para liberar. Caso contrário, None."""
+
+    bloqueado_ate = valor_linha(conta, "bloqueado_ate")
+    if not bloqueado_ate:
+        return None
+    try:
+        expira_em = datetime.strptime(bloqueado_ate, "%Y-%m-%d %H:%M:%S")
+    except (TypeError, ValueError):
+        return None
+    restante = (expira_em - datetime.now()).total_seconds()
+    if restante <= 0:
+        return None
+    return max(1, int(restante // 60) + 1)
+
+
+def registrar_falha_login(conn, tabela, conta_id, tentativas_atuais):
+    """Soma uma tentativa errada; bloqueia a conta temporariamente ao
+    atingir o limite."""
+
+    if tabela not in _TABELAS_LOGIN_PERMITIDAS:
+        raise ValueError("Tabela de login inválida.")
+
+    novas_tentativas = (tentativas_atuais or 0) + 1
+    bloqueado_ate = None
+    if novas_tentativas >= LIMITE_TENTATIVAS_LOGIN:
+        bloqueado_ate = (
+            datetime.now() + timedelta(minutes=BLOQUEIO_LOGIN_MINUTOS)
+        ).strftime("%Y-%m-%d %H:%M:%S")
+        novas_tentativas = 0
+
+    try:
+        conn.execute(
+            f"UPDATE {tabela} SET tentativas_falhas = ?, bloqueado_ate = ? WHERE id = ?",
+            (novas_tentativas, bloqueado_ate, conta_id),
+        )
+        conn.commit()
+    except Exception:
+        # Banco ainda não migrado (colunas novas ausentes) — não deixa o
+        # login quebrar por causa disso; a proteção de bloqueio volta a
+        # valer normalmente assim que a migração automática for concluída.
+        conn.rollback()
+        return False
+    return bloqueado_ate is not None
+
+
+def limpar_falhas_login(conn, tabela, conta_id):
+    if tabela not in _TABELAS_LOGIN_PERMITIDAS:
+        raise ValueError("Tabela de login inválida.")
+
+    try:
+        conn.execute(
+            f"UPDATE {tabela} SET tentativas_falhas = 0, bloqueado_ate = NULL WHERE id = ?",
+            (conta_id,),
+        )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+
+def mes_atual_competencia():
+    """Retorna o mês corrente no formato YYYY-MM, calculado em Python.
+
+    Evita depender de funções específicas de PostgreSQL (TO_CHAR) que não
+    existem no SQLite.
+    """
+
+    return date.today().strftime("%Y-%m")
+
+
+def meses_recentes(quantidade=6):
+    """Retorna uma lista com as últimas `quantidade` competências (YYYY-MM),
+    da mais antiga para a mais recente, incluindo o mês atual.
+
+    Calculado inteiramente em Python para funcionar da mesma forma no
+    SQLite e no PostgreSQL (substitui combinações de DATE_TRUNC/
+    generate_series/INTERVAL, que são exclusivas do PostgreSQL).
+    """
+
+    hoje = date.today()
+    competencias = []
+    ano, mes = hoje.year, hoje.month
+    for indice in range(quantidade - 1, -1, -1):
+        mes_calculado = mes - indice
+        ano_calculado = ano
+        while mes_calculado <= 0:
+            mes_calculado += 12
+            ano_calculado -= 1
+        competencias.append(f"{ano_calculado:04d}-{mes_calculado:02d}")
+    return competencias
 
 
 def buscar_ou_criar_cliente(
@@ -858,6 +981,68 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
+# ---------------------------------------------------------------------------
+# Proteção CSRF
+# ---------------------------------------------------------------------------
+# Implementação própria e leve (sem depender do Flask-WTF): cada sessão
+# recebe um token aleatório; toda requisição que muda dados (POST/PUT/
+# PATCH/DELETE) precisa devolver esse mesmo token, seja num campo de
+# formulário oculto (_csrf_token) seja no header X-CSRFToken (usado pelas
+# chamadas via JavaScript/fetch). Isso impede que outro site force o
+# navegador de alguém já logado a executar uma ação sem que a pessoa saiba.
+
+_METODOS_PROTEGIDOS_CSRF = {"POST", "PUT", "PATCH", "DELETE"}
+
+# Módulos isentos: rotas públicas de agendamento (sem sessão autenticada de
+# dono de empresa) e o webhook da Evolution API (chamada servidor-a-servidor,
+# sem navegador e sem cookie de sessão envolvidos).
+_MODULOS_ISENTOS_CSRF = {"routes.publico", "routes.webhooks"}
+
+
+def csrf_token():
+    """Gera (uma vez por sessão) e devolve o token CSRF atual."""
+
+    token = session.get("_csrf_token")
+    if not token:
+        token = secrets.token_hex(32)
+        session["_csrf_token"] = token
+    return token
+
+
+app.jinja_env.globals["csrf_token"] = csrf_token
+
+
+@app.before_request
+def protecao_csrf():
+    if request.method not in _METODOS_PROTEGIDOS_CSRF:
+        return
+
+    endpoint = request.endpoint
+    if endpoint and endpoint in app.view_functions:
+        if app.view_functions[endpoint].__module__ in _MODULOS_ISENTOS_CSRF:
+            return
+
+    token_esperado = session.get("_csrf_token")
+    token_enviado = request.form.get("_csrf_token") or request.headers.get("X-CSRFToken")
+    if not token_enviado and request.is_json:
+        token_enviado = (request.get_json(silent=True) or {}).get("_csrf_token")
+
+    if not token_esperado or not token_enviado or not secrets.compare_digest(
+        str(token_esperado), str(token_enviado)
+    ):
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify(
+                sucesso=False,
+                erro="Sessão expirada ou inválida. Atualize a página e tente novamente.",
+            ), 400
+        flash(
+            "Sua sessão expirou ou a página ficou aberta por muito tempo. Tente novamente.",
+            "erro",
+        )
+        return redirect(request.referrer or url_for("admin_dashboard"))
+
+
 def arquivo_permitido(nome_arquivo):
     return (
         "." in nome_arquivo
@@ -898,6 +1083,101 @@ def recurso_required(chave_recurso):
     return decorator
 
 
+# ---------------------------------------------------------------------------
+# Permissões por usuário (equipe)
+# ---------------------------------------------------------------------------
+# Além do plano contratado (recurso_required, acima), cada login individual
+# dentro de uma empresa pode ter acesso restrito a algumas seções. O
+# "proprietario" sempre tem acesso total; um "colaborador" só acessa as
+# seções marcadas em session["permissoes"].
+
+PERMISSOES_DISPONIVEIS = {
+    "agenda": "Agenda",
+    "clientes": "Clientes / CRM",
+    "fidelidade": "Fidelidade",
+    "servicos": "Serviços",
+    "funcionarios": "Profissionais",
+    "whatsapp": "Comunicação (WhatsApp)",
+    "relatorios": "Relatórios",
+    "configuracoes": "Dados do estabelecimento",
+}
+
+# Mapeia o módulo (arquivo routes/*.py) para a chave de permissão da seção.
+# Rotas de arquivos não listados aqui (ex.: dashboard, minha conta, equipe)
+# ficam sempre acessíveis a qualquer usuário logado da empresa.
+_MODULO_PERMISSAO = {
+    "routes.agenda": "agenda",
+    "routes.clientes": "clientes",
+    "routes.crm_inteligencia": "clientes",
+    "routes.fidelidade": "fidelidade",
+    "routes.servicos": "servicos",
+    "routes.funcionarios": "funcionarios",
+    "routes.whatsapp": "whatsapp",
+    "routes.relatorios": "relatorios",
+}
+
+# Endpoints específicos que sobrescrevem a regra do módulo (têm prioridade
+# sobre o mapa acima). Usado quando um arquivo mistura rotas restritas com
+# rotas que devem ficar sempre abertas (ex.: conta.py).
+_ENDPOINT_PERMISSAO = {
+    "admin_meu_espaco": "configuracoes",
+    "admin_barbearia": "configuracoes",
+}
+
+
+def _permissoes_da_sessao():
+    bruto = session.get("permissoes")
+    return bruto if isinstance(bruto, list) else []
+
+
+@app.before_request
+def verificar_permissoes_colaborador():
+    """Bloqueia colaboradores fora das seções liberadas para eles.
+
+    Não afeta o proprietário (acesso sempre total) nem sessões do painel
+    master, que não têm session["papel"] == "colaborador".
+    """
+
+    if session.get("papel") != "colaborador":
+        return
+
+    endpoint = request.endpoint
+    if not endpoint or endpoint not in app.view_functions:
+        return
+
+    chave = _ENDPOINT_PERMISSAO.get(endpoint)
+    if chave is None:
+        modulo = app.view_functions[endpoint].__module__
+        chave = _MODULO_PERMISSAO.get(modulo)
+
+    if not chave:
+        return
+
+    if chave not in _permissoes_da_sessao():
+        flash(
+            "Você não tem permissão para acessar esta área. Fale com o responsável da empresa.",
+            "erro",
+        )
+        return redirect(url_for("admin_dashboard"))
+
+
+def apenas_proprietario(view):
+    """Restringe a rota ao usuário com papel 'proprietario' da empresa."""
+
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if not session.get("empresa_id"):
+            return redirect(url_for("admin_login"))
+        if session.get("papel") == "colaborador":
+            flash(
+                "Apenas o proprietário da conta pode gerenciar a equipe.",
+                "erro",
+            )
+            return redirect(url_for("admin_dashboard"))
+        return view(*args, **kwargs)
+    return wrapped_view
+
+
 def gerar_horarios():
     horarios = []
     inicio = datetime.strptime("09:00", "%H:%M")
@@ -909,6 +1189,119 @@ def gerar_horarios():
         horarios.append(atual.strftime("%H:%M"))
         atual += intervalo
 
+    return horarios
+
+
+# ---------------------------------------------------------------------------
+# Horário de funcionamento configurável por empresa
+# ---------------------------------------------------------------------------
+# Cada empresa pode definir, por dia da semana, se abre e em que horário.
+# Guardado como JSON na coluna empresas.horarios_funcionamento:
+#   {"0": {"aberto": true, "abertura": "09:00", "fechamento": "20:00"}, ...}
+# onde a chave é o dia da semana no padrão de Python (0=segunda ... 6=domingo).
+
+DIAS_SEMANA_LABELS = [
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+    "Domingo",
+]
+
+
+def _valor_empresa(empresa, chave, padrao=None):
+    """Lê uma coluna da empresa com segurança, funcionando tanto com
+    sqlite3.Row quanto com o dict-like do PostgresConnection, mesmo que a
+    coluna não tenha sido incluída na consulta original."""
+
+    if not empresa:
+        return padrao
+    try:
+        valor = empresa[chave]
+    except (IndexError, KeyError):
+        return padrao
+    return padrao if valor is None else valor
+
+
+def horarios_funcionamento_padrao():
+    """Configuração de fábrica: todo dia aberto das 09:00 às 18:00 — igual
+    ao comportamento fixo que o sistema tinha antes desta função existir.
+    É o que vale para qualquer empresa que ainda não personalizou nada."""
+
+    return {
+        str(dia): {"aberto": True, "abertura": "09:00", "fechamento": "18:00"}
+        for dia in range(7)
+    }
+
+
+def obter_horarios_funcionamento(empresa):
+    """Lê e valida o horário de funcionamento salvo da empresa, caindo no
+    padrão de fábrica se não estiver configurado ou estiver corrompido."""
+
+    padrao = horarios_funcionamento_padrao()
+    bruto = _valor_empresa(empresa, "horarios_funcionamento")
+    if not bruto:
+        return padrao
+
+    try:
+        configurado = json.loads(bruto)
+    except (TypeError, ValueError):
+        return padrao
+
+    if not isinstance(configurado, dict):
+        return padrao
+
+    resultado = {}
+    for dia in range(7):
+        chave = str(dia)
+        item = configurado.get(chave)
+        if (
+            isinstance(item, dict)
+            and isinstance(item.get("abertura"), str)
+            and isinstance(item.get("fechamento"), str)
+        ):
+            resultado[chave] = {
+                "aberto": bool(item.get("aberto", True)),
+                "abertura": item["abertura"],
+                "fechamento": item["fechamento"],
+            }
+        else:
+            resultado[chave] = padrao[chave]
+    return resultado
+
+
+def gerar_horarios_do_dia(empresa, data_referencia):
+    """Gera os horários disponíveis (ex.: ['09:00', '09:40', ...]) para uma
+    empresa numa data específica, respeitando o dia da semana configurado e
+    o intervalo entre agendamentos. Devolve lista vazia se a empresa não
+    abre naquele dia."""
+
+    configuracao = obter_horarios_funcionamento(empresa)
+    dia = configuracao.get(str(data_referencia.weekday()))
+
+    if not dia or not dia.get("aberto"):
+        return []
+
+    try:
+        inicio = datetime.strptime(dia["abertura"], "%H:%M")
+        fim = datetime.strptime(dia["fechamento"], "%H:%M")
+    except (KeyError, ValueError):
+        return []
+
+    try:
+        intervalo_minutos = int(_valor_empresa(empresa, "intervalo_agendamento_minutos", 40))
+    except (TypeError, ValueError):
+        intervalo_minutos = 40
+    intervalo_minutos = max(5, intervalo_minutos)
+    intervalo = timedelta(minutes=intervalo_minutos)
+
+    horarios = []
+    atual = inicio
+    while atual < fim:
+        horarios.append(atual.strftime("%H:%M"))
+        atual += intervalo
     return horarios
 
 def master_login_required(view):
@@ -961,16 +1354,85 @@ def contexto_admin_multissegmento():
 
 
 
+@app.get("/health")
+def healthcheck():
+    """Verificação simples para VPS, proxy reverso e monitoramento."""
+    try:
+        conn = get_connection()
+        conn.execute("SELECT 1").fetchone()
+        migrations = conn.execute("SELECT COUNT(*) AS total FROM schema_migrations").fetchone()
+        conn.close()
+        return jsonify(status="ok", banco="ok", migrations=migrations["total"]), 200
+    except Exception as exc:
+        app.logger.exception("Falha no healthcheck")
+        return jsonify(status="erro", banco="erro", detalhe=str(exc)), 503
+
+
 _db_initialized = False
+_worker_embutido_iniciado = False
+
+
+def _iniciar_worker_embutido():
+    """Inicia, em uma thread separada, o processamento automático da fila
+    de mensagens do WhatsApp (confirmações, lembretes e cancelamentos).
+
+    Sem isso, as mensagens ficavam apenas enfileiradas e só eram enviadas
+    quando alguém clicava manualmente em "Atualizar status" no painel de
+    Comunicação, ou quando o script separado do worker era executado à parte.
+
+    Pode ser desativado com BYTECH_EMBED_WORKER=0 no .env — por exemplo, ao
+    publicar com múltiplos workers/processos do Gunicorn, caso em que o envio
+    deve ficar a cargo do processo único em scripts/evolution/executar_worker.py
+    (ou do atalho INICIAR-WORKER-WHATSAPP.bat) para não haver duplicidade.
+    """
+
+    global _worker_embutido_iniciado
+    if _worker_embutido_iniciado:
+        return
+
+    if os.getenv("BYTECH_EMBED_WORKER", "1") != "1":
+        return
+
+    # Com o reloader de debug do Flask, o processo "monitor" reinicia o
+    # processo real e não deve rodar o worker (senão ele roda em dobro).
+    debug_ligado = os.getenv("BYTECH_DEBUG", "0") == "1"
+    if debug_ligado and os.getenv("WERKZEUG_RUN_MAIN") != "true":
+        return
+
+    import logging
+    import threading
+
+    def _loop():
+        from services.scheduler_service import SchedulerConfig, executar_ciclo
+
+        logger = logging.getLogger("bytech.worker_embutido")
+        config = SchedulerConfig.from_env()
+        logger.info(
+            "Worker embutido iniciado (intervalo=%ss, lote=%s).",
+            config.intervalo_segundos,
+            config.lote,
+        )
+        while True:
+            try:
+                executar_ciclo(config)
+            except Exception:
+                logger.exception(
+                    "Falha no ciclo automático de mensagens; nova tentativa no próximo intervalo."
+                )
+            time.sleep(config.intervalo_segundos)
+
+    threading.Thread(target=_loop, name="bytech-worker-embutido", daemon=True).start()
+    _worker_embutido_iniciado = True
 
 
 @app.before_request
 def setup():
-    """Garante a estrutura uma única vez por processo do servidor."""
+    """Garante a estrutura do banco e o worker de mensagens uma única vez por processo."""
     global _db_initialized
     if not _db_initialized:
         init_db()
         _db_initialized = True
+    _iniciar_worker_embutido()
 
 
 

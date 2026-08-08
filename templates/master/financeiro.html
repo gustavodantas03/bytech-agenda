@@ -175,6 +175,7 @@
                         <a class="btn btn-small btn-secondary" href="{{ url_for('master_recibo', pagamento_id=p.id) }}">Recibo PDF</a>
                         {% if not p.estornado %}
                         <form method="post" action="{{ url_for('master_estornar_pagamento', pagamento_id=p.id) }}" onsubmit="return confirmarEstorno(this)">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="motivo">
                             <button class="btn btn-small btn-danger">Estornar</button>
                         </form>
@@ -197,6 +198,7 @@
         <p class="payment-modal-subtitle">Confira os valores antes de confirmar. O recibo em PDF será gerado após o registro.</p>
 
         <form id="paymentForm" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="payment-summary-box">
                 <div><span>Valor original</span><strong id="paymentOriginalText">R$ 0,00</strong></div>
                 <div><span>Valor final</span><strong id="paymentFinalText">R$ 0,00</strong></div>

@@ -129,6 +129,7 @@
             </div>
 
             <form class="crm-settings-form" method="post" action="{{ url_for('admin_crm_configuracoes') }}" data-settings-form>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label class="crm-field">
                     <span>Dias para considerar em risco</span>
                     <div class="crm-input-suffix"><input type="number" min="7" name="dias_risco" value="{{ config.dias_risco }}" required><em>dias</em></div>
@@ -239,6 +240,7 @@
                     </div>
                 </div>
                 <form class="crm-campaign-form" method="post" action="{{ url_for('admin_crm_nova_campanha') }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                     <label class="crm-field crm-field-full">
                         <span>Nome da campanha</span>
                         <input name="nome" maxlength="120" required placeholder="Ex.: Volte e ganhe 10%">
@@ -301,9 +303,11 @@
                         <p>{{ campanha.mensagem }}</p>
                         <div class="crm-campaign-actions">
                             <form method="post" action="{{ url_for('admin_crm_status_campanha', campanha_id=campanha.id) }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                 <button class="crm-action-button" type="submit">{{ 'Pausar' if campanha.ativo else 'Ativar' }}</button>
                             </form>
                             <form method="post" action="{{ url_for('admin_crm_excluir_campanha', campanha_id=campanha.id) }}" onsubmit="return confirm('Excluir esta campanha?')">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                 <button class="crm-action-button danger" type="submit">Excluir</button>
                             </form>
                         </div>

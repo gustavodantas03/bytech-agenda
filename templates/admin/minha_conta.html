@@ -44,10 +44,29 @@ Minha conta | Bytech Agenda
 
     </div>
 
+    {% if session.get('papel') != 'colaborador' %}
+    <div class="account-user-card">
+
+        <div class="account-user-icon">
+            👥
+        </div>
+
+        <div>
+            <span>Sua equipe</span>
+
+            <strong>
+                <a href="{{ url_for('admin_equipe') }}">Gerenciar usuários da equipe</a>
+            </strong>
+        </div>
+
+    </div>
+    {% endif %}
+
     <form
         method="POST"
         class="account-password-form"
     >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
         <div class="field-group">
 

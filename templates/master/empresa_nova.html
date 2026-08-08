@@ -23,6 +23,7 @@ Nova empresa
 <section class="panel narrow-panel">
 
     <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
         <label for="segmento">Segmento *</label>
         <select

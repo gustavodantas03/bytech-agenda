@@ -1,0 +1,644 @@
+2026-08-07 16:02:25,111 | INFO | werkzeug | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-08-07 16:02:25,111 | INFO | werkzeug | [33mPress CTRL+C to quit[0m
+2026-08-07 16:02:49,527 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "[32mGET / HTTP/1.1[0m" 302 -
+2026-08-07 16:02:49,541 | INFO | bytech.worker_embutido | Worker embutido iniciado (intervalo=60s, lote=30).
+2026-08-07 16:02:49,585 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "GET /demo HTTP/1.1" 200 -
+2026-08-07 16:02:49,619 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "GET /static/css/style.css?v=14 HTTP/1.1" 200 -
+2026-08-07 16:02:49,639 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "GET /static/img/bytech-agenda-icon.png HTTP/1.1" 200 -
+2026-08-07 16:02:49,761 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "[36mGET /static/css/style.css?v=14 HTTP/1.1[0m" 304 -
+2026-08-07 16:02:49,774 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:49] "GET /static/img/favicon.png HTTP/1.1" 200 -
+2026-08-07 16:02:57,010 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:57] "GET /demo HTTP/1.1" 200 -
+2026-08-07 16:02:57,032 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:57] "GET /static/css/style.css?v=14 HTTP/1.1" 200 -
+2026-08-07 16:02:57,044 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:57] "GET /static/img/bytech-agenda-icon.png HTTP/1.1" 200 -
+2026-08-07 16:02:57,151 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:02:57] "GET /static/img/favicon.png HTTP/1.1" 200 -
+2026-08-07 16:03:01,427 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /demo/agendar HTTP/1.1" 200 -
+2026-08-07 16:03:01,472 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/css/style.css?v=25 HTTP/1.1" 200 -
+2026-08-07 16:03:01,496 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:01,503 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/main.js?v=2 HTTP/1.1" 200 -
+2026-08-07 16:03:01,555 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/servicos.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,556 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/horarios.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,557 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/fluxo.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,557 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/api.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,574 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/interface.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,584 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/resumo.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,584 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/config.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,584 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/util.js HTTP/1.1" 200 -
+2026-08-07 16:03:01,587 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:01] "GET /static/js/estado.js HTTP/1.1" 200 -
+2026-08-07 16:03:11,928 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:11] "[32mGET /admin HTTP/1.1[0m" 302 -
+2026-08-07 16:03:11,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:11] "GET /admin/login HTTP/1.1" 200 -
+2026-08-07 16:03:11,980 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:11] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-08-07 16:03:11,988 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:11] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:21,198 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2026-08-07 16:03:21,261 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "GET /admin HTTP/1.1" 200 -
+2026-08-07 16:03:21,276 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "GET /static/css/style.css?v=23 HTTP/1.1" 200 -
+2026-08-07 16:03:21,282 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "GET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1" 200 -
+2026-08-07 16:03:21,283 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:21,283 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "GET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1" 200 -
+2026-08-07 16:03:21,551 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:21,563 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:21] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:03:26,911 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:26] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:29,570 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:30,858 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "GET /admin/equipe HTTP/1.1" 200 -
+2026-08-07 16:03:30,869 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:03:30,872 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:03:30,881 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:30,892 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:03:30,894 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:30] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:32,983 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:32] "GET /admin/barbearia HTTP/1.1" 200 -
+2026-08-07 16:03:32,993 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:32] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:03:33,002 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:33] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:03:33,003 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:33] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:33,040 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:33] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:03:33,046 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:41,381 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:41,385 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:47,244 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:47] "[36mGET /static/img/favicon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:03:49,055 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:03:57,045 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:03:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:25,680 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:29,048 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:37,045 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:40,442 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "GET /admin HTTP/1.1" 200 -
+2026-08-07 16:04:40,456 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:40,459 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:40,460 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "[36mGET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:40,463 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:40,479 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:40,481 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:40] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:43,535 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "GET /admin/agenda HTTP/1.1" 200 -
+2026-08-07 16:04:43,546 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:43,554 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:43,567 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:43,567 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "GET /static/js/agenda.js?v=9 HTTP/1.1" 200 -
+2026-08-07 16:04:43,578 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "GET /static/css/agenda-premium.css?v=4 HTTP/1.1" 200 -
+2026-08-07 16:04:43,635 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:43,645 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:43] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:46,239 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "GET /admin/funcionarios HTTP/1.1" 200 -
+2026-08-07 16:04:46,250 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:46,254 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:46,261 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:46,285 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:46,290 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:46] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:47,284 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 16:04:47,295 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "GET /static/css/crm-dashboard.css?v=1 HTTP/1.1" 200 -
+2026-08-07 16:04:47,300 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:47,302 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:47,309 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:47,312 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "GET /static/js/crm-dashboard.js?v=1 HTTP/1.1" 200 -
+2026-08-07 16:04:47,367 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:47,369 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:47] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:48,661 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "GET /admin/servicos HTTP/1.1" 200 -
+2026-08-07 16:04:48,675 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:48,678 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:48,680 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:48,702 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:48,708 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:48] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:49,669 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "GET /admin/fidelidade HTTP/1.1" 200 -
+2026-08-07 16:04:49,681 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:49,683 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "GET /static/css/fidelidade.css HTTP/1.1" 200 -
+2026-08-07 16:04:49,687 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:49,695 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "GET /static/js/fidelidade.js HTTP/1.1" 200 -
+2026-08-07 16:04:49,715 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:49,786 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:49,831 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:50,641 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "GET /admin/fidelidade HTTP/1.1" 200 -
+2026-08-07 16:04:50,666 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:50,679 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:50,679 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:50,683 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[36mGET /static/css/fidelidade.css HTTP/1.1[0m" 304 -
+2026-08-07 16:04:50,687 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[36mGET /static/js/fidelidade.js HTTP/1.1[0m" 304 -
+2026-08-07 16:04:50,708 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:50,716 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:50] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:51,577 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "GET /admin/fidelidade HTTP/1.1" 200 -
+2026-08-07 16:04:51,592 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:51,595 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:51,602 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:51,612 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[36mGET /static/css/fidelidade.css HTTP/1.1[0m" 304 -
+2026-08-07 16:04:51,606 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[36mGET /static/js/fidelidade.js HTTP/1.1[0m" 304 -
+2026-08-07 16:04:51,653 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:51,664 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:51] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:52,353 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "GET /admin/servicos HTTP/1.1" 200 -
+2026-08-07 16:04:52,367 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:52,377 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:52,377 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:52,400 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:52,404 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:52] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:57,059 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "GET /admin/comunicacao/whatsapp HTTP/1.1" 200 -
+2026-08-07 16:04:57,071 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "GET /static/css/whatsapp.css?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 16:04:57,076 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:57,086 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:04:57,087 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:04:57,094 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "GET /static/js/whatsapp.js?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 16:04:57,102 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:04:57,112 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:04:57,126 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:04:57] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:05:05,562 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:05] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:05:13,570 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:13] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:05:21,559 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:21] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:05:22,900 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:22] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:24,331 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "GET /admin/relatorios HTTP/1.1" 200 -
+2026-08-07 16:05:24,342 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:24,348 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:24,348 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:05:24,376 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:05:24,383 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:24] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:28,832 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "GET /admin/barbearia HTTP/1.1" 200 -
+2026-08-07 16:05:28,848 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:28,860 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:28,869 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:05:28,880 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:05:28,890 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:28] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:36,888 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:36] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:44,130 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "[32mPOST /admin/barbearia HTTP/1.1[0m" 302 -
+2026-08-07 16:05:44,138 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "GET /admin/barbearia HTTP/1.1" 200 -
+2026-08-07 16:05:44,157 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:05:44,158 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:44,159 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:44,185 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:05:44,189 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:44] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:58,671 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:58] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:05:59,711 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "GET /admin/equipe HTTP/1.1" 200 -
+2026-08-07 16:05:59,724 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:59,731 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:05:59,733 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:05:59,754 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:05:59,770 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:05:59] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:01,085 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "GET /admin/minha-conta HTTP/1.1" 200 -
+2026-08-07 16:06:01,102 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:01,109 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:01,121 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:01,158 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:06:01,187 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:06,338 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "GET /admin/barbearia HTTP/1.1" 200 -
+2026-08-07 16:06:06,349 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,357 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,360 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,384 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:06:06,386 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:06,795 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "GET /admin/equipe HTTP/1.1" 200 -
+2026-08-07 16:06:06,811 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,816 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,818 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:06,827 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:06:06,833 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:06] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:08,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:08] "GET /admin/relatorios HTTP/1.1" 200 -
+2026-08-07 16:06:08,978 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:08] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:08,988 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:08] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:08,992 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:08] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:09,007 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:09] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:06:09,045 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:14,162 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:14] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:06:24,689 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:24] "[32mGET /master HTTP/1.1[0m" 302 -
+2026-08-07 16:06:24,711 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:24] "GET /master/login HTTP/1.1" 200 -
+2026-08-07 16:06:24,735 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:24] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-08-07 16:06:24,745 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:24] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:34,790 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:34] "[32mPOST /master/login HTTP/1.1[0m" 302 -
+2026-08-07 16:06:34,825 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:34] "GET /master HTTP/1.1" 200 -
+2026-08-07 16:06:34,838 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:34] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:34,839 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:34] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:48,729 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:48] "GET /master/empresas HTTP/1.1" 200 -
+2026-08-07 16:06:48,751 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:48] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:48,761 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:48] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:50,752 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:50] "GET /master/planos HTTP/1.1" 200 -
+2026-08-07 16:06:50,761 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:50] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:50,764 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:50] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:06:54,652 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:54] "GET /master/planos/1/editar HTTP/1.1" 200 -
+2026-08-07 16:06:54,662 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:54] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:06:54,667 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:06:54] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:07:00,281 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:00] "GET /master/planos HTTP/1.1" 200 -
+2026-08-07 16:07:00,296 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:00] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:07:00,307 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:00] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:07:01,409 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:01] "GET /master/planos/2/editar HTTP/1.1" 200 -
+2026-08-07 16:07:01,421 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:01] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:07:01,430 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:01] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:07:12,369 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:12] "GET /master/financeiro HTTP/1.1" 200 -
+2026-08-07 16:07:12,378 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:12] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:07:12,380 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:12] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:07:16,528 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:16] "GET /master/planos HTTP/1.1" 200 -
+2026-08-07 16:07:16,540 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:16] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:07:16,552 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:07:16] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:29:47,418 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /demo/agendar HTTP/1.1" 200 -
+2026-08-07 16:29:47,480 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/main.js?v=2 HTTP/1.1" 200 -
+2026-08-07 16:29:47,600 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/servicos.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,610 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/horarios.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,634 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/fluxo.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,665 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/api.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,696 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/interface.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,705 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/config.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,714 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/resumo.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,720 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/estado.js HTTP/1.1" 200 -
+2026-08-07 16:29:47,729 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:47] "GET /static/js/util.js HTTP/1.1" 200 -
+2026-08-07 16:29:49,207 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:49] "[32mGET /admin/relatorios HTTP/1.1[0m" 302 -
+2026-08-07 16:29:49,217 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:49] "GET /admin/login HTTP/1.1" 200 -
+2026-08-07 16:29:49,250 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:49] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-08-07 16:29:58,726 | ERROR | core | Exception on /admin/login [POST]
+Traceback (most recent call last):
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\routes\auth.py", line 79, in admin_login
+    minutos_restantes = minutos_bloqueio_restante(conta)
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 89, in minutos_bloqueio_restante
+    bloqueado_ate = conta["bloqueado_ate"] if conta else None
+                    ~~~~~^^^^^^^^^^^^^^^^^
+IndexError: No item with that key
+2026-08-07 16:29:58,768 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:58] "[35m[1mPOST /admin/login HTTP/1.1[0m" 500 -
+2026-08-07 16:29:58,793 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:29:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-08-07 16:30:07,298 | ERROR | core | Exception on /admin/login [POST]
+Traceback (most recent call last):
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\routes\auth.py", line 79, in admin_login
+    minutos_restantes = minutos_bloqueio_restante(conta)
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 89, in minutos_bloqueio_restante
+    bloqueado_ate = conta["bloqueado_ate"] if conta else None
+                    ~~~~~^^^^^^^^^^^^^^^^^
+IndexError: No item with that key
+2026-08-07 16:30:07,300 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:07] "[35m[1mPOST /admin/login HTTP/1.1[0m" 500 -
+2026-08-07 16:30:07,335 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-08-07 16:30:11,021 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "GET /master HTTP/1.1" 200 -
+2026-08-07 16:30:11,031 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "GET /static/css/style.css?v=25 HTTP/1.1" 200 -
+2026-08-07 16:30:11,051 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "GET /static/img/bytech-agenda-icon.png HTTP/1.1" 200 -
+2026-08-07 16:30:11,907 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "GET /master/empresas HTTP/1.1" 200 -
+2026-08-07 16:30:11,919 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "[36mGET /static/css/style.css?v=25 HTTP/1.1[0m" 304 -
+2026-08-07 16:30:11,921 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:30:11] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:54:19,697 | INFO | werkzeug | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-08-07 16:54:19,703 | INFO | werkzeug | [33mPress CTRL+C to quit[0m
+2026-08-07 16:54:26,065 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:26] "[32mGET /admin HTTP/1.1[0m" 302 -
+2026-08-07 16:54:26,099 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:26] "GET /admin/login HTTP/1.1" 200 -
+2026-08-07 16:54:26,109 | INFO | bytech.worker_embutido | Worker embutido iniciado (intervalo=60s, lote=30).
+2026-08-07 16:54:26,151 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-08-07 16:54:26,184 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:26] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:54:29,394 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "[32mPOST /admin/login HTTP/1.1[0m" 302 -
+2026-08-07 16:54:29,529 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "GET /admin HTTP/1.1" 200 -
+2026-08-07 16:54:29,546 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "GET /static/css/style.css?v=23 HTTP/1.1" 200 -
+2026-08-07 16:54:29,557 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:54:29,568 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "GET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1" 200 -
+2026-08-07 16:54:29,575 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "GET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1" 200 -
+2026-08-07 16:54:29,827 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:54:29,839 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:29] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:54:45,253 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:54:45,832 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:54:48,378 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "GET /admin/comunicacao/whatsapp HTTP/1.1" 200 -
+2026-08-07 16:54:48,391 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:54:48,405 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:54:48,412 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:54:48,421 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "GET /static/css/whatsapp.css?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 16:54:48,428 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:54:48,445 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "GET /static/js/whatsapp.js?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 16:54:48,463 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:54:48,478 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:48] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:54:56,748 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:54:56] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:04,760 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:04] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:12,757 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:12] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:20,747 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:20] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:28,746 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:28] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:36,756 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:36] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:55:44,746 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:55:44] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:56:07,599 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:07] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:56:07,601 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:07] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:56:07,614 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:07] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:56:08,461 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:56:08,479 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 16:56:08,641 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 16:56:08,649 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:56:08,655 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:56:08,657 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:56:08,678 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /static/css/crm-dashboard.css?v=1 HTTP/1.1" 200 -
+2026-08-07 16:56:08,705 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /static/js/crm-dashboard.js?v=1 HTTP/1.1" 200 -
+2026-08-07 16:56:08,758 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:56:08,767 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:56:08] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:57:52,312 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:52] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:57:52,767 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:52] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:57:53,327 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "GET /admin HTTP/1.1" 200 -
+2026-08-07 16:57:53,338 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:53,350 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:53,351 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "[36mGET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:53,353 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:57:53,377 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:57:53,382 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:57:58,814 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 16:57:58,824 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:58,832 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:58,833 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:57:58,837 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[36mGET /static/css/crm-dashboard.css?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:58,840 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[36mGET /static/js/crm-dashboard.js?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 16:57:58,929 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:57:58,931 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:57:58] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:58:02,064 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "GET /admin/clientes HTTP/1.1" 200 -
+2026-08-07 16:58:02,074 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:02,079 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:02,084 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:58:02,102 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "GET /static/css/clientes-premium.css?v=1 HTTP/1.1" 200 -
+2026-08-07 16:58:02,125 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "GET /static/js/clientes-premium.js?v=1 HTTP/1.1" 200 -
+2026-08-07 16:58:02,150 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:58:02,156 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:02] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:58:07,390 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 16:58:07,405 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:07,413 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[36mGET /static/css/crm-dashboard.css?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:07,414 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:07,417 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:58:07,419 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[36mGET /static/js/crm-dashboard.js?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:07,436 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:58:07,447 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:07] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:58:15,438 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:15] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:58:23,434 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:23] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 16:58:26,348 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "GET /admin HTTP/1.1" 200 -
+2026-08-07 16:58:26,365 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:26,369 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:26,373 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "[36mGET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1[0m" 304 -
+2026-08-07 16:58:26,376 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 16:58:26,396 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 16:58:26,401 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 16:58:26] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:06:30,843 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:30] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:06:30,905 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:30] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:06:32,330 | ERROR | core | Exception on /admin [GET]
+Traceback (most recent call last):
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 1032, in wrapped_view
+    str(token_esperado), str(token_enviado)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\routes\dashboard.py", line 335, in admin_dashboard
+    return render_template(
+        "admin/dashboard.html",
+    ...<20 lines>...
+        whatsapp_configurado=whatsapp_configurado,
+    )
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\templating.py", line 127, in _render
+    app.update_template_context(context)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 530, in update_template_context
+    context.update(self.ensure_sync(func)())
+                   ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 1313, in contexto_admin_multissegmento
+    return view(*args, **kwargs)
+            ~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\services\recursos.py", line 46, in uso_do_plano
+    "usuarios": conn.execute(
+                ~~~~~~~~~~~~^
+        "SELECT COUNT(*) total FROM usuarios WHERE empresa_id = ? AND ativo = 1",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (empresa_id,),
+        ^^^^^^^^^^^^^^
+    ).fetchone()["total"],
+    ^
+sqlite3.OperationalError: no such column: ativo
+2026-08-07 17:06:32,398 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:32] "[35m[1mGET /admin HTTP/1.1[0m" 500 -
+2026-08-07 17:06:32,422 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:32] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-08-07 17:06:33,352 | ERROR | core | Exception on /admin [GET]
+Traceback (most recent call last):
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 1032, in wrapped_view
+    str(token_esperado), str(token_enviado)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\routes\dashboard.py", line 335, in admin_dashboard
+    return render_template(
+        "admin/dashboard.html",
+    ...<20 lines>...
+        whatsapp_configurado=whatsapp_configurado,
+    )
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\templating.py", line 127, in _render
+    app.update_template_context(context)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\gustavo.dantas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\flask\app.py", line 530, in update_template_context
+    context.update(self.ensure_sync(func)())
+                   ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\core.py", line 1313, in contexto_admin_multissegmento
+    return view(*args, **kwargs)
+            ~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\gustavo.dantas\Downloads\bytech_agenda_saas_corrigido\bytech_agenda_saas\services\recursos.py", line 46, in uso_do_plano
+    "usuarios": conn.execute(
+                ~~~~~~~~~~~~^
+        "SELECT COUNT(*) total FROM usuarios WHERE empresa_id = ? AND ativo = 1",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (empresa_id,),
+        ^^^^^^^^^^^^^^
+    ).fetchone()["total"],
+    ^
+sqlite3.OperationalError: no such column: ativo
+2026-08-07 17:06:33,354 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:33] "[35m[1mGET /admin HTTP/1.1[0m" 500 -
+2026-08-07 17:06:56,800 | INFO | werkzeug | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-08-07 17:06:56,800 | INFO | werkzeug | [33mPress CTRL+C to quit[0m
+2026-08-07 17:06:59,504 | INFO | bytech.worker_embutido | Worker embutido iniciado (intervalo=60s, lote=30).
+2026-08-07 17:06:59,670 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /admin HTTP/1.1" 200 -
+2026-08-07 17:06:59,702 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /static/css/style.css?v=23 HTTP/1.1" 200 -
+2026-08-07 17:06:59,707 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /static/css/dashboard-onboarding.css?v=rc1-2 HTTP/1.1" 200 -
+2026-08-07 17:06:59,716 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1" 200 -
+2026-08-07 17:06:59,728 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /static/img/bytech-agenda-icon.png HTTP/1.1" 200 -
+2026-08-07 17:06:59,949 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:06:59,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:06:59] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:00,096 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:00] "GET /static/img/favicon.png HTTP/1.1" 200 -
+2026-08-07 17:07:12,148 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:12] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:12,927 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:12] "GET /admin/agenda HTTP/1.1" 200 -
+2026-08-07 17:07:12,942 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:12] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:12,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:12] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:12,974 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:12] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:13,007 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "GET /static/css/agenda-premium.css?v=4 HTTP/1.1" 200 -
+2026-08-07 17:07:13,021 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:13,041 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "GET /static/js/agenda.js?v=9 HTTP/1.1" 200 -
+2026-08-07 17:07:13,107 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:13,542 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "GET /admin/funcionarios HTTP/1.1" 200 -
+2026-08-07 17:07:13,553 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:13,560 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:13,563 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:13,586 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:13,596 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:14,515 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 17:07:14,525 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:14,532 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:14,536 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:14,543 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "GET /static/css/crm-dashboard.css?v=1 HTTP/1.1" 200 -
+2026-08-07 17:07:14,544 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "GET /static/js/crm-dashboard.js?v=1 HTTP/1.1" 200 -
+2026-08-07 17:07:14,577 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:14,580 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:14] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:15,238 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "GET /admin/fidelidade HTTP/1.1" 200 -
+2026-08-07 17:07:15,253 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:15,257 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:15,270 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:15,287 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "GET /static/css/fidelidade.css HTTP/1.1" 200 -
+2026-08-07 17:07:15,318 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "GET /static/js/fidelidade.js HTTP/1.1" 200 -
+2026-08-07 17:07:15,422 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:15,426 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:15] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:16,079 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /admin/servicos HTTP/1.1" 200 -
+2026-08-07 17:07:16,092 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,095 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,102 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,132 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:16,135 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:16,906 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /admin/comunicacao/whatsapp HTTP/1.1" 200 -
+2026-08-07 17:07:16,917 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,922 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,929 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:16,938 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /static/js/whatsapp.js?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 17:07:16,939 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /static/css/whatsapp.css?v=rc2-4 HTTP/1.1" 200 -
+2026-08-07 17:07:16,978 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:16,985 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:16,999 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:16] "GET /admin/comunicacao/whatsapp/status HTTP/1.1" 200 -
+2026-08-07 17:07:17,892 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "GET /admin/relatorios HTTP/1.1" 200 -
+2026-08-07 17:07:17,904 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:17,912 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:07:17,914 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:07:17,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:07:17,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:25,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:33,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:41,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:49,949 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:07:57,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:07:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:05,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:13,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:21,948 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:29,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:37,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:45,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:08:53,964 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:08:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:01,950 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:09,964 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:17,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:25,950 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:33,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:41,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:49,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:09:57,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:09:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:05,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:13,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:21,964 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:29,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:37,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:45,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:10:53,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:10:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:01,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:09,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:17,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:25,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:33,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:41,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:49,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:11:57,949 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:11:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:05,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:13,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:21,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:29,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:37,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:45,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:12:53,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:12:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:01,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:09,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:17,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:25,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:33,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:41,964 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:49,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:13:57,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:13:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:05,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:13,965 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:21,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:29,965 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:37,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:45,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:14:53,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:14:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:01,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:09,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:17,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:25,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:33,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:41,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:49,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:15:57,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:15:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:05,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:13,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:21,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:29,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:37,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:45,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:16:53,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:16:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:01,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:09,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:17,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:25,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:33,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:41,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:49,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:17:57,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:17:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:05,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:13,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:21,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:29,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:37,961 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:45,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:18:53,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:18:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:01,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:09,966 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:17,954 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:25,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:33,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:41,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:49,952 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:19:57,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:19:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:05,957 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:13,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:21,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:29,959 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:37,964 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:45,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:20:53,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:20:53] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:01,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:01] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:09,951 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:09] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:17,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:17] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:25,962 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:25] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:33,955 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:33] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:41,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:41] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:49,956 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:49] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:21:57,965 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:21:57] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:05,965 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:05] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:13,963 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:13] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:21,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:21] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:29,958 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:29] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:37,953 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:37] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:22:45,960 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:22:45] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:33:31,777 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:31] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:33:31,779 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:31] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -
+2026-08-07 17:33:32,743 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "GET /admin/crm HTTP/1.1" 200 -
+2026-08-07 17:33:32,760 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[36mGET /static/css/style.css?v=23 HTTP/1.1[0m" 304 -
+2026-08-07 17:33:32,776 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[36mGET /static/css/design-system.css?v=rc2-3-2 HTTP/1.1[0m" 304 -
+2026-08-07 17:33:32,784 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[36mGET /static/css/crm-dashboard.css?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 17:33:32,786 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[36mGET /static/js/crm-dashboard.js?v=1 HTTP/1.1[0m" 304 -
+2026-08-07 17:33:32,786 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[36mGET /static/img/bytech-agenda-icon.png HTTP/1.1[0m" 304 -
+2026-08-07 17:33:32,806 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "[35m[1mGET /static/sounds/notification_message-nada-9-326002.mp3?v=20 HTTP/1.1[0m" 206 -
+2026-08-07 17:33:32,811 | INFO | werkzeug | 127.0.0.1 - - [07/Aug/2026 17:33:32] "GET /admin/api/ultimo-agendamento HTTP/1.1" 200 -

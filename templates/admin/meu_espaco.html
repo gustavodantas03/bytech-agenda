@@ -19,6 +19,7 @@
     </div>
 
     <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div class="admin-form-grid">
             <div class="form-group">
                 <label for="nome">Nome do estabelecimento</label>
@@ -134,6 +135,96 @@
                     Ver página pública
                 </a>
             {% endif %}
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span>Agendamento online</span>
+            <h2>Horário de funcionamento</h2>
+        </div>
+    </div>
+
+    <p>
+        Defina em quais dias e horários seus clientes podem marcar horário pela
+        página pública. O texto do campo "Horário de funcionamento" acima é só
+        informativo — é aqui que os horários realmente oferecidos são controlados.
+    </p>
+
+    <form method="post" action="{{ url_for('admin_meu_espaco_horarios') }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label for="intervalo_agendamento_minutos">
+                Duração de cada horário disponível (minutos)
+            </label>
+            <input
+                id="intervalo_agendamento_minutos"
+                name="intervalo_agendamento_minutos"
+                type="number"
+                min="5"
+                max="240"
+                step="5"
+                value="{{ empresa.intervalo_agendamento_minutos or 40 }}"
+                style="max-width: 160px;"
+            >
+            <small>
+                Ex.: 40 minutos gera horários como 09:00, 09:40, 10:20...
+            </small>
+        </div>
+
+        <div class="horarios-semana" style="margin-top: 16px;">
+            {% for dia_indice, dia_nome in dias_semana %}
+                {% set config = horarios_funcionamento[dia_indice|string] %}
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        gap: 16px;
+                        flex-wrap: wrap;
+                        padding: 12px 0;
+                        border-bottom: 1px solid #e2e8f0;
+                    "
+                >
+                    <label style="display:flex; align-items:center; gap:8px; min-width: 190px; cursor:pointer;">
+                        <input
+                            type="checkbox"
+                            name="aberto_{{ dia_indice }}"
+                            {{ 'checked' if config.aberto else '' }}
+                            style="width:auto;"
+                        >
+                        <strong>{{ dia_nome }}</strong>
+                    </label>
+
+                    <label style="display:flex; align-items:center; gap:6px; margin:0;">
+                        das
+                        <input
+                            type="time"
+                            name="abertura_{{ dia_indice }}"
+                            value="{{ config.abertura }}"
+                            style="width: 120px;"
+                        >
+                    </label>
+
+                    <label style="display:flex; align-items:center; gap:6px; margin:0;">
+                        até
+                        <input
+                            type="time"
+                            name="fechamento_{{ dia_indice }}"
+                            value="{{ config.fechamento }}"
+                            style="width: 120px;"
+                        >
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn btn-primary" type="submit">
+                Salvar horário de funcionamento
+            </button>
         </div>
     </form>
 </section>

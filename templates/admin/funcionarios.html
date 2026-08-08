@@ -17,6 +17,7 @@
         <h2>Novo {{ ui.profissional_singular if ui else 'profissional' }}</h2>
 
         <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <label for="nome">Nome</label>
             <input id="nome" name="nome" required>
 
@@ -69,6 +70,7 @@
                                 funcionario_id=funcionario.id
                             ) }}"
                         >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             <button
                                 class="btn btn-small
                                 {{ 'btn-danger' if funcionario.ativo else 'btn-secondary' }}"
@@ -86,6 +88,7 @@
                             ) }}"
                             onsubmit="return confirm('Deseja excluir este profissional?');"
                         >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             <button class="btn btn-small btn-danger" type="submit">
                                 Excluir
                             </button>

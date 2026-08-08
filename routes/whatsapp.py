@@ -183,7 +183,7 @@ def status_whatsapp():
                numero_conectado=COALESCE(NULLIF(?, ''), numero_conectado),
                nome_perfil=COALESCE(NULLIF(?, ''), nome_perfil),
                foto_perfil=COALESCE(NULLIF(?, ''), foto_perfil),
-               conectado_em=CASE WHEN ?='conectado' THEN COALESCE(conectado_em, CURRENT_TIMESTAMP) ELSE conectado_em END,
+               conectado_em=CASE WHEN ?='conectado' THEN COALESCE(conectado_em, CAST(CURRENT_TIMESTAMP AS TEXT)) ELSE conectado_em END,
                ultima_sincronizacao=CURRENT_TIMESTAMP WHERE empresa_id=?""",
             (estado, qr, perfil["numero"], perfil["nome"], perfil["foto"], estado, empresa_id),
         )

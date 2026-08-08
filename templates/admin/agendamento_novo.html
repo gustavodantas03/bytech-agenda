@@ -25,6 +25,7 @@ Novo agendamento
 <section class="panel narrow-panel">
 
     <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
         <label for="cliente_nome">
             Nome do cliente
@@ -66,7 +67,7 @@ Novo agendamento
 
             {% for servico in servicos %}
 
-                <option value="{{ servico.id }}">
+                <option value="{{ servico.id }}" data-duracao="{{ servico.duracao }}">
                     {{ servico.nome }}
                     — R$
                     {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
@@ -154,5 +155,62 @@ Novo agendamento
     </form>
 
 </section>
+
+<script>
+(function () {
+    const campoData = document.getElementById("data");
+    const campoHora = document.getElementById("hora");
+    const campoServico = document.getElementById("servico_id");
+    const campoFuncionario = document.getElementById("funcionario_id");
+    if (!campoData || !campoHora) return;
+
+    async function atualizarHorarios() {
+        const data = campoData.value;
+        const funcionarioId = campoFuncionario ? campoFuncionario.value : "";
+        if (!data) return;
+
+        const opcaoServico = campoServico ? campoServico.selectedOptions[0] : null;
+        const duracao = opcaoServico ? (opcaoServico.dataset.duracao || 40) : 40;
+
+        const params = new URLSearchParams({
+            data: data,
+            duracao_total: duracao
+        });
+        if (funcionarioId) params.set("funcionario_id", funcionarioId);
+
+        const horaAtual = campoHora.value;
+        try {
+            const resposta = await fetch(
+                "{{ url_for('admin_horarios_disponiveis') }}?" + params.toString(),
+                {headers: {"Accept": "application/json"}, credentials: "same-origin"}
+            );
+            const dados = await resposta.json();
+            const horarios = dados.horarios || [];
+
+            campoHora.innerHTML = "";
+            const opcaoVazia = document.createElement("option");
+            opcaoVazia.value = "";
+            opcaoVazia.textContent = horarios.length
+                ? "Selecione o horário"
+                : "Nenhum horário disponível neste dia";
+            campoHora.appendChild(opcaoVazia);
+
+            horarios.forEach(function (horario) {
+                const opcao = document.createElement("option");
+                opcao.value = horario;
+                opcao.textContent = horario;
+                if (horario === horaAtual) opcao.selected = true;
+                campoHora.appendChild(opcao);
+            });
+        } catch (erro) {
+            // Se a chamada falhar, mantém a lista atual do servidor.
+        }
+    }
+
+    campoData.addEventListener("change", atualizarHorarios);
+    if (campoFuncionario) campoFuncionario.addEventListener("change", atualizarHorarios);
+    if (campoServico) campoServico.addEventListener("change", atualizarHorarios);
+})();
+</script>
 
 {% endblock %}

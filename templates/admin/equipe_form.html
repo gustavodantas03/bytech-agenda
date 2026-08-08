@@ -1,0 +1,134 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+{{ 'Editar usuário' if membro else 'Novo usuário' }} | Bytech Agenda
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <span>Equipe</span>
+        <h1>{{ 'Editar usuário' if membro else 'Novo usuário' }}</h1>
+    </div>
+</header>
+
+{% if limite_excedido %}
+    <section class="panel">
+        <p class="alert alert-erro">
+            Seu plano atual permite até {{ limite }} usuário(s) ativo(s) e esse limite já foi
+            atingido. Desative outro usuário para liberar uma vaga ou fale com a Bytech para
+            aumentar o limite antes de criar um novo.
+        </p>
+        <a class="btn btn-secondary" href="{{ url_for('admin_equipe') }}">Voltar</a>
+    </section>
+{% else %}
+<section class="panel narrow-panel">
+    <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label for="nome">Nome</label>
+        <input
+            id="nome"
+            name="nome"
+            required
+            value="{{ membro.nome if membro else '' }}"
+            placeholder="Nome do colaborador"
+        >
+
+        {% if not membro %}
+            <label for="usuario">Usuário de login</label>
+            <input
+                id="usuario"
+                name="usuario"
+                required
+                placeholder="ex.: joana"
+            >
+            <small>Precisa ser único em todo o sistema (não só na sua empresa).</small>
+
+            <label for="senha">Senha provisória</label>
+            <input
+                id="senha"
+                name="senha"
+                type="password"
+                required
+                minlength="6"
+                placeholder="Mínimo de 6 caracteres"
+            >
+        {% else %}
+            <label>Usuário de login</label>
+            <input value="{{ membro.usuario }}" disabled>
+
+            <label for="nova_senha">Nova senha (opcional)</label>
+            <input
+                id="nova_senha"
+                name="nova_senha"
+                type="password"
+                minlength="6"
+                placeholder="Deixe em branco para manter a senha atual"
+            >
+        {% endif %}
+
+        <label>Papel</label>
+        <div class="radio-group">
+            <label>
+                <input
+                    type="radio"
+                    name="papel"
+                    value="colaborador"
+                    {{ 'checked' if not membro or membro.papel != 'proprietario' else '' }}
+                    onchange="document.getElementById('bloco-permissoes').style.display='block'"
+                >
+                Colaborador — acesso só às áreas marcadas abaixo
+            </label>
+            <label>
+                <input
+                    type="radio"
+                    name="papel"
+                    value="proprietario"
+                    {{ 'checked' if membro and membro.papel == 'proprietario' else '' }}
+                    onchange="document.getElementById('bloco-permissoes').style.display='none'"
+                >
+                Proprietário — acesso total, inclusive gerenciar a equipe
+            </label>
+        </div>
+
+        <div
+            id="bloco-permissoes"
+            style="display: {{ 'none' if membro and membro.papel == 'proprietario' else 'block' }};"
+        >
+            <label>Áreas liberadas para este usuário</label>
+            <div class="checkbox-group">
+                {% for chave, rotulo in permissoes_disponiveis.items() %}
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="permissoes"
+                            value="{{ chave }}"
+                            {{ 'checked' if membro and chave in membro.permissoes_lista else '' }}
+                        >
+                        {{ rotulo }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if membro %}
+            <label class="checkbox-inline">
+                <input
+                    type="checkbox"
+                    name="ativo"
+                    {{ 'checked' if membro.ativo else '' }}
+                >
+                Usuário ativo (desmarque para bloquear o acesso sem excluir)
+            </label>
+        {% endif %}
+
+        <div class="page-header-actions" style="margin-top: 16px;">
+            <button class="btn btn-primary" type="submit">
+                {{ 'Salvar alterações' if membro else 'Criar usuário' }}
+            </button>
+            <a class="btn btn-secondary" href="{{ url_for('admin_equipe') }}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endif %}
+{% endblock %}

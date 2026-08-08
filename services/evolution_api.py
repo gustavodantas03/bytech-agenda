@@ -19,8 +19,9 @@ from database import get_connection
 MODELOS_PADRAO = {
     "confirmacao": (
         "Confirmação de agendamento",
-        "Olá {{nome}}! 👋\n\nSeu agendamento na {{empresa}} foi confirmado.\n\n"
-        "📅 {{data}}\n⏰ {{hora}}\n✨ {{servico}}\n👤 {{profissional}}\n\nAté breve!",
+        "Olá {{nome}}! 👋\n\nRecebemos seu agendamento na {{empresa}}.\n\n"
+        "📅 {{data}}\n⏰ {{hora}}\n✨ {{servico}}\n👤 {{profissional}}\n\n"
+        "Responda com:\n1️⃣ Confirmar\n2️⃣ Reagendar\n3️⃣ Cancelar",
     ),
     "lembrete_24h": (
         "Lembrete de 24 horas",

@@ -1,3 +1,12 @@
+## RC2.6.0 — WhatsApp bidirecional
+
+- Webhook público da Evolution com token opcional e proteção contra eventos duplicados.
+- Respostas 1, 2 e 3 confirmam, iniciam reagendamento ou cancelam.
+- Reagendamento completo por data e horário disponíveis.
+- Sessões persistentes de conversa por empresa e telefone.
+- Histórico de mensagens recebidas e respostas automáticas.
+- Script para configurar o webhook da instância na Evolution.
+
 # Changelog
 
 ## RC1.3.4 — Compatibilidade CRM e relatórios
@@ -53,3 +62,18 @@
 - Registro da resposta da Evolution no histórico de mensagens de teste.
 - Bloqueio do teste quando a instância não estiver conectada.
 - Atualização visual automática do perfil e da última sincronização.
+
+## RC2.5.0 — Motor de automações do WhatsApp
+- Adicionado worker separado do Flask para processar confirmações e lembretes sem bloquear o agendamento.
+- Adicionado ciclo automático de geração dos lembretes de 24 horas e 2 horas.
+- Adicionadas retentativas progressivas para mensagens pendentes na fila existente.
+- Adicionados scripts para execução contínua e diagnóstico de um único ciclo.
+- O agendamento público agora vincula corretamente o registro ao CRM por `cliente_id`.
+- O telefone do cliente é normalizado antes de ser salvo e enviado ao WhatsApp.
+
+## RC2.7.0 - Estabilização e operação
+- Migrações versionadas com tabela `schema_migrations`.
+- Índices adicionais para PostgreSQL.
+- Logs rotativos e endpoint `/health`.
+- Webhook com validação de HTTPS e criação automática da configuração.
+- Backup/restauração PostgreSQL e testes de fumaça.
