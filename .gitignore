@@ -17,3 +17,4 @@ static/uploads/logos/*
 Thumbs.db
 # Evolution API
 /docker/evolution/.env.evolution
+logs/*.log
