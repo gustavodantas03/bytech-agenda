@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytech Agenda | Sistema de Agendamento para Barbearias e Salões</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <style>
+        :root {
+            --azul: #2563eb;
+            --azul-escuro: #1e40af;
+            --cinza-texto: #475569;
+            --cinza-claro: #f8fafc;
+            --preto: #0f172a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            color: var(--preto);
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; }
+        .logo img { height: 36px; }
+        header nav a {
+            margin-left: 28px;
+            text-decoration: none;
+            color: var(--cinza-texto);
+            font-weight: 500;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 26px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 15px;
+        }
+        .btn-primary { background: var(--azul); color: #fff; }
+        .btn-primary:hover { background: var(--azul-escuro); }
+        .btn-outline { background: transparent; color: var(--azul); border: 2px solid var(--azul); }
+        .hero {
+            text-align: center;
+            padding: 80px 24px 60px;
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+        }
+        .hero h1 {
+            font-size: 44px;
+            font-weight: 800;
+            max-width: 700px;
+            margin: 0 auto 20px;
+            line-height: 1.2;
+        }
+        .hero h1 span { color: var(--azul); }
+        .hero p {
+            font-size: 18px;
+            color: var(--cinza-texto);
+            max-width: 560px;
+            margin: 0 auto 32px;
+        }
+        .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .features { padding: 80px 24px; }
+        .features h2 { text-align: center; font-size: 32px; margin-bottom: 12px; }
+        .features > .container > p {
+            text-align: center;
+            color: var(--cinza-texto);
+            margin-bottom: 48px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 28px;
+        }
+        .feature-card { background: var(--cinza-claro); padding: 28px; border-radius: 14px; }
+        .feature-card .icon { font-size: 28px; margin-bottom: 12px; }
+        .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
+        .feature-card p { color: var(--cinza-texto); font-size: 15px; }
+        .planos { padding: 80px 24px; background: var(--cinza-claro); }
+        .planos h2 { text-align: center; font-size: 32px; margin-bottom: 48px; }
+        .planos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .plano-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 32px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .plano-card.destaque { border: 2px solid var(--azul); position: relative; }
+        .plano-card.destaque::before {
+            content: "Mais popular";
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--azul);
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+        .plano-card h3 { font-size: 20px; margin-bottom: 8px; }
+        .plano-card .preco { font-size: 36px; font-weight: 800; margin: 16px 0; }
+        .plano-card .preco small { font-size: 14px; font-weight: 400; color: var(--cinza-texto); }
+        .plano-card ul { list-style: none; text-align: left; margin: 24px 0; }
+        .plano-card li { padding: 6px 0; color: var(--cinza-texto); font-size: 14px; }
+        .plano-card li::before { content: "✓ "; color: var(--azul); font-weight: 700; }
+        .cta-final { text-align: center; padding: 80px 24px; }
+        .cta-final h2 { font-size: 30px; margin-bottom: 16px; }
+        .cta-final p { color: var(--cinza-texto); margin-bottom: 28px; }
+        footer {
+            text-align: center;
+            padding: 32px 24px;
+            color: var(--cinza-texto);
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 30px; }
+            header { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
+            Bytech Agenda
+        </div>
+        <nav>
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#planos">Planos</a>
+            <a href="{{ url_for('admin_login') }}">Entrar</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Agenda cheia, <span>sem dor de cabeça</span>.</h1>
+        <p>O sistema de agendamento completo para barbearias e salões: agenda online, lembretes automáticos no WhatsApp e controle financeiro em um só lugar.</p>
+        <div class="hero-ctas">
+            <a href="/demo" class="btn btn-primary">Ver demonstração</a>
+            <a href="#planos" class="btn btn-outline">Ver planos</a>
+        </div>
+    </section>
+
+    <section class="features" id="funcionalidades">
+        <div class="container">
+            <h2>Tudo que seu negócio precisa</h2>
+            <p>Feito para o dia a dia de barbearias, salões e estúdios de beleza.</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">📅</div>
+                    <h3>Agenda online</h3>
+                    <p>Clientes marcam horário sozinhos, 24 horas por dia, sem ligação nem WhatsApp manual.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💬</div>
+                    <h3>Lembretes automáticos</h3>
+                    <p>Confirmações e lembretes de agendamento enviados direto no WhatsApp do cliente.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💰</div>
+                    <h3>Controle financeiro</h3>
+                    <p>Acompanhe faturamento, comissões e relatórios sem precisar de planilha.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">👥</div>
+                    <h3>Gestão de equipe</h3>
+                    <p>Cada profissional com sua própria agenda e permissões de acesso.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎁</div>
+                    <h3>Programa de fidelidade</h3>
+                    <p>Fidelize clientes com recompensas automáticas por frequência.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>Relatórios e CRM</h3>
+                    <p>Entenda seus clientes e o desempenho do negócio com dados reais.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="planos" id="planos">
+        <div class="container">
+            <h2>Planos para todo tamanho de negócio</h2>
+            <div class="planos-grid">
+                <div class="plano-card">
+                    <h3>Essencial</h3>
+                    <div class="preco">R$ 49<small>/mês</small></div>
+                    <ul>
+                        <li>Agenda online</li>
+                        <li>Até 2 usuários</li>
+                        <li>Lembretes no WhatsApp</li>
+                    </ul>
+                    <a href="{{ url_for('admin_login') }}" class="btn btn-outline">Começar agora</a>
+                </div>
+                <div class="plano-card destaque">
+                    <h3>Profissional</h3>
+                    <div class="preco">R$ 99<small>/mês</small></div>
+                    <ul>
+                        <li>Tudo do Essencial</li>
+                        <li>Usuários ilimitados</li>
+                        <li>Programa de fidelidade</li>
+                        <li>Relatórios avançados</li>
+                    </ul>
+                    <a href="{{ url_for('admin_login') }}" class="btn btn-primary">Começar agora</a>
+                </div>
+                <div class="plano-card">
+                    <h3>Avançado</h3>
+                    <div class="preco">Fale conosco</div>
+                    <ul>
+                        <li>Tudo do Profissional</li>
+                        <li>Múltiplas unidades</li>
+                        <li>Suporte prioritário</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline">Falar com vendas</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-final">
+        <h2>Pronto para organizar sua agenda?</h2>
+        <p>Veja o sistema funcionando com um exemplo real de barbearia.</p>
+        <a href="/demo" class="btn btn-primary">Ver demonstração gratuita</a>
+    </section>
+
+    <footer>
+        © 2026 Bytech Agenda. Todos os direitos reservados.
+    </footer>
+</body>
+</html>

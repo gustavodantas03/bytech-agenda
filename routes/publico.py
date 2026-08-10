@@ -4,7 +4,7 @@ from core import *  # noqa: F401,F403
 
 @app.route("/")
 def index():
-    return redirect(url_for("landing", slug="demo"))
+    return render_template("home.html")
 
 
 @app.route("/<slug>")
