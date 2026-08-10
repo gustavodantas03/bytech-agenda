@@ -137,6 +137,7 @@
           </div>
         </div>
         <form method="post" action="{{ url_for('admin_salvar_observacoes_cliente', cliente_id=cliente.id) }}" class="customer-notes-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           <textarea name="observacoes" rows="8" maxlength="2000" placeholder="Preferências, restrições, horários preferidos e outras informações importantes.">{{ cliente.observacoes or '' }}</textarea>
           <button class="btn btn-primary" type="submit">Salvar observações</button>
         </form>
@@ -161,6 +162,7 @@
       </div>
 
       <form method="post" action="{{ url_for('admin_ajuste_pontos', cliente_id=cliente.id) }}" class="customer-mini-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <h3>Ajuste manual</h3>
         <label>Pontos (+ ou -)<input required type="number" name="quantidade" placeholder="Ex.: 10 ou -5"></label>
         <label>Motivo<input name="descricao" maxlength="200" placeholder="Bônus, correção..."></label>
@@ -168,6 +170,7 @@
       </form>
 
       <form method="post" action="{{ url_for('admin_resgatar_recompensa', cliente_id=cliente.id) }}" class="customer-mini-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <h3>Resgatar recompensa</h3>
         <label>Recompensa
           <select name="recompensa_id" required>

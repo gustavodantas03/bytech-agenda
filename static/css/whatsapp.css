@@ -30,3 +30,13 @@
 .wa-profile-avatar img{width:100%;height:100%;object-fit:cover}
 .wa-profile div:last-child{display:flex;flex-direction:column;min-width:0}
 .wa-profile small{color:#64748b}.wa-profile strong{font-size:1rem}.wa-profile span{color:#475569;font-size:.92rem}
+
+/* Conexão por código de pareamento (sem QR Code) */
+.wa-connect-tabs{display:flex;gap:8px;margin-bottom:14px}
+.wa-connect-tab{flex:1;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;color:#334155;font-weight:700;font-size:.85rem;cursor:pointer}
+.wa-connect-tab.active{background:var(--empresa-cor-botao,#2563eb);border-color:transparent;color:#fff}
+.wa-connect-option[hidden]{display:none}
+.wa-connect-hint{color:#64748b;font-size:.85rem;margin:0 0 10px}
+.wa-pairing-code{font-size:2.4rem;letter-spacing:.14em;color:#0f172a}
+.wa-pairing p{margin-top:10px}
+@media(max-width:560px){.wa-connect-tabs{flex-direction:column}}

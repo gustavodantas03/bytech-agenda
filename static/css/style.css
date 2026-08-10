@@ -22,11 +22,15 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 body {
     margin: 0;
     min-height: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     font-family: Arial, Helvetica, sans-serif;
@@ -1436,6 +1440,14 @@ label {
     text-align: left;
 }
 
+.login-card form label:not(:first-child) {
+    margin-top: 16px;
+}
+
+.login-card form .btn {
+    margin-top: 22px;
+}
+
 /* ==================================================
    ADMINISTRATIVO
 ================================================== */
@@ -1607,6 +1619,13 @@ label {
     border: 1px solid rgba(255, 255, 255, .09);
     border-radius: 17px;
     background: rgba(255, 255, 255, .04);
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease;
+}
+
+.admin-support-card:hover {
+    background: rgba(255, 255, 255, .08);
+    border-color: rgba(255, 255, 255, .18);
 }
 
 .admin-support-icon {
@@ -4772,7 +4791,7 @@ body[style] .booking-progress-bar {
 @media(max-width:700px){.master-financial-stats{grid-template-columns:repeat(2,1fr)}.master-company-finance.detailed{grid-template-columns:1fr}.payment-inline-form{flex-direction:column;align-items:stretch}}
 
 /* Sprint 2.1 - Master modular */
-.master-overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.master-simple-list{display:flex;flex-direction:column}.master-simple-list>a,.master-simple-list>div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e2e8f0;text-decoration:none;color:inherit}.master-simple-list span{display:flex;flex-direction:column;gap:4px}.master-simple-list small{color:#64748b}.master-plans-grid{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:20px}.master-plan-card{display:flex;flex-direction:column;gap:18px}.master-plan-top{display:flex;justify-content:space-between;gap:18px}.master-plan-top>div>span{font-size:.75rem;text-transform:uppercase;color:#2563eb;font-weight:700}.master-plan-top h2{margin:5px 0}.master-plan-top p{color:#64748b}.master-plan-top>strong{font-size:1.45rem;white-space:nowrap}.master-plan-top>strong small{font-size:.75rem;color:#64748b}.master-plan-limits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.master-plan-limits span{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;font-size:.72rem;color:#64748b}.master-plan-limits b{display:block;color:#0f172a;margin-top:4px}.master-resource-tags{display:flex;flex-wrap:wrap;gap:8px;min-height:70px}.master-resource-tags span{background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:7px 10px;font-size:.78rem}.master-resource-checks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0 22px}.master-resource-checks label{display:flex;gap:10px;padding:13px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer}.master-resource-checks span{display:flex;flex-direction:column}.master-resource-checks small{color:#64748b;margin-top:3px}@media(max-width:1000px){.master-plans-grid{grid-template-columns:1fr 1fr}.master-overview-grid{grid-template-columns:1fr}}@media(max-width:700px){.master-plans-grid,.master-resource-checks{grid-template-columns:1fr}}
+.master-overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.master-simple-list{display:flex;flex-direction:column}.master-simple-list>a,.master-simple-list>div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e2e8f0;text-decoration:none;color:inherit}.master-simple-list span{display:flex;flex-direction:column;gap:4px}.master-simple-list small{color:#64748b}.master-plans-grid{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:20px}.master-plan-card{display:flex;flex-direction:column;gap:18px}.master-plan-top{display:flex;justify-content:space-between;gap:18px}.master-plan-top>div>span{font-size:.75rem;text-transform:uppercase;color:#2563eb;font-weight:700}.master-plan-top h2{margin:5px 0}.master-plan-top p{color:#64748b}.master-plan-top>strong{font-size:1.45rem;white-space:nowrap}.master-plan-top>strong small{font-size:.75rem;color:#64748b}.master-plan-limits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.master-plan-limits span{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;font-size:.72rem;color:#64748b}.master-plan-limits b{display:block;color:#0f172a;margin-top:4px}.master-resource-tags{display:flex;flex-wrap:wrap;gap:8px;min-height:70px}.master-resource-tags span{background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:7px 10px;font-size:.78rem}.master-resource-checks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 22px}.master-resource-checks label{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer}.master-resource-checks input[type=checkbox]{width:16px;height:16px;min-width:16px;margin-top:2px;flex-shrink:0}.master-resource-checks span{display:flex;flex-direction:column}.master-resource-checks strong{font-size:.85rem}.master-resource-checks small{color:#64748b;margin-top:2px;font-size:.75rem;line-height:1.35}@media(max-width:1000px){.master-plans-grid{grid-template-columns:1fr 1fr}.master-overview-grid{grid-template-columns:1fr}}@media(max-width:700px){.master-plans-grid,.master-resource-checks{grid-template-columns:1fr}}
 
 /* Sprint 2.3 - Financeiro SaaS */
 .finance-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:18px 0}.finance-kpis article{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:7px}.finance-kpis span{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#64748b;font-weight:800}.finance-kpis strong{font-size:1.45rem;color:#0f172a}.finance-kpis small{color:#64748b}.finance-filters{display:grid;grid-template-columns:2fr 1fr 1fr auto auto;gap:12px;align-items:end}.finance-filters label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:.82rem}.finance-actions{display:flex;gap:7px;align-items:center}.finance-actions form{margin:0}.btn-danger{background:#fee2e2!important;color:#991b1b!important;border-color:#fecaca!important}.charge-status.cancelada{background:#e2e8f0;color:#475569}.finance-modal{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.58);display:grid;place-items:center;padding:20px}.finance-modal[hidden]{display:none!important}.finance-modal-card{position:relative;background:#fff;width:min(520px,100%);border-radius:22px;padding:28px;box-shadow:0 25px 80px rgba(15,23,42,.28)}.finance-modal-card form{display:grid;gap:14px}.finance-modal-card label{display:grid;gap:6px;font-weight:700}.modal-close{position:absolute;right:16px;top:14px;border:0;background:#f1f5f9;border-radius:50%;width:34px;height:34px;font-size:22px;cursor:pointer}.finance-timeline{display:grid;gap:17px}.finance-timeline>div{display:grid;grid-template-columns:16px 1fr;gap:12px}.finance-timeline i{width:11px;height:11px;border-radius:50%;background:#2563eb;margin-top:5px;box-shadow:0 0 0 5px #dbeafe}.finance-timeline p{margin:4px 0;color:#475569}.finance-timeline small{color:#94a3b8}@media(max-width:900px){.finance-kpis{grid-template-columns:repeat(2,1fr)}.finance-filters{grid-template-columns:1fr 1fr}.finance-actions{flex-direction:column;align-items:stretch}}@media(max-width:560px){.finance-kpis,.finance-filters{grid-template-columns:1fr}}

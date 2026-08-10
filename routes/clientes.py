@@ -49,6 +49,8 @@ def admin_crm_dashboard():
     empresa_id = session["empresa_id"]
     hoje = date.today()
     limite_inativo = (hoje - timedelta(days=60)).isoformat()
+    limite_30 = (hoje - timedelta(days=30)).isoformat()
+    limite_60 = (hoje - timedelta(days=60)).isoformat()
     mes_dia = hoje.strftime("-%m-%d")
 
     conn = get_connection()
@@ -57,15 +59,15 @@ def admin_crm_dashboard():
         SELECT
             COUNT(*) AS total_clientes,
             SUM(CASE WHEN COALESCE(ativo, 1) = 1 THEN 1 ELSE 0 END) AS ativos,
-            SUM(CASE WHEN CAST(criado_em AS date) >= (CURRENT_DATE - INTERVAL '30 days') THEN 1 ELSE 0 END) AS novos_30_dias,
-            SUM(CASE WHEN CAST(criado_em AS date) >= (CURRENT_DATE - INTERVAL '60 days')
-                      AND CAST(criado_em AS date) < (CURRENT_DATE - INTERVAL '30 days') THEN 1 ELSE 0 END) AS novos_periodo_anterior,
+            SUM(CASE WHEN substr(criado_em, 1, 10) >= ? THEN 1 ELSE 0 END) AS novos_30_dias,
+            SUM(CASE WHEN substr(criado_em, 1, 10) >= ?
+                      AND substr(criado_em, 1, 10) < ? THEN 1 ELSE 0 END) AS novos_periodo_anterior,
             SUM(CASE WHEN data_nascimento IS NOT NULL
                       AND substr(data_nascimento, 5, 6) = ? THEN 1 ELSE 0 END) AS aniversariantes_hoje
         FROM clientes
         WHERE empresa_id = ?
         """,
-        (mes_dia, empresa_id),
+        (limite_30, limite_60, limite_30, mes_dia, empresa_id),
     ).fetchone()
 
     comportamento = conn.execute(
@@ -113,11 +115,11 @@ def admin_crm_dashboard():
         FROM clientes
         WHERE empresa_id = ? AND COALESCE(ativo,1) = 1
           AND data_nascimento IS NOT NULL
-          AND substr(data_nascimento, 6, 2) = TO_CHAR(CURRENT_DATE, 'MM')
+          AND substr(data_nascimento, 6, 2) = ?
         ORDER BY substr(data_nascimento, 9, 2), nome
         LIMIT 6
         """,
-        (empresa_id,),
+        (empresa_id, hoje.strftime("%m")),
     ).fetchall()
 
     proximos_agendamentos = conn.execute(
@@ -141,45 +143,49 @@ def admin_crm_dashboard():
         (empresa_id,),
     ).fetchall()
 
-    oportunidades = conn.execute(
+    oportunidades_bruto = conn.execute(
         """
         SELECT c.id, c.nome, c.telefone, c.pontos_fidelidade,
                c.recompensas_disponiveis,
-               MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) AS ultima_visita,
-               CAST(CURRENT_DATE - MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN CAST(a.data AS date) END) AS INTEGER) AS dias_sem_visita
+               MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) AS ultima_visita
         FROM clientes c
         LEFT JOIN agendamentos a ON a.cliente_id = c.id
         WHERE c.empresa_id = ? AND COALESCE(c.ativo,1) = 1
         GROUP BY c.id
         HAVING MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) IS NOT NULL
            AND MAX(CASE WHEN a.status IN ('finalizado','concluido') THEN a.data END) < ?
-        ORDER BY dias_sem_visita DESC
-        LIMIT 5
         """,
         (empresa_id, limite_inativo),
     ).fetchall()
 
-    crescimento = conn.execute(
-        """
-        WITH meses AS (
-            SELECT generate_series(
-                DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months',
-                DATE_TRUNC('month', CURRENT_DATE),
-                INTERVAL '1 month'
-            ) AS inicio
-        )
-        SELECT TO_CHAR(inicio, 'MM') AS mes_numero,
-               TO_CHAR(inicio, 'YYYY-MM') AS chave,
-               COUNT(c.id) AS total
-        FROM meses
-        LEFT JOIN clientes c
-          ON c.empresa_id = ?
-         AND TO_CHAR(CAST(c.criado_em AS timestamp), 'YYYY-MM') = TO_CHAR(inicio, 'YYYY-MM')
-        GROUP BY inicio
-        ORDER BY inicio
+    oportunidades = []
+    for linha in oportunidades_bruto:
+        item = dict(linha)
+        try:
+            ultima = datetime.strptime(item["ultima_visita"][:10], "%Y-%m-%d").date()
+            item["dias_sem_visita"] = (hoje - ultima).days
+        except (TypeError, ValueError):
+            item["dias_sem_visita"] = 0
+        oportunidades.append(item)
+    oportunidades.sort(key=lambda x: x["dias_sem_visita"], reverse=True)
+    oportunidades = oportunidades[:5]
+
+    competencias_crescimento = meses_recentes(6)
+    marcadores_crescimento = ",".join("?" for _ in competencias_crescimento)
+    crescimento_linhas = conn.execute(
+        f"""
+        SELECT substr(criado_em, 1, 7) AS chave, COUNT(*) AS total
+        FROM clientes
+        WHERE empresa_id = ? AND substr(criado_em, 1, 7) IN ({marcadores_crescimento})
+        GROUP BY substr(criado_em, 1, 7)
         """,
-        (empresa_id,),
+        (empresa_id, *competencias_crescimento),
     ).fetchall()
+    crescimento_mapa = {linha["chave"]: int(linha["total"] or 0) for linha in crescimento_linhas}
+    crescimento = [
+        {"mes_numero": chave[5:7], "chave": chave, "total": crescimento_mapa.get(chave, 0)}
+        for chave in competencias_crescimento
+    ]
 
     menor_recompensa = conn.execute(
         """SELECT MIN(pontos_necessarios) AS pontos
@@ -191,6 +197,7 @@ def admin_crm_dashboard():
 
     proximos_recompensa = []
     if meta_recompensa > 0:
+        piso_pontos = max(0, meta_recompensa - 20)
         proximos_recompensa = conn.execute(
             """
             SELECT id,nome,telefone,pontos_fidelidade,
@@ -198,11 +205,11 @@ def admin_crm_dashboard():
             FROM clientes
             WHERE empresa_id=? AND COALESCE(ativo,1)=1
               AND pontos_fidelidade < ?
-              AND pontos_fidelidade >= MAX(0, ? - 20)
+              AND pontos_fidelidade >= ?
             ORDER BY faltam, nome
             LIMIT 5
             """,
-            (meta_recompensa, empresa_id, meta_recompensa, meta_recompensa),
+            (meta_recompensa, empresa_id, meta_recompensa, piso_pontos),
         ).fetchall()
 
     conn.close()
@@ -258,6 +265,11 @@ def admin_clientes():
     if filtro not in filtros_validos:
         filtro = "todos"
 
+    hoje = date.today()
+    mes_atual_mm = hoje.strftime("%m")
+    limite_60_sem_retorno = (hoje - timedelta(days=60)).isoformat()
+    inicio_mes_atual = hoje.replace(day=1).isoformat()
+
     conn = get_connection()
     condicoes = ["c.empresa_id = ?"]
     parametros = [empresa_id]
@@ -285,16 +297,18 @@ def admin_clientes():
     elif filtro == "aniversariantes":
         condicoes.append(
             "c.data_nascimento IS NOT NULL "
-            "AND substr(c.data_nascimento, 6, 2) = TO_CHAR(CURRENT_DATE, 'MM')"
+            "AND substr(c.data_nascimento, 6, 2) = ?"
         )
+        parametros.append(mes_atual_mm)
     elif filtro == "com_pontos":
         condicoes.append("COALESCE(c.pontos_fidelidade,0) > 0")
     elif filtro == "sem_retorno":
         condicoes.append(
             "NOT EXISTS (SELECT 1 FROM agendamentos ax "
             "WHERE ax.cliente_id=c.id AND ax.status IN ('finalizado','concluido') "
-            "AND CAST(ax.data AS date) >= (CURRENT_DATE - INTERVAL '60 days'))"
+            "AND ax.data >= ?)"
         )
+        parametros.append(limite_60_sem_retorno)
 
     where_sql = " AND ".join(condicoes)
     total_filtrado = conn.execute(
@@ -334,13 +348,13 @@ def admin_clientes():
         """
         SELECT COUNT(*) AS total_clientes,
                SUM(CASE WHEN COALESCE(ativo,1)=1 THEN 1 ELSE 0 END) AS total_ativos,
-               SUM(CASE WHEN CAST(criado_em AS date) >= DATE_TRUNC('month', CURRENT_DATE)::date THEN 1 ELSE 0 END) AS novos_mes,
+               SUM(CASE WHEN substr(criado_em, 1, 10) >= ? THEN 1 ELSE 0 END) AS novos_mes,
                SUM(CASE WHEN pontos_fidelidade >= 7 OR recompensas_disponiveis > 0 THEN 1 ELSE 0 END) AS total_vip,
                COALESCE(SUM(pontos_fidelidade),0) AS pontos_distribuidos,
                COALESCE(SUM(recompensas_disponiveis),0) AS recompensas_pendentes
         FROM clientes WHERE empresa_id = ?
         """,
-        (empresa_id,),
+        (inicio_mes_atual, empresa_id),
     ).fetchone()
 
     financeiro = conn.execute(
@@ -545,6 +559,7 @@ def admin_perfil_cliente(cliente_id):
         tuple(parametros),
     ).fetchall()
 
+    limite_evolucao = meses_recentes(12)[0]
     evolucao = conn.execute(
         """
         SELECT substr(data,1,7) AS mes,
@@ -553,11 +568,11 @@ def admin_perfil_cliente(cliente_id):
         FROM agendamentos
         WHERE empresa_id = ? AND cliente_id = ?
           AND status IN ('finalizado','concluido')
-          AND data >= (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '11 months')::date
+          AND substr(data,1,7) >= ?
         GROUP BY substr(data,1,7)
         ORDER BY mes
         """,
-        (empresa_id, cliente_id),
+        (empresa_id, cliente_id, limite_evolucao),
     ).fetchall()
 
     servicos = conn.execute(

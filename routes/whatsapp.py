@@ -108,6 +108,65 @@ def salvar_whatsapp_modelos():
     return redirect(url_for("admin_whatsapp") + "#modelos")
 
 
+@app.route("/admin/comunicacao/whatsapp/conectar-numero", methods=["POST"])
+@login_required
+@recurso_required("whatsapp")
+def conectar_whatsapp_numero():
+    """Alternativa ao QR Code: gera um código de pareamento de 8 dígitos
+    que a pessoa digita direto no próprio WhatsApp (Configurações →
+    Aparelhos conectados → Conectar com número de telefone). Útil quando
+    o estabelecimento só tem o celular que já está com o WhatsApp aberto,
+    sem outro aparelho para escanear o QR Code."""
+
+    empresa_id = session["empresa_id"]
+    numero = normalizar_telefone(request.form.get("numero", ""))
+
+    if len(numero) < 10:
+        flash("Informe o número de WhatsApp com DDD (ex.: 11987654321).", "erro")
+        return redirect(url_for("admin_whatsapp") + "#conexao")
+
+    if not numero.startswith("55"):
+        numero = "55" + numero
+
+    conn = get_connection(); garantir_configuracao_empresa(conn, empresa_id)
+    config = conn.execute("SELECT * FROM whatsapp_configuracoes WHERE empresa_id=?", (empresa_id,)).fetchone()
+    if not infraestrutura_evolution_configurada():
+        conn.close()
+        flash("A infraestrutura do WhatsApp ainda não foi configurada pela Bytech.", "erro")
+        return redirect(url_for("admin_whatsapp"))
+
+    client = cliente_evolution_para_config(config)
+    estado = client.estado(config["instance_name"])
+    criacao = None
+    if not estado.ok:
+        criacao = client.criar_instancia(config["instance_name"])
+        if not criacao.ok and criacao.status_code not in (400, 409):
+            conn.close()
+            flash(f"Não foi possível preparar a instância: {criacao.error}", "erro")
+            return redirect(url_for("admin_whatsapp"))
+
+    resultado = client.conectar(config["instance_name"], numero=numero)
+    dados = resultado.data if resultado.ok else {}
+    codigo = dados.get("pairingCode")
+
+    if codigo:
+        conn.execute(
+            """UPDATE whatsapp_configuracoes SET status='aguardando_qr', qr_code=NULL,
+               pairing_code=?, ultima_sincronizacao=CURRENT_TIMESTAMP WHERE empresa_id=?""",
+            (codigo, empresa_id),
+        )
+        conn.commit()
+        flash("Código gerado. Digite-o no WhatsApp do celular.", "sucesso")
+    else:
+        flash(
+            f"Não foi possível gerar o código: {resultado.error or 'a Evolution API não devolveu um código para este número'}. "
+            "Tente novamente ou use a opção de QR Code.",
+            "erro",
+        )
+    conn.close()
+    return redirect(url_for("admin_whatsapp") + "#conexao")
+
+
 @app.route("/admin/comunicacao/whatsapp/conectar", methods=["POST"])
 @login_required
 @recurso_required("whatsapp")
@@ -137,7 +196,7 @@ def conectar_whatsapp():
     if qrcode:
         conn.execute(
             """UPDATE whatsapp_configuracoes SET status='aguardando_qr', qr_code=?,
-               ultima_sincronizacao=CURRENT_TIMESTAMP WHERE empresa_id=?""",
+               pairing_code=NULL, ultima_sincronizacao=CURRENT_TIMESTAMP WHERE empresa_id=?""",
             (qrcode, empresa_id),
         )
         conn.commit()
@@ -180,12 +239,13 @@ def status_whatsapp():
                 perfil = extrair_perfil_instancia(detalhes.data, config["instance_name"])
         conn.execute(
             """UPDATE whatsapp_configuracoes SET status=?, qr_code=?,
+               pairing_code=CASE WHEN ?='conectado' THEN NULL ELSE pairing_code END,
                numero_conectado=COALESCE(NULLIF(?, ''), numero_conectado),
                nome_perfil=COALESCE(NULLIF(?, ''), nome_perfil),
                foto_perfil=COALESCE(NULLIF(?, ''), foto_perfil),
-               conectado_em=CASE WHEN ?='conectado' THEN COALESCE(conectado_em, CURRENT_TIMESTAMP) ELSE conectado_em END,
+               conectado_em=CASE WHEN ?='conectado' THEN COALESCE(conectado_em, CAST(CURRENT_TIMESTAMP AS TEXT)) ELSE conectado_em END,
                ultima_sincronizacao=CURRENT_TIMESTAMP WHERE empresa_id=?""",
-            (estado, qr, perfil["numero"], perfil["nome"], perfil["foto"], estado, empresa_id),
+            (estado, qr, estado, perfil["numero"], perfil["nome"], perfil["foto"], estado, empresa_id),
         )
         conn.commit()
     config_atual = conn.execute("SELECT * FROM whatsapp_configuracoes WHERE empresa_id=?", (empresa_id,)).fetchone()

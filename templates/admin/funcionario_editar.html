@@ -14,6 +14,7 @@ Editar {{ ui.profissional_singular if ui else 'profissional' }}
 
 <section class="panel narrow-panel">
     <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <label for="nome">Nome</label>
         <input
             id="nome"

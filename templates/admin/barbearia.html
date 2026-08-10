@@ -19,6 +19,7 @@
     </div>
 
     <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div class="admin-form-grid">
             <div class="form-group">
                 <label for="nome">Nome do estabelecimento</label>

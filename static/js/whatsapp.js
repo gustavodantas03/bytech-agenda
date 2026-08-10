@@ -31,4 +31,14 @@
   if (button) button.addEventListener("click", () => atualizarStatus(true));
   atualizarStatus(false);
   window.setInterval(() => atualizarStatus(false), 8000);
+
+  document.querySelectorAll(".wa-connect-tab").forEach((aba) => {
+    aba.addEventListener("click", () => {
+      document.querySelectorAll(".wa-connect-tab").forEach((a) => a.classList.remove("active"));
+      document.querySelectorAll(".wa-connect-option").forEach((op) => { op.hidden = true; });
+      aba.classList.add("active");
+      const alvo = document.getElementById(aba.dataset.alvo);
+      if (alvo) alvo.hidden = false;
+    });
+  });
 })();

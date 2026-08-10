@@ -1,0 +1,86 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Suporte | Bytech Agenda
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <span>Ajuda</span>
+        <h1>Fale com a Bytech</h1>
+        <p class="page-subtitle">
+            Teve algum problema com o sistema ou tem uma dúvida? Manda pra gente aqui embaixo.
+        </p>
+    </div>
+</header>
+
+<section class="panel narrow-panel">
+    <form method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <label for="assunto">Assunto</label>
+        <input
+            id="assunto"
+            name="assunto"
+            required
+            placeholder="Ex.: Dúvida sobre o WhatsApp"
+        >
+
+        <label for="mensagem">Mensagem</label>
+        <textarea
+            id="mensagem"
+            name="mensagem"
+            rows="5"
+            required
+            placeholder="Descreva o que está acontecendo com o máximo de detalhes possível."
+        ></textarea>
+
+        <label for="telefone_contato">Telefone para retorno (opcional)</label>
+        <input
+            id="telefone_contato"
+            name="telefone_contato"
+            placeholder="(11) 91234-5678"
+        >
+
+        <button class="btn btn-primary full" type="submit" style="margin-top: 14px;">
+            Enviar mensagem
+        </button>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span>Histórico</span>
+            <h2>Suas mensagens</h2>
+        </div>
+    </div>
+
+    <div class="service-admin-list">
+        {% for msg in mensagens %}
+            <div class="service-admin-item">
+                <div>
+                    <strong>
+                        {{ msg.assunto }}
+                        <span class="wa-badge {{ 'enviado' if msg.status == 'respondido' else '' }}">
+                            {{ 'Respondido' if msg.status == 'respondido' else 'Aguardando resposta' }}
+                        </span>
+                    </strong>
+                    <span>{{ msg.mensagem }}</span>
+                    <span>Enviado em {{ msg.criado_em }}</span>
+
+                    {% if msg.resposta %}
+                        <div style="margin-top: 10px; padding: 12px; border-radius: 10px; background: #eff6ff;">
+                            <strong>Resposta da Bytech:</strong>
+                            <p style="margin: 6px 0 0;">{{ msg.resposta }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>Você ainda não enviou nenhuma mensagem.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

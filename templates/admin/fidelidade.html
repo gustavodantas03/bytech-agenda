@@ -73,6 +73,7 @@
 
       <div class="loyalty-card-body">
         <form method="post" action="{{ url_for('admin_fidelidade_configuracoes') }}" class="loyalty-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           <div class="switch-box">
             <div>
               <strong>Programa de fidelidade</strong>
@@ -149,6 +150,7 @@
 
       <div class="loyalty-card-body">
         <form method="post" action="{{ url_for('admin_nova_recompensa') }}" class="loyalty-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           <div class="loyalty-field full">
             <span>Nome da recompensa</span>
             <input required name="nome" maxlength="80" placeholder="Ex.: Corte grátis">
@@ -222,6 +224,7 @@
 
                 <div class="reward-actions">
                   <form method="post" action="{{ url_for('admin_status_recompensa', recompensa_id=r.id) }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                     <button type="submit">{{ 'Desativar' if r.ativo else 'Ativar' }}</button>
                   </form>
                 </div>

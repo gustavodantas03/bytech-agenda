@@ -19,8 +19,9 @@ from database import get_connection
 MODELOS_PADRAO = {
     "confirmacao": (
         "Confirmação de agendamento",
-        "Olá {{nome}}! 👋\n\nSeu agendamento na {{empresa}} foi confirmado.\n\n"
-        "📅 {{data}}\n⏰ {{hora}}\n✨ {{servico}}\n👤 {{profissional}}\n\nAté breve!",
+        "Olá {{nome}}! 👋\n\nRecebemos seu agendamento na {{empresa}}.\n\n"
+        "📅 {{data}}\n⏰ {{hora}}\n✨ {{servico}}\n👤 {{profissional}}\n\n"
+        "Responda com:\n1️⃣ Confirmar\n2️⃣ Reagendar\n3️⃣ Cancelar",
     ),
     "lembrete_24h": (
         "Lembrete de 24 horas",
@@ -95,8 +96,11 @@ class EvolutionClient:
             },
         )
 
-    def conectar(self, instance_name: str) -> EvolutionResult:
-        return self._call("GET", f"/instance/connect/{instance_name}")
+    def conectar(self, instance_name: str, numero: str | None = None) -> EvolutionResult:
+        caminho = f"/instance/connect/{instance_name}"
+        if numero:
+            caminho += f"?number={parse.quote(numero, safe='')}"
+        return self._call("GET", caminho)
 
     def estado(self, instance_name: str) -> EvolutionResult:
         return self._call("GET", f"/instance/connectionState/{instance_name}")

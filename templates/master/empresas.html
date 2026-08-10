@@ -83,8 +83,10 @@
   <div class="master-company-actions">
     <a class="btn btn-small btn-secondary" href="{{ url_for('landing',slug=empresa.slug) }}" target="_blank">Abrir</a>
     <a class="btn btn-small master-edit-button" href="{{ url_for('master_editar_empresa',empresa_id=empresa.id) }}">Editar</a>
-    {% if empresa.cobranca_aberta_id %}<form method="post" action="{{ url_for('master_registrar_pagamento',cobranca_id=empresa.cobranca_aberta_id) }}"><input type="hidden" name="forma_pagamento" value="Pix"><button class="btn btn-small master-pay-button" onclick="return confirm('Registrar pagamento desta mensalidade?')">Registrar pagamento</button></form>{% endif %}
-    <form method="post" action="{{ url_for('master_alternar_empresa',empresa_id=empresa.id) }}"><button class="btn btn-small {{ 'btn-danger' if not empresa.bloqueio_manual else 'master-activate-button' }}">{{ 'Bloquear' if not empresa.bloqueio_manual else 'Desbloquear' }}</button></form>
+    {% if empresa.cobranca_aberta_id %}<form method="post" action="{{ url_for('master_registrar_pagamento',cobranca_id=empresa.cobranca_aberta_id) }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="forma_pagamento" value="Pix"><button class="btn btn-small master-pay-button" onclick="return confirm('Registrar pagamento desta mensalidade?')">Registrar pagamento</button></form>{% endif %}
+    <form method="post" action="{{ url_for('master_alternar_empresa',empresa_id=empresa.id) }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="btn btn-small {{ 'btn-danger' if not empresa.bloqueio_manual else 'master-activate-button' }}">{{ 'Bloquear' if not empresa.bloqueio_manual else 'Desbloquear' }}</button></form>
   </div>
 </article>{% endfor %}
 </section>{% else %}<section class="panel master-empty-state"><div>🏢</div><h2>Nenhuma empresa encontrada</h2></section>{% endif %}

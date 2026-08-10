@@ -1,0 +1,68 @@
+{% extends 'master/base.html' %}
+
+{% block title %}
+Suporte | Bytech Master
+{% endblock %}
+
+{% block content %}
+<header class="master-page-header">
+    <div>
+        <span>Atendimento</span>
+        <h1>Suporte</h1>
+        <p>Mensagens enviadas pelos clientes através do painel administrativo deles.</p>
+    </div>
+</header>
+
+<section class="panel">
+    <div class="wa-tabs" style="margin-bottom: 18px;">
+        <a href="{{ url_for('master_suporte', status='aberto') }}" class="{{ 'active' if filtro == 'aberto' else '' }}">
+            Abertos ({{ total_abertos }})
+        </a>
+        <a href="{{ url_for('master_suporte', status='respondido') }}" class="{{ 'active' if filtro == 'respondido' else '' }}">
+            Respondidos
+        </a>
+        <a href="{{ url_for('master_suporte', status='todos') }}" class="{{ 'active' if filtro not in ('aberto', 'respondido') else '' }}">
+            Todos
+        </a>
+    </div>
+
+    <div class="master-simple-list">
+        {% for msg in mensagens %}
+            <div style="flex-direction: column; align-items: stretch; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                    <span>
+                        <strong>{{ msg.assunto }}</strong>
+                        <small>
+                            {{ msg.empresa_nome }} · {{ msg.nome_contato or 'sem nome informado' }}
+                            {% if msg.telefone_contato %} · {{ msg.telefone_contato }}{% endif %}
+                            · {{ msg.criado_em }}
+                        </small>
+                    </span>
+                    <span class="wa-badge {{ 'enviado' if msg.status == 'respondido' else '' }}">
+                        {{ 'Respondido' if msg.status == 'respondido' else 'Aberto' }}
+                    </span>
+                </div>
+
+                <p style="margin: 0; color: #334155;">{{ msg.mensagem }}</p>
+
+                {% if msg.resposta %}
+                    <div style="padding: 12px; border-radius: 10px; background: #eff6ff;">
+                        <strong>Sua resposta:</strong>
+                        <p style="margin: 6px 0 0;">{{ msg.resposta }}</p>
+                    </div>
+                {% else %}
+                    <form method="post" action="{{ url_for('master_suporte_responder', mensagem_id=msg.id) }}" style="display: flex; gap: 10px; align-items: flex-end;">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <div style="flex: 1;">
+                            <textarea name="resposta" rows="2" placeholder="Escreva a resposta para o cliente..." required style="width: 100%;"></textarea>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Responder</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>Nenhuma mensagem por aqui.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

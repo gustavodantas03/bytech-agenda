@@ -1,0 +1,89 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Equipe | Bytech Agenda
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <span>Minha conta</span>
+        <h1>Equipe</h1>
+        <p class="page-subtitle">
+            Crie logins para os colaboradores da sua empresa e escolha o que cada um pode acessar.
+        </p>
+    </div>
+
+    <div class="page-header-actions">
+        {% set limite = uso.plano.limite_usuarios if uso.plano else None %}
+        {% if limite is none or uso.usuarios < limite %}
+            <a class="btn btn-primary" href="{{ url_for('admin_equipe_novo') }}">
+                + Novo usuário
+            </a>
+        {% endif %}
+    </div>
+</header>
+
+<section class="panel">
+    <p>
+        <strong>{{ uso.usuarios }}</strong>
+        {{ 'de ' ~ limite ~ ' usuários ativos usados no plano atual.' if limite is not none else 'usuário(s) ativo(s) — seu plano não tem limite de usuários.' }}
+    </p>
+
+    {% if limite is not none and uso.usuarios >= limite %}
+        <p class="alert alert-erro">
+            Você atingiu o limite de usuários do seu plano. Desative alguém para liberar uma
+            vaga ou fale com a Bytech para aumentar o limite.
+        </p>
+    {% endif %}
+
+    <div class="service-admin-list">
+        {% for membro in membros %}
+            <div class="service-admin-item">
+                <div>
+                    <strong>
+                        {{ membro.nome or membro.usuario }}
+                        {% if membro.papel == 'proprietario' %}
+                            <span class="badge">Proprietário</span>
+                        {% endif %}
+                    </strong>
+                    <span>
+                        usuário: {{ membro.usuario }} ·
+                        {{ 'Ativo' if membro.ativo else 'Inativo' }}
+                    </span>
+                    {% if membro.papel != 'proprietario' %}
+                        <span>
+                            Acesso:
+                            {{ membro.permissoes_rotulos|join(', ') if membro.permissoes_rotulos else 'nenhuma área liberada ainda' }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="actions">
+                    <a
+                        class="btn btn-small btn-secondary"
+                        href="{{ url_for('admin_equipe_editar', usuario_id=membro.id) }}"
+                    >
+                        Editar
+                    </a>
+
+                    <form
+                        method="post"
+                        action="{{ url_for('admin_equipe_alternar', usuario_id=membro.id) }}"
+                    >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <button
+                            class="btn btn-small {{ 'btn-danger' if membro.ativo else 'btn-secondary' }}"
+                            type="submit"
+                        >
+                            {{ 'Desativar' if membro.ativo else 'Ativar' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p>Nenhum usuário cadastrado ainda.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

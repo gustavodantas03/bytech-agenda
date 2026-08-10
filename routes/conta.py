@@ -70,7 +70,7 @@ def admin_minha_conta():
                 url_for("admin_minha_conta")
             )
 
-        if senha_atual != conta["senha"]:
+        if not senha_confere(senha_atual, conta["senha"]):
             conn.close()
 
             flash(
@@ -126,7 +126,7 @@ def admin_minha_conta():
               AND empresa_id = ?
             """,
             (
-                nova_senha,
+                gerar_hash_senha(nova_senha),
                 usuario_id,
                 empresa_id,
             ),
@@ -253,5 +253,55 @@ def admin_meu_espaco():
     return render_template(
         "admin/meu_espaco.html",
         empresa=empresa,
+        horarios_funcionamento=obter_horarios_funcionamento(empresa),
+        dias_semana=list(enumerate(DIAS_SEMANA_LABELS)),
     )
+
+
+@app.route("/admin/meu-espaco/horarios", methods=["POST"])
+@login_required
+def admin_meu_espaco_horarios():
+    empresa_id = session["empresa_id"]
+
+    try:
+        intervalo = int(request.form.get("intervalo_agendamento_minutos", 40))
+    except (TypeError, ValueError):
+        intervalo = 40
+    intervalo = min(max(intervalo, 5), 240)
+
+    nova_configuracao = {}
+    for dia in range(7):
+        aberto = request.form.get(f"aberto_{dia}") == "on"
+        abertura = request.form.get(f"abertura_{dia}", "09:00").strip() or "09:00"
+        fechamento = request.form.get(f"fechamento_{dia}", "18:00").strip() or "18:00"
+
+        try:
+            valido = datetime.strptime(abertura, "%H:%M") < datetime.strptime(fechamento, "%H:%M")
+        except ValueError:
+            valido = False
+
+        if not valido:
+            aberto = False
+            abertura, fechamento = "09:00", "18:00"
+
+        nova_configuracao[str(dia)] = {
+            "aberto": aberto,
+            "abertura": abertura,
+            "fechamento": fechamento,
+        }
+
+    conn = get_connection()
+    conn.execute(
+        """
+        UPDATE empresas
+        SET horarios_funcionamento = ?, intervalo_agendamento_minutos = ?
+        WHERE id = ?
+        """,
+        (json.dumps(nova_configuracao), intervalo, empresa_id),
+    )
+    conn.commit()
+    conn.close()
+
+    flash("Horário de funcionamento atualizado.", "sucesso")
+    return redirect(url_for("admin_meu_espaco"))
 

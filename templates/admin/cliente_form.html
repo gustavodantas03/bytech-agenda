@@ -2,7 +2,8 @@
 {% block title %}{{ 'Novo cliente' if modo == 'novo' else 'Editar cliente' }} | Bytech Agenda{% endblock %}
 {% block content %}
 <header class="page-header"><div><span>Relacionamento</span><h1>{{ 'Novo cliente' if modo == 'novo' else 'Editar cliente' }}</h1><p class="page-subtitle">Nome e WhatsApp são obrigatórios. Os demais dados são opcionais.</p></div><a class="btn btn-secondary" href="{{ url_for('admin_clientes') }}">Voltar</a></header>
-<section class="panel client-form-panel"><form method="post" class="client-form"><div class="client-form-grid">
+<section class="panel client-form-panel"><form method="post" class="client-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><div class="client-form-grid">
 <label class="form-field"><span>Nome *</span><input type="text" name="nome" value="{{ cliente.nome or '' }}" maxlength="120" required autocomplete="name"></label>
 <label class="form-field"><span>WhatsApp *</span><input type="tel" name="telefone" value="{{ cliente.telefone or '' }}" maxlength="20" required autocomplete="tel" inputmode="tel"><small>Use DDD e número. Ex.: 85999999999.</small></label>
 <label class="form-field"><span>E-mail</span><input type="email" name="email" value="{{ cliente.email or '' }}" maxlength="160" autocomplete="email"></label>

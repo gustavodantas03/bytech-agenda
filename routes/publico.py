@@ -91,9 +91,14 @@ def horarios_disponiveis(slug):
     if duracao_total < 1 or duracao_total > 480:
         return jsonify({"erro": "Duração total inválida."}), 400
 
+    try:
+        data_obj = date.fromisoformat(data)
+    except ValueError:
+        return jsonify({"erro": "Data inválida."}), 400
+
     conn = get_connection()
     empresa = conn.execute(
-        "SELECT id FROM empresas WHERE slug = ? AND ativo = 1", (slug,)
+        "SELECT * FROM empresas WHERE slug = ? AND ativo = 1", (slug,)
     ).fetchone()
 
     if not empresa:
@@ -122,11 +127,18 @@ def horarios_disponiveis(slug):
     ).fetchall()
     conn.close()
 
-    abertura = datetime.strptime("09:00", "%H:%M")
-    fechamento = datetime.strptime("18:00", "%H:%M")
+    horarios_do_dia = gerar_horarios_do_dia(empresa, data_obj)
+    if not horarios_do_dia:
+        # Empresa fechada nesse dia da semana (ou fora do horário configurado).
+        return jsonify({"horarios": []})
+
+    fechamento = datetime.strptime(
+        obter_horarios_funcionamento(empresa)[str(data_obj.weekday())]["fechamento"],
+        "%H:%M",
+    )
     livres = []
 
-    for hora in gerar_horarios():
+    for hora in horarios_do_dia:
         inicio_candidato = datetime.strptime(hora, "%H:%M")
         fim_candidato = inicio_candidato + timedelta(minutes=duracao_total)
 
@@ -144,7 +156,7 @@ def horarios_disponiveis(slug):
                 tem_conflito = True
                 break
 
-        if not tem_conflito and inicio_candidato >= abertura:
+        if not tem_conflito:
             livres.append(hora)
 
     return jsonify({"horarios": livres})
@@ -242,12 +254,18 @@ def criar_agendamento(slug):
             return jsonify({"erro": "Este intervalo de horário acabou de ser ocupado. Escolha outro."}), 409
 
     try:
+        cliente_nome = dados["cliente_nome"].strip()
+        cliente_telefone = normalizar_telefone(dados["cliente_telefone"])
+        cliente_id = buscar_ou_criar_cliente(
+            conn, empresa["id"], cliente_nome, cliente_telefone
+        )
+
         cursor = conn.execute(
-            
             """
             INSERT INTO agendamentos
             (
                 empresa_id,
+                cliente_id,
                 cliente_nome,
                 cliente_telefone,
                 servico_id,
@@ -257,12 +275,13 @@ def criar_agendamento(slug):
                 duracao_total,
                 valor_total
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 empresa["id"],
-                dados["cliente_nome"].strip(),
-                dados["cliente_telefone"].strip(),
+                cliente_id,
+                cliente_nome,
+                cliente_telefone,
                 servico_ids[0],
                 funcionario["id"],
                 dados["data"],

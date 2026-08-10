@@ -25,6 +25,7 @@ Editar empresa | Bytech Master
 </header>
 
 <form method="post" class="master-edit-layout">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <section class="panel master-form-panel">
         <div class="panel-header">
             <div>
@@ -269,6 +270,7 @@ Editar empresa | Bytech Master
             );
         "
     >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <label for="confirmacao">
             Digite exatamente:
             <strong>{{ empresa.nome }}</strong>

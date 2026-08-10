@@ -94,7 +94,12 @@ Empresa criada
 
         <p>
             <strong>Senha provisória:</strong>
-            {{ empresa.senha }}
+            {% if senha_temporaria %}
+                {{ senha_temporaria }}
+            {% else %}
+                <em>Já exibida anteriormente — por segurança, a senha não fica salva em texto
+                visível. Se precisar, gere uma nova em "editar empresa".</em>
+            {% endif %}
         </p>
 
     </div>

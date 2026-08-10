@@ -75,7 +75,7 @@ Não use `down -v` depois de conectar o WhatsApp, pois esse comando também remo
 Para o teste local:
 
 ```env
-EVOLUTION_URL=http://127.0.0.1:8080
+EVOLUTION_BASE_URL=http://127.0.0.1:8080
 EVOLUTION_API_KEY=bytech_evolution_local_2026
 ```
 
