@@ -1,0 +1,29 @@
+BYTECH_APP_VERSION=RC1.3.0-PG
+BYTECH_SECRET_KEY=euamosushi@123abc
+DATABASE_URL=postgresql://bytech:Gn031216@@127.0.0.1:5432/bytech_agenda
+FLASK_DEBUG=0
+
+# Ative como "1" somente depois que o domínio estiver com HTTPS funcionando
+# na VPS. Isso faz o cookie de login só ser aceito em conexões seguras.
+BYTECH_FORCE_HTTPS=0
+
+# URL pública onde o sistema está publicado (sem barra no final).
+# Usada para montar o link de agendamento enviado por WhatsApp quando o
+# cliente manda mensagem sem ter um agendamento ativo. Ex.: https://agenda.suaempresa.com.br
+BYTECH_PUBLIC_URL=https://agenda.suaempresa.com.br
+
+# Evolution API - credenciais globais da infraestrutura Bytech
+EVOLUTION_BASE_URL=http://127.0.0.1:8080
+EVOLUTION_API_KEY=troque-por-uma-chave-segura
+EVOLUTION_TIMEOUT=15
+
+# Proteção opcional do endpoint de webhook
+EVOLUTION_WEBHOOK_TOKEN=troque-por-um-token-seguro
+
+# Worker de comunicação (fila do WhatsApp) embutido no processo do Flask.
+# Deixe "1" (padrão) se você roda o sistema com "py app.py" ou com o Gunicorn
+# usando 1 único worker. Se subir com múltiplos workers/processos (ex.: vários
+# processos do Gunicorn), defina "0" aqui e rode o worker separado com
+# scripts/evolution/executar_worker.py (ou o atalho INICIAR-WORKER-WHATSAPP.bat)
+# para não haver duplicidade no envio das mensagens.
+BYTECH_EMBED_WORKER=1

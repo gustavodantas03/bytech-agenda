@@ -330,3 +330,70 @@ def criar_agendamento(slug):
         "duracao_total": duracao_total,
     })
 
+
+
+@app.route("/teste-gratis", methods=["GET", "POST"])
+def teste_gratis():
+    if request.method == "GET":
+        return render_template("teste_gratis.html")
+
+    nome = (request.form.get("nome") or "").strip()
+    telefone = (request.form.get("telefone") or "").strip()
+    email = (request.form.get("email") or "").strip()
+    nome_negocio = (request.form.get("nome_negocio") or "").strip()
+    segmento = (request.form.get("segmento") or "").strip()
+    mensagem = (request.form.get("mensagem") or "").strip()
+
+    if not nome or not telefone or not nome_negocio:
+        return render_template(
+            "teste_gratis.html",
+            erro="Preencha nome, telefone e nome do negócio para continuar.",
+        )
+
+    conn = get_connection()
+    conn.execute(
+        """
+        INSERT INTO leads_teste_gratis
+        (nome, telefone, email, nome_negocio, segmento, mensagem)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (nome, telefone, email, nome_negocio, segmento, mensagem),
+    )
+    conn.commit()
+    conn.close()
+
+    try:
+        from services.evolution_api import (
+            cliente_evolution_para_config,
+            garantir_configuracao_empresa,
+        )
+        conn = get_connection()
+        empresa_demo = conn.execute(
+            "SELECT id FROM empresas WHERE slug = 'demo'"
+        ).fetchone()
+        if empresa_demo:
+            garantir_configuracao_empresa(conn, empresa_demo["id"])
+            config = conn.execute(
+                "SELECT * FROM whatsapp_configuracoes WHERE empresa_id = ?",
+                (empresa_demo["id"],),
+            ).fetchone()
+            conn.close()
+
+            texto = (
+                f"🎉 Novo pedido de teste grátis!\n\n"
+                f"Nome: {nome}\n"
+                f"Negócio: {nome_negocio}\n"
+                f"Telefone: {telefone}\n"
+                f"Email: {email or 'não informado'}\n"
+                f"Segmento: {segmento or 'não informado'}\n"
+                f"Mensagem: {mensagem or '-'}"
+            )
+            cliente = cliente_evolution_para_config(config)
+            cliente.enviar_texto(config["instance_name"], "5585999677086", texto)
+        else:
+            conn.close()
+    except Exception:
+        # A indisponibilidade do WhatsApp nunca deve impedir o cadastro do lead.
+        pass
+
+    return render_template("teste_gratis.html", sucesso=True)

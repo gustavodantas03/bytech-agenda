@@ -132,6 +132,65 @@
             .hero h1 { font-size: 30px; }
             header { flex-direction: column; gap: 16px; }
         }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero {
+            background: linear-gradient(120deg, #eff6ff, #dbeafe, #eff6ff, #f0f9ff);
+            background-size: 300% 300%;
+            animation: gradientMove 12s ease infinite;
+        }
+        .btn-primary {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+        .btn-outline {
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        .btn-outline:hover {
+            transform: translateY(-2px);
+            background: var(--azul);
+            color: #fff;
+        }
+        .feature-card, .plano-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+        .plano-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .hero h1 {
+            animation: fadeInUp 0.8s ease both;
+        }
+        .hero p {
+            animation: fadeInUp 0.8s ease 0.15s both;
+        }
+        .hero-ctas {
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -151,12 +210,12 @@
         <h1>Agenda cheia, <span>sem dor de cabeça</span>.</h1>
         <p>O sistema de agendamento completo para barbearias e salões: agenda online, lembretes automáticos no WhatsApp e controle financeiro em um só lugar.</p>
         <div class="hero-ctas">
-            <a href="/demo" class="btn btn-primary">Ver demonstração</a>
-            <a href="#planos" class="btn btn-outline">Ver planos</a>
+            <a href="/teste-gratis" class="btn btn-primary">Solicitar teste grátis</a>
+            <a href="/demo" class="btn btn-outline" style="opacity:.85">Ver demonstração</a>
         </div>
     </section>
 
-    <section class="features" id="funcionalidades">
+    <section class="features reveal" id="funcionalidades">
         <div class="container">
             <h2>Tudo que seu negócio precisa</h2>
             <p>Feito para o dia a dia de barbearias, salões e estúdios de beleza.</p>
@@ -195,7 +254,7 @@
         </div>
     </section>
 
-    <section class="planos" id="planos">
+    <section class="planos reveal" id="planos">
         <div class="container">
             <h2>Planos para todo tamanho de negócio</h2>
             <div class="planos-grid">
@@ -234,14 +293,26 @@
         </div>
     </section>
 
-    <section class="cta-final">
+    <section class="cta-final reveal">
         <h2>Pronto para organizar sua agenda?</h2>
         <p>Veja o sistema funcionando com um exemplo real de barbearia.</p>
-        <a href="/demo" class="btn btn-primary">Ver demonstração gratuita</a>
+        <a href="/teste-gratis" class="btn btn-primary">Solicitar teste grátis</a>
     </section>
 
     <footer>
         © 2026 Bytech Agenda. Todos os direitos reservados.
     </footer>
+
+    <script>
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+        reveals.forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste grátis por 7 dias | Bytech Agenda</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .card {
+            background: #fff;
+            max-width: 480px;
+            width: 100%;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; margin-bottom: 24px; }
+        .logo img { height: 32px; }
+        h1 { font-size: 26px; margin-bottom: 8px; }
+        p.sub { color: #475569; margin-bottom: 28px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 6px; }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #1e40af; }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-erro { background: #fef2f2; color: #b91c1c; }
+        .sucesso { text-align: center; }
+        .sucesso .icone { font-size: 48px; margin-bottom: 16px; }
+        .voltar { display: inline-block; margin-top: 20px; color: #2563eb; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        {% if sucesso %}
+            <div class="sucesso">
+                <div class="icone">🎉</div>
+                <h1>Pedido recebido!</h1>
+                <p class="sub">Nossa equipe vai entrar em contato em breve para ativar seu teste grátis de 7 dias.</p>
+                <a href="/" class="voltar">← Voltar para o site</a>
+            </div>
+        {% else %}
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
+                Bytech Agenda
+            </div>
+            <h1>Teste grátis por 7 dias</h1>
+            <p class="sub">Preencha seus dados e ative seu acesso sem compromisso.</p>
+
+            {% if erro %}
+                <div class="alert alert-erro">{{ erro }}</div>
+            {% endif %}
+
+            <form method="post">
+                <label>Seu nome</label>
+                <input type="text" name="nome" required>
+
+                <label>WhatsApp (com DDD)</label>
+                <input type="text" name="telefone" placeholder="85999999999" required>
+
+                <label>Nome do negócio</label>
+                <input type="text" name="nome_negocio" required>
+
+                <label>Segmento</label>
+                <select name="segmento">
+                    <option value="barbearia">Barbearia</option>
+                    <option value="salao">Salão de beleza</option>
+                    <option value="estudio">Estúdio de beleza</option>
+                    <option value="outro">Outro</option>
+                </select>
+
+                <label>E-mail (opcional)</label>
+                <input type="email" name="email">
+
+                <label>Alguma observação? (opcional)</label>
+                <textarea name="mensagem"></textarea>
+
+                <button type="submit">Solicitar teste grátis</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -358,6 +358,29 @@
 
             bar.style.width = `${width}%`;
         });
+
+    let ultimoAgendamentoId = null;
+
+    async function verificarNovoAgendamento() {
+        try {
+            const resposta = await fetch("{{ url_for('admin_ultimo_agendamento') }}");
+            const dados = await resposta.json();
+
+            if (ultimoAgendamentoId === null) {
+                ultimoAgendamentoId = dados.id;
+                return;
+            }
+
+            if (dados.id && dados.id !== ultimoAgendamentoId) {
+                window.location.reload();
+            }
+        } catch (erro) {
+            // Falha de rede não deve interromper a experiência do usuário.
+        }
+    }
+
+    verificarNovoAgendamento();
+    setInterval(verificarNovoAgendamento, 20000);
 </script>
 
 {% endblock %}

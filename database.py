@@ -1337,6 +1337,17 @@ def init_db():
             ON fidelidade_movimentos (empresa_id, cliente_id, criado_em);
             CREATE INDEX IF NOT EXISTS idx_fidelidade_recompensas_empresa
             ON fidelidade_recompensas (empresa_id, ativo);
+            CREATE TABLE IF NOT EXISTS leads_teste_gratis (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                telefone TEXT NOT NULL,
+                email TEXT,
+                nome_negocio TEXT NOT NULL,
+                segmento TEXT,
+                mensagem TEXT,
+                status TEXT NOT NULL DEFAULT 'novo',
+                criado_em TEXT DEFAULT CURRENT_TIMESTAMP
+            );
             """
         )
 
