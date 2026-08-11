@@ -342,6 +342,10 @@ def teste_gratis():
     email = (request.form.get("email") or "").strip()
     nome_negocio = (request.form.get("nome_negocio") or "").strip()
     segmento = (request.form.get("segmento") or "").strip()
+    if segmento == "outro":
+        segmento_outro = (request.form.get("segmento_outro") or "").strip()
+        if segmento_outro:
+            segmento = segmento_outro
     mensagem = (request.form.get("mensagem") or "").strip()
 
     if not nome or not telefone or not nome_negocio:

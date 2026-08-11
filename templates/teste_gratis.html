@@ -81,6 +81,7 @@
                 <img src="{{ url_for('static', filename='img/bytech-agenda-icon.png') }}" alt="Bytech Agenda">
                 Bytech Agenda
             </div>
+            <a href="/" style="display:inline-block; margin-bottom:16px; color:#2563eb; text-decoration:none; font-weight:600; font-size:14px;">← Voltar para o site</a>
             <h1>Teste grátis por 7 dias</h1>
             <p class="sub">Preencha seus dados e ative seu acesso sem compromisso.</p>
 
@@ -99,12 +100,17 @@
                 <input type="text" name="nome_negocio" required>
 
                 <label>Segmento</label>
-                <select name="segmento">
+                <select name="segmento" id="segmentoSelect" onchange="document.getElementById('segmentoOutroBox').style.display = this.value === 'outro' ? 'block' : 'none';">
                     <option value="barbearia">Barbearia</option>
                     <option value="salao">Salão de beleza</option>
                     <option value="estudio">Estúdio de beleza</option>
                     <option value="outro">Outro</option>
                 </select>
+
+                <div id="segmentoOutroBox" style="display:none;">
+                    <label>Qual o segmento?</label>
+                    <input type="text" name="segmento_outro" placeholder="Ex: Clínica de estética">
+                </div>
 
                 <label>E-mail (opcional)</label>
                 <input type="email" name="email">

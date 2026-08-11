@@ -3,194 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bytech Agenda | Sistema de Agendamento para Barbearias e Salões</title>
+    <title>Bytech Agenda | Seu sistema de agendamento</title>
+    <meta name="description" content="Agenda online, lembretes automáticos no WhatsApp e controle financeiro para barbearias, salões e estúdios de beleza.">
+    <meta property="og:title" content="Bytech Agenda | Seu sistema de agendamento">
+    <meta property="og:description" content="Agenda online, lembretes automáticos no WhatsApp e controle financeiro em um só lugar.">
+    <meta property="og:image" content="{{ url_for('static', filename='img/bytech-agenda-icon.png', _external=True) }}">
+    <meta property="og:type" content="website">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --azul: #2563eb;
             --azul-escuro: #1e40af;
+            --azul-claro: #60a5fa;
             --cinza-texto: #475569;
             --cinza-claro: #f8fafc;
             --preto: #0f172a;
+            --marinho: #0b1224;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             color: var(--preto);
             line-height: 1.6;
         }
+        h1, h2, h3 { font-family: 'Sora', 'Inter', sans-serif; }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 24px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; max-width: 1100px; margin: 0 auto; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; font-family: 'Sora', sans-serif; }
         .logo img { height: 36px; }
-        header nav a {
-            margin-left: 28px;
-            text-decoration: none;
-            color: var(--cinza-texto);
-            font-weight: 500;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 26px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-size: 15px;
-        }
-        .btn-primary { background: var(--azul); color: #fff; }
-        .btn-primary:hover { background: var(--azul-escuro); }
+        header nav a { margin-left: 28px; text-decoration: none; color: var(--cinza-texto); font-weight: 500; }
+        header nav a:hover { color: var(--azul); }
+        .btn { display: inline-block; padding: 13px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; font-size: 15px; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: linear-gradient(135deg, var(--azul), var(--azul-escuro)); color: #fff; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37, 99, 235, 0.4); }
         .btn-outline { background: transparent; color: var(--azul); border: 2px solid var(--azul); }
-        .hero {
-            text-align: center;
-            padding: 80px 24px 60px;
-            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
-        }
-        .hero h1 {
-            font-size: 44px;
-            font-weight: 800;
-            max-width: 700px;
-            margin: 0 auto 20px;
-            line-height: 1.2;
-        }
+        .btn-outline:hover { transform: translateY(-2px); background: var(--azul); color: #fff; }
+        .btn { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease; }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .hero { position: relative; overflow: hidden; padding: 90px 24px 60px; background: linear-gradient(120deg, #eff6ff, #dbeafe, #eff6ff, #f0f9ff); background-size: 300% 300%; animation: gradientMove 14s ease infinite; }
+        .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; filter: blur(10px); opacity: 0.35; z-index: 0; }
+        .hero::before { width: 260px; height: 260px; background: var(--azul-claro); top: -80px; left: -60px; }
+        .hero::after { width: 320px; height: 320px; background: #93c5fd; bottom: -120px; right: -80px; }
+        .hero-grid { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+        .badge { display: inline-block; background: #fff; border: 1px solid #dbeafe; color: var(--azul); font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 30px; margin-bottom: 22px; }
+        .hero h1 { font-size: 44px; font-weight: 800; margin: 0 0 20px; line-height: 1.18; animation: fadeInUp 0.8s ease both; }
         .hero h1 span { color: var(--azul); }
-        .hero p {
-            font-size: 18px;
-            color: var(--cinza-texto);
-            max-width: 560px;
-            margin: 0 auto 32px;
-        }
-        .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .hero p { font-size: 18px; color: var(--cinza-texto); max-width: 480px; margin: 0 0 32px; animation: fadeInUp 0.8s ease 0.15s both; }
+        .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeInUp 0.8s ease 0.3s both; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .mockup { background: #fff; border-radius: 16px; box-shadow: 0 30px 60px rgba(15, 23, 42, 0.18); overflow: hidden; animation: fadeInUp 0.9s ease 0.2s both; }
+        .mockup-bar { background: #f1f5f9; padding: 10px 14px; display: flex; gap: 6px; }
+        .mockup-bar span { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
+        .mockup-body { padding: 22px; }
+        .mockup-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 16px; color: var(--preto); }
+        .mockup-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .mockup-stat { background: var(--cinza-claro); border-radius: 10px; padding: 12px; text-align: center; }
+        .mockup-stat strong { display: block; font-size: 18px; color: var(--azul); }
+        .mockup-stat span { font-size: 11px; color: var(--cinza-texto); }
+        .mockup-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: var(--cinza-claro); margin-bottom: 8px; }
+        .mockup-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--azul-claro); flex-shrink: 0; }
+        .mockup-row .linha1 { width: 60%; height: 8px; background: #cbd5e1; border-radius: 4px; margin-bottom: 5px; }
+        .mockup-row .linha2 { width: 35%; height: 6px; background: #e2e8f0; border-radius: 4px; }
+        .mockup-row .badge-mini { margin-left: auto; font-size: 10px; background: #dcfce7; color: #166534; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+        .divisor { display: block; width: 100%; line-height: 0; }
+        .divisor svg { display: block; width: 100%; height: 60px; }
+        .destaques { background: var(--marinho); color: #fff; padding: 40px 24px 44px; margin-top: -1px; }
+        .destaques .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: center; }
+        .destaques .item strong { display: block; font-size: 22px; margin-bottom: 4px; font-family: 'Sora', sans-serif; }
+        .destaques .item span { color: #94a3b8; font-size: 14px; }
+        .como-funciona { padding: 80px 24px; background: var(--cinza-claro); }
+        .como-funciona h2 { text-align: center; font-size: 32px; margin-bottom: 12px; }
+        .como-funciona > .container > p { text-align: center; color: var(--cinza-texto); margin-bottom: 48px; }
+        .passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+        .passo { background: #fff; border-radius: 14px; padding: 28px; text-align: center; border: 1px solid #e2e8f0; }
+        .passo .numero { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--azul), var(--azul-escuro)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; margin: 0 auto 16px; }
+        .passo h3 { font-size: 17px; margin-bottom: 8px; }
+        .passo p { color: var(--cinza-texto); font-size: 14px; }
         .features { padding: 80px 24px; }
         .features h2 { text-align: center; font-size: 32px; margin-bottom: 12px; }
-        .features > .container > p {
-            text-align: center;
-            color: var(--cinza-texto);
-            margin-bottom: 48px;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 28px;
-        }
-        .feature-card { background: var(--cinza-claro); padding: 28px; border-radius: 14px; }
-        .feature-card .icon { font-size: 28px; margin-bottom: 12px; }
+        .features > .container > p { text-align: center; color: var(--cinza-texto); margin-bottom: 48px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
+        .feature-card { background: var(--cinza-claro); padding: 28px; border-radius: 14px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .feature-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+        .feature-icon { width: 48px; height: 48px; border-radius: 12px; background: #dbeafe; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .feature-icon svg { width: 24px; height: 24px; stroke: var(--azul); }
         .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
         .feature-card p { color: var(--cinza-texto); font-size: 15px; }
         .planos { padding: 80px 24px; background: var(--cinza-claro); }
         .planos h2 { text-align: center; font-size: 32px; margin-bottom: 48px; }
-        .planos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-        }
-        .plano-card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 32px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
+        .planos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+        .plano-card { background: #fff; border-radius: 14px; padding: 32px; text-align: center; border: 1px solid #e2e8f0; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .plano-card:hover { transform: translateY(-6px); box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1); }
         .plano-card.destaque { border: 2px solid var(--azul); position: relative; }
-        .plano-card.destaque::before {
-            content: "Mais popular";
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--azul);
-            color: #fff;
-            font-size: 12px;
-            padding: 4px 14px;
-            border-radius: 20px;
-        }
+        .plano-card.destaque::before { content: "Mais popular"; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--azul); color: #fff; font-size: 12px; padding: 4px 14px; border-radius: 20px; }
         .plano-card h3 { font-size: 20px; margin-bottom: 8px; }
-        .plano-card .preco { font-size: 36px; font-weight: 800; margin: 16px 0; }
+        .plano-card .preco { font-size: 36px; font-weight: 800; margin: 16px 0; font-family: 'Sora', sans-serif; }
         .plano-card .preco small { font-size: 14px; font-weight: 400; color: var(--cinza-texto); }
         .plano-card ul { list-style: none; text-align: left; margin: 24px 0; }
         .plano-card li { padding: 6px 0; color: var(--cinza-texto); font-size: 14px; }
         .plano-card li::before { content: "✓ "; color: var(--azul); font-weight: 700; }
-        .cta-final { text-align: center; padding: 80px 24px; }
+        .faq { padding: 80px 24px; }
+        .faq h2 { text-align: center; font-size: 32px; margin-bottom: 48px; }
+        .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+        .faq-item { background: var(--cinza-claro); border-radius: 12px; padding: 4px 22px; }
+        .faq-item summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 600; font-size: 15.5px; display: flex; justify-content: space-between; align-items: center; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::after { content: "+"; font-size: 22px; color: var(--azul); font-weight: 400; transition: transform 0.25s ease; margin-left: 12px; }
+        .faq-item[open] summary::after { transform: rotate(45deg); }
+        .faq-item p { color: var(--cinza-texto); font-size: 14.5px; padding-bottom: 20px; }
+        .cta-final { text-align: center; padding: 90px 24px; background: linear-gradient(135deg, var(--azul), var(--azul-escuro)); color: #fff; }
         .cta-final h2 { font-size: 30px; margin-bottom: 16px; }
-        .cta-final p { color: var(--cinza-texto); margin-bottom: 28px; }
-        footer {
-            text-align: center;
-            padding: 32px 24px;
-            color: var(--cinza-texto);
-            font-size: 14px;
-            border-top: 1px solid #e2e8f0;
-        }
-        @media (max-width: 640px) {
-            .hero h1 { font-size: 30px; }
-            header { flex-direction: column; gap: 16px; }
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .hero {
-            background: linear-gradient(120deg, #eff6ff, #dbeafe, #eff6ff, #f0f9ff);
-            background-size: 300% 300%;
-            animation: gradientMove 12s ease infinite;
-        }
-        .btn-primary {
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-        }
-        .btn-outline {
-            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
-        }
-        .btn-outline:hover {
-            transform: translateY(-2px);
-            background: var(--azul);
-            color: #fff;
-        }
-        .feature-card, .plano-card {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-        }
-        .plano-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .hero h1 {
-            animation: fadeInUp 0.8s ease both;
-        }
-        .hero p {
-            animation: fadeInUp 0.8s ease 0.15s both;
-        }
-        .hero-ctas {
-            animation: fadeInUp 0.8s ease 0.3s both;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .cta-final p { color: #dbeafe; margin-bottom: 28px; }
+        .cta-final .btn-primary { background: #fff; color: var(--azul); box-shadow: none; }
+        .cta-final .btn-primary:hover { background: #f0f9ff; }
+        footer { background: var(--marinho); color: #94a3b8; padding: 40px 24px; text-align: center; font-size: 14px; }
+        footer .login-link { display: inline-block; margin-top: 14px; padding: 8px 20px; border: 1px solid #334155; border-radius: 20px; color: #cbd5e1; text-decoration: none; font-size: 13px; transition: border-color 0.2s ease, color 0.2s ease; }
+        footer .login-link:hover { border-color: var(--azul-claro); color: #fff; }
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; text-align: center; } .hero p { margin-left: auto; margin-right: auto; } .hero-ctas { justify-content: center; } .mockup { max-width: 420px; margin: 0 auto; } }
+        @media (max-width: 640px) { .hero h1 { font-size: 30px; } header { flex-direction: column; gap: 16px; } }
     </style>
 </head>
 <body>
@@ -202,16 +137,56 @@
         <nav>
             <a href="#funcionalidades">Funcionalidades</a>
             <a href="#planos">Planos</a>
-            <a href="{{ url_for('admin_login') }}">Entrar</a>
         </nav>
     </header>
-
     <section class="hero">
-        <h1>Agenda cheia, <span>sem dor de cabeça</span>.</h1>
-        <p>O sistema de agendamento completo para barbearias e salões: agenda online, lembretes automáticos no WhatsApp e controle financeiro em um só lugar.</p>
-        <div class="hero-ctas">
-            <a href="/teste-gratis" class="btn btn-primary">Solicitar teste grátis</a>
-            <a href="/demo" class="btn btn-outline" style="opacity:.85">Ver demonstração</a>
+        <div class="hero-grid">
+            <div>
+                <span class="badge">✨ Teste grátis por 7 dias</span>
+                <h1>Agenda cheia, <span>sem dor de cabeça</span>.</h1>
+                <p>O sistema de agendamento completo para barbearias, salões e estúdios de beleza: agenda online, lembretes automáticos no WhatsApp e controle financeiro em um só lugar.</p>
+                <div class="hero-ctas">
+                    <a href="/teste-gratis" class="btn btn-primary">Solicitar teste grátis</a>
+                </div>
+            </div>
+            <div class="mockup">
+                <div class="mockup-bar"><span></span><span></span><span></span></div>
+                <div class="mockup-body">
+                    <div class="mockup-title">Agenda de hoje</div>
+                    <div class="mockup-stats">
+                        <div class="mockup-stat"><strong>12</strong><span>agendamentos</span></div>
+                        <div class="mockup-stat"><strong>R$ 890</strong><span>faturamento</span></div>
+                        <div class="mockup-stat"><strong>4</strong><span>profissionais</span></div>
+                    </div>
+                    <div class="mockup-row"><div class="mockup-dot"></div><div><div class="linha1"></div><div class="linha2"></div></div><span class="badge-mini">confirmado</span></div>
+                    <div class="mockup-row"><div class="mockup-dot"></div><div><div class="linha1"></div><div class="linha2"></div></div><span class="badge-mini">confirmado</span></div>
+                    <div class="mockup-row"><div class="mockup-dot"></div><div><div class="linha1"></div><div class="linha2"></div></div><span class="badge-mini">confirmado</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divisor">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,30 C300,60 900,0 1200,30 L1200,60 L0,60 Z" fill="#0b1224"></path></svg>
+    </div>
+
+    <section class="destaques">
+        <div class="container">
+            <div class="item"><strong>7 dias</strong><span>de teste grátis, sem compromisso</span></div>
+            <div class="item"><strong>WhatsApp</strong><span>lembretes e confirmações automáticas</span></div>
+            <div class="item"><strong>5 minutos</strong><span>para configurar sua empresa</span></div>
+        </div>
+    </section>
+
+    <section class="como-funciona">
+        <div class="container">
+            <h2>Como funciona</h2>
+            <p>Do cadastro ao primeiro agendamento em poucos passos.</p>
+            <div class="passos">
+                <div class="passo"><div class="numero">1</div><h3>Solicite seu teste grátis</h3><p>Preencha o formulário com os dados do seu negócio.</p></div>
+                <div class="passo"><div class="numero">2</div><h3>Configure em minutos</h3><p>Cadastre serviços, profissionais e horários de funcionamento.</p></div>
+                <div class="passo"><div class="numero">3</div><h3>Compartilhe sua agenda</h3><p>Envie o link para seus clientes agendarem sozinhos.</p></div>
+            </div>
         </div>
     </section>
 
@@ -221,32 +196,32 @@
             <p>Feito para o dia a dia de barbearias, salões e estúdios de beleza.</p>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="icon">📅</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
                     <h3>Agenda online</h3>
                     <p>Clientes marcam horário sozinhos, 24 horas por dia, sem ligação nem WhatsApp manual.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon">💬</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
                     <h3>Lembretes automáticos</h3>
                     <p>Confirmações e lembretes de agendamento enviados direto no WhatsApp do cliente.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon">💰</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
                     <h3>Controle financeiro</h3>
                     <p>Acompanhe faturamento, comissões e relatórios sem precisar de planilha.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon">👥</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
                     <h3>Gestão de equipe</h3>
                     <p>Cada profissional com sua própria agenda e permissões de acesso.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon">🎁</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></div>
                     <h3>Programa de fidelidade</h3>
                     <p>Fidelize clientes com recompensas automáticas por frequência.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="icon">📊</div>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
                     <h3>Relatórios e CRM</h3>
                     <p>Entenda seus clientes e o desempenho do negócio com dados reais.</p>
                 </div>
@@ -261,56 +236,69 @@
                 <div class="plano-card">
                     <h3>Essencial</h3>
                     <div class="preco">R$ 49<small>/mês</small></div>
-                    <ul>
-                        <li>Agenda online</li>
-                        <li>Até 2 usuários</li>
-                        <li>Lembretes no WhatsApp</li>
-                    </ul>
-                    <a href="{{ url_for('admin_login') }}" class="btn btn-outline">Começar agora</a>
+                    <ul><li>Agenda online</li><li>Até 2 usuários</li><li>Lembretes no WhatsApp</li></ul>
+                    <a href="/teste-gratis" class="btn btn-outline">Começar agora</a>
                 </div>
                 <div class="plano-card destaque">
                     <h3>Profissional</h3>
                     <div class="preco">R$ 99<small>/mês</small></div>
-                    <ul>
-                        <li>Tudo do Essencial</li>
-                        <li>Usuários ilimitados</li>
-                        <li>Programa de fidelidade</li>
-                        <li>Relatórios avançados</li>
-                    </ul>
-                    <a href="{{ url_for('admin_login') }}" class="btn btn-primary">Começar agora</a>
+                    <ul><li>Tudo do Essencial</li><li>Usuários ilimitados</li><li>Programa de fidelidade</li><li>Relatórios avançados</li></ul>
+                    <a href="/teste-gratis" class="btn btn-primary">Começar agora</a>
                 </div>
                 <div class="plano-card">
                     <h3>Avançado</h3>
                     <div class="preco">Fale conosco</div>
-                    <ul>
-                        <li>Tudo do Profissional</li>
-                        <li>Múltiplas unidades</li>
-                        <li>Suporte prioritário</li>
-                    </ul>
-                    <a href="#" class="btn btn-outline">Falar com vendas</a>
+                    <ul><li>Tudo do Profissional</li><li>Múltiplas unidades</li><li>Suporte prioritário</li></ul>
+                    <a href="/teste-gratis" class="btn btn-outline">Falar com vendas</a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq reveal">
+        <div class="container">
+            <h2>Perguntas frequentes</h2>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Preciso pagar algo para testar?</summary>
+                    <p>Não. O teste grátis dura 7 dias e não pede cartão de crédito nem qualquer forma de pagamento.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>O sistema funciona para outros tipos de negócio, além de barbearia?</summary>
+                    <p>Sim! Além de barbearias, o Bytech Agenda atende salões de beleza, estúdios de estética e outros negócios baseados em agendamento.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Como funciona o envio de lembretes no WhatsApp?</summary>
+                    <p>O sistema envia confirmações e lembretes automáticos para seus clientes, reduzindo faltas sem que você precise mandar mensagem manualmente.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Posso cancelar quando quiser?</summary>
+                    <p>Sim, não há fidelidade nem multa. Você pode cancelar sua assinatura a qualquer momento.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Meus dados e os dos meus clientes ficam seguros?</summary>
+                    <p>Sim. Utilizamos conexão criptografada (HTTPS) e boas práticas de segurança para proteger as informações da sua empresa e dos seus clientes.</p>
+                </details>
             </div>
         </div>
     </section>
 
     <section class="cta-final reveal">
         <h2>Pronto para organizar sua agenda?</h2>
-        <p>Veja o sistema funcionando com um exemplo real de barbearia.</p>
+        <p>Comece agora com 7 dias de teste grátis, sem compromisso.</p>
         <a href="/teste-gratis" class="btn btn-primary">Solicitar teste grátis</a>
     </section>
 
     <footer>
         © 2026 Bytech Agenda. Todos os direitos reservados.
+        <br>
+        <a href="{{ url_for('admin_login') }}" class="login-link">Já é cliente? Acesse sua conta</a>
     </footer>
 
     <script>
         const reveals = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
         }, { threshold: 0.15 });
         reveals.forEach(el => observer.observe(el));
     </script>
