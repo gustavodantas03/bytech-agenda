@@ -40,3 +40,10 @@
 .wa-pairing-code{font-size:2.4rem;letter-spacing:.14em;color:#0f172a}
 .wa-pairing p{margin-top:10px}
 @media(max-width:560px){.wa-connect-tabs{flex-direction:column}}
+
+/* Corrige "vazamento" horizontal em telas pequenas: itens do grid da página
+   de WhatsApp (como as abas com rolagem própria) não devem forçar o grid
+   pai a crescer além da largura da tela. */
+.whatsapp-page > * {
+    min-width: 0;
+}

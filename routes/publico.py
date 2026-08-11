@@ -367,6 +367,20 @@ def teste_gratis():
     conn.close()
 
     try:
+        from services.email_service import enviar_email_lead
+        corpo_email = (
+            f"Nome: {nome}\n"
+            f"Negócio: {nome_negocio}\n"
+            f"Telefone: {telefone}\n"
+            f"Email: {email or 'não informado'}\n"
+            f"Segmento: {segmento or 'não informado'}\n"
+            f"Mensagem: {mensagem or '-'}"
+        )
+        enviar_email_lead("Novo pedido de teste grátis - Bytech Agenda", corpo_email)
+    except Exception:
+        pass
+
+    try:
         from services.evolution_api import (
             cliente_evolution_para_config,
             garantir_configuracao_empresa,
