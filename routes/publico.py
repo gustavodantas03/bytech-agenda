@@ -415,3 +415,8 @@ def teste_gratis():
         pass
 
     return render_template("teste_gratis.html", sucesso=True)
+
+
+@app.route("/politica-de-privacidade")
+def politica_privacidade():
+    return render_template("politica_privacidade.html")

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade | Bytech Agenda</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a; line-height: 1.7; background: #f8fafc; }
+        .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+        a.voltar { color: #2563eb; text-decoration: none; font-weight: 600; font-size: 14px; }
+        h1 { font-size: 30px; margin: 20px 0 6px; }
+        .atualizado { color: #64748b; font-size: 14px; margin-bottom: 32px; }
+        h2 { font-size: 19px; margin: 32px 0 10px; color: #0f172a; }
+        p, li { color: #334155; font-size: 15px; margin-bottom: 10px; }
+        ul { padding-left: 22px; margin-bottom: 14px; }
+        .card { background: #fff; border-radius: 16px; padding: 36px; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
+        .contato { background: #eff6ff; border-radius: 12px; padding: 18px 20px; margin-top: 24px; }
+        .contato strong { display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="voltar">← Voltar para o site</a>
+        <h1>Política de Privacidade</h1>
+        <p class="atualizado">Última atualização: 11 de agosto de 2026</p>
+
+        <div class="card">
+            <p>Esta Política de Privacidade descreve como o <strong>Bytech Agenda</strong> coleta, usa, armazena e protege os dados pessoais de quem utiliza o sistema — tanto os estabelecimentos contratantes quanto os clientes finais que realizam agendamentos. Ela está em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).</p>
+
+            <h2>1. Quem é o responsável pelos seus dados</h2>
+            <p>O Bytech Agenda é operado por Gustavo Dantas, pessoa física responsável pelo tratamento dos dados coletados através da plataforma. Para qualquer dúvida ou solicitação relacionada aos seus dados, entre em contato pelo e-mail <strong>comercial@bytechce.com.br</strong>.</p>
+
+            <h2>2. Quais dados coletamos</h2>
+            <p>Dependendo de como você usa o sistema, podemos coletar:</p>
+            <ul>
+                <li><strong>Estabelecimentos (donos e equipe):</strong> nome, e-mail, telefone, endereço do negócio, dados de login (usuário e senha com hash criptografado).</li>
+                <li><strong>Clientes finais (quem agenda um horário):</strong> nome, telefone/WhatsApp, e histórico de agendamentos realizados.</li>
+                <li><strong>Comunicações via WhatsApp:</strong> mensagens trocadas para confirmação, lembrete e cancelamento de agendamentos.</li>
+                <li><strong>Dados de uso do site:</strong> informações técnicas básicas de acesso (como endereço IP e navegador), coletadas automaticamente pelo servidor por motivos de segurança.</li>
+            </ul>
+            <h2>3. Para que usamos seus dados</h2>
+            <ul>
+                <li>Viabilizar o agendamento de serviços entre estabelecimentos e seus clientes.</li>
+                <li>Enviar confirmações, lembretes e notificações relacionadas aos agendamentos via WhatsApp.</li>
+                <li>Permitir o acesso e gerenciamento do painel administrativo pelos estabelecimentos.</li>
+                <li>Melhorar a seguranca e o funcionamento da plataforma.</li>
+                <li>Cumprir obrigacoes legais, quando aplicavel.</li>
+            </ul>
+
+            <h2>4. Com quem compartilhamos seus dados</h2>
+            <p>Nao vendemos nem alugamos dados pessoais a terceiros. Compartilhamos informacoes apenas com:</p>
+            <ul>
+                <li><strong>Evolution API:</strong> servico tecnico utilizado para envio de mensagens via WhatsApp, necessario para o funcionamento das automacoes de comunicacao.</li>
+                <li><strong>Provedores de infraestrutura:</strong> como Amazon Web Services (AWS), responsaveis por hospedar o sistema com seguranca.</li>
+            </ul>
+
+            <h2>5. Por quanto tempo guardamos seus dados</h2>
+            <p>Os dados sao mantidos enquanto sua conta ou a do estabelecimento estiver ativa, ou pelo tempo necessario para cumprir finalidades legais e contratuais. Voce pode solicitar a exclusao dos seus dados a qualquer momento, conforme descrito na secao 7.</p>
+
+            <h2>6. Seguranca dos dados</h2>
+            <p>Adotamos medidas tecnicas para proteger seus dados, incluindo conexao criptografada (HTTPS), senhas armazenadas com hash criptografico, protecao contra tentativas de acesso indevido e backups periodicos do banco de dados.</p>
+
+            <h2>7. Seus direitos como titular dos dados</h2>
+            <p>De acordo com a LGPD, voce tem direito a:</p>
+            <ul>
+                <li>Confirmar a existencia de tratamento de dados sobre voce;</li>
+                <li>Acessar seus dados;</li>
+                <li>Corrigir dados incompletos, inexatos ou desatualizados;</li>
+                <li>Solicitar a exclusao dos seus dados, quando aplicavel;</li>
+                <li>Revogar o consentimento dado anteriormente;</li>
+                <li>Solicitar informacoes sobre com quem compartilhamos seus dados.</li>
+            </ul>
+
+            <h2>8. Cookies</h2>
+            <p>Nosso site utiliza apenas cookies essenciais ao funcionamento do sistema (como manter voce conectado apos o login). Nao utilizamos cookies de rastreamento publicitario.</p>
+
+            <h2>9. Alteracoes nesta politica</h2>
+            <p>Esta politica pode ser atualizada periodicamente para refletir mudancas no sistema ou na legislacao. A data da ultima atualizacao estara sempre indicada no topo desta pagina.</p>
+
+            <div class="contato">
+                <strong>Duvidas ou solicitacoes sobre seus dados?</strong>
+                Entre em contato: comercial@bytechce.com.br
+            </div>
+        </div>
+    </div>
+</body>
+</html>
