@@ -126,6 +126,31 @@
         .reveal.visible { opacity: 1; transform: translateY(0); }
         @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; text-align: center; } .hero p { margin-left: auto; margin-right: auto; } .hero-ctas { justify-content: center; } .mockup { max-width: 420px; margin: 0 auto; } }
         @media (max-width: 640px) { .hero h1 { font-size: 30px; } header { flex-direction: column; gap: 16px; } }
+
+        .galeria { padding: 80px 24px; background: var(--cinza-claro); }
+        .galeria h2 { text-align: center; font-size: 32px; margin-bottom: 12px; }
+        .galeria > .container > p { text-align: center; color: var(--cinza-texto); margin-bottom: 48px; }
+        .galeria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+        .galeria-item {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .galeria-item:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14); }
+        .galeria-item img { width: 100%; display: block; }
+        .galeria-item span {
+            display: block;
+            padding: 14px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--preto);
+        }
     </style>
 </head>
 <body>
@@ -186,6 +211,31 @@
                 <div class="passo"><div class="numero">1</div><h3>Solicite seu teste grátis</h3><p>Preencha o formulário com os dados do seu negócio.</p></div>
                 <div class="passo"><div class="numero">2</div><h3>Configure em minutos</h3><p>Cadastre serviços, profissionais e horários de funcionamento.</p></div>
                 <div class="passo"><div class="numero">3</div><h3>Compartilhe sua agenda</h3><p>Envie o link para seus clientes agendarem sozinhos.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="galeria">
+        <div class="container">
+            <h2>Veja o sistema por dentro</h2>
+            <p>Feito para o dia a dia da sua empresa, sem complicação.</p>
+            <div class="galeria-grid">
+                <div class="galeria-item">
+                    <img src="{{ url_for('static', filename='img/screenshot-dashboard-menu.png') }}" alt="Dashboard do sistema">
+                    <span>Dashboard completo</span>
+                </div>
+                <div class="galeria-item">
+                    <img src="{{ url_for('static', filename='img/screenshot-atendimentos.png') }}" alt="Tela de atendimentos do dia">
+                    <span>Atendimentos do dia</span>
+                </div>
+                <div class="galeria-item">
+                    <img src="{{ url_for('static', filename='img/screenshot-agenda.png') }}" alt="Agenda do sistema">
+                    <span>Agenda organizada</span>
+                </div>
+                <div class="galeria-item">
+                    <img src="{{ url_for('static', filename='img/screenshot-menu.png') }}" alt="Menu e plano do sistema">
+                    <span>Gestão do seu plano</span>
+                </div>
             </div>
         </div>
     </section>

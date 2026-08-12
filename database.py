@@ -7,6 +7,12 @@ Desenvolvimento: SQLite como fallback para facilitar testes locais.
 from __future__ import annotations
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+from dotenv import load_dotenv
+
+load_dotenv()
 import re
 import sqlite3
 from pathlib import Path

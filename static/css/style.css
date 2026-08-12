@@ -1441,11 +1441,11 @@ label {
 }
 
 .login-card form label:not(:first-child) {
-    margin-top: 16px;
+    margin-top: 22px;
 }
 
 .login-card form .btn {
-    margin-top: 22px;
+    margin-top: 32px;
 }
 
 /* ==================================================

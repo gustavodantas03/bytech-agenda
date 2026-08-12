@@ -117,9 +117,9 @@ def gerar_lembretes(agora: datetime | None = None) -> dict:
             ).fetchone()
             janelas = []
             if auto["lembrete_24h_ativo"]:
-                janelas.append(("lembrete_24h", agora + timedelta(hours=23, minutes=55), agora + timedelta(hours=24, minutes=5)))
+                janelas.append(("lembrete_24h", agora + timedelta(minutes=5), agora + timedelta(hours=24, minutes=5)))
             if auto["lembrete_2h_ativo"]:
-                janelas.append(("lembrete_2h", agora + timedelta(hours=1, minutes=55), agora + timedelta(hours=2, minutes=5)))
+                janelas.append(("lembrete_2h", agora + timedelta(minutes=5), agora + timedelta(hours=2, minutes=5)))
 
             for tipo, inicio, fim in janelas:
                 itens = conn.execute(
