@@ -137,6 +137,68 @@ def gerar_lembretes(agora: datetime | None = None) -> dict:
                         criados += 1
                     else:
                         ignorados += 1
+
+            if auto["aniversario_ativo"]:
+                hoje_mm_dd = agora.strftime("%m-%d")
+                clientes_aniversario = conn.execute(
+                    """
+                    SELECT id, nome, telefone, data_nascimento
+                    FROM clientes
+                    WHERE empresa_id=?
+                      AND ativo=1
+                      AND data_nascimento IS NOT NULL
+                      AND substr(data_nascimento, 6, 5) = ?
+                    """,
+                    (empresa_id, hoje_mm_dd),
+                ).fetchall()
+                for cliente in clientes_aniversario:
+                    ja_enviado = conn.execute(
+                        """
+                        SELECT 1 FROM whatsapp_fila
+                        WHERE empresa_id=? AND cliente_id=? AND tipo='aniversario'
+                          AND date(criado_em) = date(?)
+                        """,
+                        (empresa_id, cliente["id"], agora.strftime("%Y-%m-%d")),
+                    ).fetchone()
+                    if ja_enviado:
+                        ignorados += 1
+                        continue
+
+                    modelo = conn.execute(
+                        "SELECT * FROM whatsapp_modelos WHERE empresa_id=? AND tipo='aniversario' AND ativo=1",
+                        (empresa_id,),
+                    ).fetchone()
+                    empresa_nome = conn.execute(
+                        "SELECT nome FROM empresas WHERE id=?", (empresa_id,)
+                    ).fetchone()
+                    if not modelo or not cliente["telefone"]:
+                        ignorados += 1
+                        continue
+
+                    mensagem = renderizar_modelo(modelo["mensagem"], {
+                        "nome": cliente["nome"],
+                        "empresa": empresa_nome["nome"] if empresa_nome else "",
+                    })
+                    config = conn.execute(
+                        "SELECT max_tentativas FROM whatsapp_configuracoes WHERE empresa_id=?",
+                        (empresa_id,),
+                    ).fetchone()
+                    conn.execute(
+                        """
+                        INSERT INTO whatsapp_fila
+                        (empresa_id, agendamento_id, cliente_id, tipo, telefone, mensagem,
+                         status, max_tentativas, agendado_para)
+                        VALUES (?, NULL, ?, 'aniversario', ?, ?, 'pendente', ?, ?)
+                        """,
+                        (
+                            empresa_id, cliente["id"],
+                            normalizar_numero_whatsapp(cliente["telefone"]),
+                            mensagem, int(config["max_tentativas"] or 3),
+                            agora.strftime("%Y-%m-%d %H:%M:%S"),
+                        ),
+                    )
+                    conn.commit()
+                    criados += 1
         return {"criados": criados, "ignorados": ignorados}
     finally:
         conn.close()

@@ -334,7 +334,7 @@ def admin_clientes():
         WHERE {where_sql}
         GROUP BY c.id
         ORDER BY COALESCE(c.ativo,1) DESC,
-                 CASE WHEN proximo_agendamento IS NOT NULL THEN 0 ELSE 1 END,
+                 CASE WHEN MIN(CASE WHEN a.status IN ('agendado','confirmado') AND CAST(a.data || ' ' || a.hora AS timestamp) >= CURRENT_TIMESTAMP THEN a.data || ' ' || a.hora END) IS NOT NULL THEN 0 ELSE 1 END,
                  proximo_agendamento,
                  c.recompensas_disponiveis DESC,
                  c.pontos_fidelidade DESC,
@@ -544,11 +544,13 @@ def admin_perfil_cliente(cliente_id):
         f"""
         SELECT a.*, f.nome AS profissional_nome, s.nome AS servico_principal,
                COALESCE((
-                   SELECT GROUP_CONCAT(s2.nome, ', ')
-                   FROM agendamento_servicos axs
-                   JOIN servicos s2 ON s2.id = axs.servico_id
-                   WHERE axs.agendamento_id = a.id
-                   ORDER BY axs.ordem
+                   SELECT GROUP_CONCAT(t.nome, ', ') FROM (
+                       SELECT s2.nome
+                       FROM agendamento_servicos axs
+                       JOIN servicos s2 ON s2.id = axs.servico_id
+                       WHERE axs.agendamento_id = a.id
+                       ORDER BY axs.ordem
+                   ) t
                ), s.nome) AS servicos_nomes
         FROM agendamentos a
         LEFT JOIN funcionarios f ON f.id = a.funcionario_id

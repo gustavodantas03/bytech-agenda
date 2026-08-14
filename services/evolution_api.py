@@ -21,7 +21,7 @@ MODELOS_PADRAO = {
         "Confirmação de agendamento",
         "Olá {{nome}}! 👋\n\nRecebemos seu agendamento na {{empresa}}.\n\n"
         "📅 {{data}}\n⏰ {{hora}}\n✨ {{servico}}\n👤 {{profissional}}\n\n"
-        "Responda com:\n1️⃣ Confirmar\n2️⃣ Reagendar\n3️⃣ Cancelar",
+        "Vamos te lembrar novamente perto do horário. Até lá!",
     ),
     "lembrete_24h": (
         "Lembrete de 24 horas",
@@ -31,7 +31,8 @@ MODELOS_PADRAO = {
     "lembrete_2h": (
         "Lembrete de 2 horas",
         "Olá {{nome}}! Seu atendimento na {{empresa}} começa às {{hora}}. "
-        "Estamos esperando por você!",
+        "Estamos esperando por você!\n\n"
+        "Responda com:\n1️⃣ Confirmar\n2️⃣ Reagendar",
     ),
     "cancelamento": (
         "Cancelamento",
@@ -42,6 +43,12 @@ MODELOS_PADRAO = {
         "Pós-atendimento",
         "Olá {{nome}}! Obrigado por escolher a {{empresa}}. Esperamos que tenha "
         "gostado do atendimento. 😊",
+    ),
+    "aniversario": (
+        "Aniversário",
+        "Olá {{nome}}! 🎉🎂\n\nA equipe da {{empresa}} deseja um feliz aniversário! "
+        "Que tal comemorar com a gente? Estamos com condições especiais essa semana "
+        "para você. Esperamos por você! 🎁",
     ),
 }
 

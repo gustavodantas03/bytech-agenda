@@ -45,23 +45,43 @@ def _enviar(conn, config, telefone: str, mensagem: str, agendamento_id=None, tip
         VALUES (?,?,?,?,?,?,?,?,CASE WHEN ? THEN CURRENT_TIMESTAMP ELSE NULL END)""",
         (config["empresa_id"], agendamento_id, tipo, telefone, mensagem,
          "enviado" if resultado.ok else "erro", resultado.error,
-         json.dumps(resultado.data, ensure_ascii=False), 1 if resultado.ok else 0),
+         json.dumps(resultado.data, ensure_ascii=False), resultado.ok),
     )
     return resultado
 
 
+def _variacoes_nono_digito(numero: str) -> list[str]:
+    """Gera variações do número com e sem o 9º dígito (celulares no Brasil),
+    pois o WhatsApp nem sempre envia esse dígito de forma consistente."""
+    variacoes = {numero}
+    # DDD (2 dígitos) + resto do número, sem código do país
+    if len(numero) == 11 and numero[2] == "9":
+        # Tem o 9º dígito -> gera variação sem ele
+        variacoes.add(numero[:2] + numero[3:])
+    elif len(numero) == 10:
+        # Não tem o 9º dígito -> gera variação com ele
+        variacoes.add(numero[:2] + "9" + numero[2:])
+    return list(variacoes)
+
+
 def _agendamento_ativo(conn, empresa_id: int, telefone: str):
     local = telefone[2:] if telefone.startswith("55") else telefone
+    candidatos = set(_variacoes_nono_digito(telefone))
+    candidatos.update(_variacoes_nono_digito(local))
+    candidatos.add(telefone)
+    candidatos.add(local)
+    placeholders = ",".join("?" for _ in candidatos)
     return conn.execute(
-        """SELECT a.*, s.nome AS servico_nome, f.nome AS profissional_nome
+        f"""SELECT a.*, s.nome AS servico_nome, f.nome AS profissional_nome
         FROM agendamentos a
         JOIN servicos s ON s.id=a.servico_id
         LEFT JOIN funcionarios f ON f.id=a.funcionario_id
         WHERE a.empresa_id=?
-          AND REPLACE(REPLACE(REPLACE(REPLACE(a.cliente_telefone,'(',''),')',''),'-',''),' ','') IN (?,?)
+          AND REPLACE(REPLACE(REPLACE(REPLACE(a.cliente_telefone,'(',''),')',''),'-',''),' ','') IN ({placeholders})
           AND a.status NOT IN ('cancelado','finalizado','concluido','faltou')
+          AND CAST(a.data || ' ' || a.hora AS timestamp) >= CAST(? AS timestamp)
         ORDER BY a.data DESC, a.hora DESC, a.id DESC LIMIT 1""",
-        (empresa_id, telefone, local),
+        (empresa_id, *candidatos, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
     ).fetchone()
 
 
@@ -218,20 +238,36 @@ def processar_webhook(payload: dict, instance_name: str = "") -> dict:
                 _enviar(conn,config,meta["telefone"],"Horário indisponível. Escolha um dos horários enviados.",agendamento["id"])
                 conn.commit(); return {"processado":True,"acao":"horario_invalido"}
             conn.execute("UPDATE agendamentos SET data=?,hora=?,status='confirmado' WHERE id=? AND empresa_id=?",(dados["data"],hora,agendamento["id"],config["empresa_id"]))
+            # Remove lembretes pendentes/já enviados do horário antigo, para que
+            # novos lembretes (24h/2h) sejam gerados com base na nova data/hora.
+            conn.execute(
+                "DELETE FROM whatsapp_fila WHERE agendamento_id=? AND tipo IN ('lembrete_24h','lembrete_2h')",
+                (agendamento["id"],),
+            )
             _salvar_sessao(conn,config["empresa_id"],meta["telefone"],agendamento["id"],"FINALIZADO",{})
             _enviar(conn,config,meta["telefone"],f"Reagendamento concluído! ✅\nNova data: {datetime.strptime(dados['data'],'%Y-%m-%d').strftime('%d/%m/%Y')}\nHorário: {hora}",agendamento["id"],"reagendamento_confirmado")
             conn.commit(); return {"processado":True,"acao":"reagendado"}
 
-        if resposta in {"1","confirmar","confirmo"}:
+        palavras_confirmar = {"1", "confirmar", "confirmo", "confirmado", "confirma", "ok", "sim"}
+        palavras_reagendar = {"2", "reagendar", "remarcar", "reagenda", "remarca", "mudar", "trocar", "alterar"}
+        palavras_cancelar = {"3", "cancelar", "cancela", "cancelado"}
+
+        def _contem_palavra(texto: str, palavras: set) -> bool:
+            if texto in palavras:
+                return True
+            tokens = set(texto.replace(",", " ").replace(".", " ").split())
+            return bool(tokens & palavras)
+
+        if _contem_palavra(resposta, palavras_confirmar):
             conn.execute("UPDATE agendamentos SET status='confirmado' WHERE id=? AND empresa_id=?",(agendamento["id"],config["empresa_id"]))
             _salvar_sessao(conn,config["empresa_id"],meta["telefone"],agendamento["id"],"FINALIZADO",{})
             _enviar(conn,config,meta["telefone"],"Obrigado! Seu agendamento está confirmado. ✅",agendamento["id"],"confirmacao_recebida")
             acao="confirmado"
-        elif resposta in {"2","reagendar"}:
+        elif _contem_palavra(resposta, palavras_reagendar):
             _salvar_sessao(conn,config["empresa_id"],meta["telefone"],agendamento["id"],"ESCOLHENDO_DATA",{})
             _enviar(conn,config,meta["telefone"],"Claro! Envie a nova data no formato DD/MM, por exemplo 05/08.",agendamento["id"],"inicio_reagendamento")
             acao="reagendamento_iniciado"
-        elif resposta in {"3","cancelar"}:
+        elif _contem_palavra(resposta, palavras_cancelar):
             conn.execute("UPDATE agendamentos SET status='cancelado' WHERE id=? AND empresa_id=?",(agendamento["id"],config["empresa_id"]))
             _salvar_sessao(conn,config["empresa_id"],meta["telefone"],agendamento["id"],"FINALIZADO",{})
             _enviar(conn,config,meta["telefone"],"Seu agendamento foi cancelado. O horário já foi liberado. Esperamos atendê-lo em breve.",agendamento["id"],"cancelamento_recebido")
