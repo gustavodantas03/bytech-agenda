@@ -244,6 +244,14 @@ def atualizar_status_agendamento(agendamento_id):
     )
     conn.commit()
 
+    if novo_status in ("finalizado", "concluido"):
+        try:
+            from services.communication_queue import enfileirar_mensagem_agendamento
+            enfileirar_mensagem_agendamento(empresa_id, agendamento_id, "pos_atendimento")
+        except Exception:
+            # A indisponibilidade do WhatsApp nunca deve impedir a atualização do status.
+            pass
+
     if novo_status in ("cancelado", "confirmado"):
         from services.evolution_api import enviar_mensagem_agendamento
         tipo_mensagem = "cancelamento" if novo_status == "cancelado" else "confirmacao"
