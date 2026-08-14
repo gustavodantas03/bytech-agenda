@@ -25,6 +25,23 @@ def _texto_payload(payload: dict) -> str:
     ).strip()
 
 
+def _tipo_midia_payload(payload: dict) -> str | None:
+    """Identifica se a mensagem é de mídia (áudio, imagem, etc.), sem texto."""
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    message = data.get("message") if isinstance(data.get("message"), dict) else {}
+    mapa = {
+        "audioMessage": "áudio",
+        "imageMessage": "imagem",
+        "videoMessage": "vídeo",
+        "documentMessage": "documento",
+        "stickerMessage": "figurinha",
+    }
+    for chave, rotulo in mapa.items():
+        if chave in message:
+            return rotulo
+    return None
+
+
 def _metadados_payload(payload: dict) -> dict:
     data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
     key = data.get("key") if isinstance(data.get("key"), dict) else {}
@@ -163,11 +180,23 @@ def _mensagem_direcionar_agendamento(empresa) -> str:
     )
 
 
+def _mensagem_midia_nao_suportada(empresa, tipo_midia: str) -> str:
+    nome_empresa = (empresa["nome"] if empresa else "") or "nosso estabelecimento"
+    link = _link_agendamento(empresa)
+    aviso = f"Recebemos seu {tipo_midia}! No momento ainda não conseguimos processar esse tipo de mensagem automaticamente."
+    if link:
+        return f"{aviso}\n\nPara marcar um horário na {nome_empresa}, acesse:\n{link}"
+    return f"{aviso}\n\nEntre em contato com a {nome_empresa} para agendar."
+
+
 def processar_webhook(payload: dict, instance_name: str = "") -> dict:
     meta = _metadados_payload(payload)
     texto = _texto_payload(payload)
+    tipo_midia = _tipo_midia_payload(payload) if not texto else None
     evento = str(payload.get("event") or payload.get("type") or "").upper()
-    if meta["from_me"] or not texto or not meta["telefone"] or "@g.us" in meta["remote"]:
+    if meta["from_me"] or not meta["telefone"] or "@g.us" in meta["remote"]:
+        return {"ignorado": True}
+    if not texto and not tipo_midia:
         return {"ignorado": True}
 
     conn=get_connection()
@@ -179,6 +208,28 @@ def processar_webhook(payload: dict, instance_name: str = "") -> dict:
         if not config:
             return {"erro":"Instância não vinculada.","status":404}
         event_id=meta["event_id"] or f"{config['empresa_id']}:{meta['telefone']}:{hash(json.dumps(payload,sort_keys=True,default=str))}"
+
+        if tipo_midia:
+            try:
+                conn.execute(
+                    """INSERT INTO whatsapp_webhook_eventos
+                    (empresa_id,event_id,evento,telefone,payload_json) VALUES (?,?,?,?,?)""",
+                    (config["empresa_id"],event_id,evento,meta["telefone"],json.dumps(payload,ensure_ascii=False)),
+                )
+                conn.commit()
+            except DatabaseIntegrityError:
+                conn.rollback()
+                return {"duplicado":True}
+            empresa = conn.execute(
+                "SELECT nome, slug FROM empresas WHERE id=?", (config["empresa_id"],)
+            ).fetchone()
+            _enviar(
+                conn, config, meta["telefone"],
+                _mensagem_midia_nao_suportada(empresa, tipo_midia),
+                tipo="midia_nao_suportada",
+            )
+            conn.commit()
+            return {"processado": True, "acao": "midia_recebida", "tipo_midia": tipo_midia}
         try:
             conn.execute(
                 """INSERT INTO whatsapp_webhook_eventos
