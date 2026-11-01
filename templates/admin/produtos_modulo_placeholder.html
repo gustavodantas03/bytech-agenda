@@ -1,0 +1,28 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom:20px;">
+    <h1 style="margin-bottom:6px;">{{ titulo }}</h1>
+    <p style="margin:0;color:#64748b;">
+        {{ descricao }}
+    </p>
+</div>
+
+{% include 'admin/produtos_nav.html' %}
+
+<div style="
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:28px;
+">
+    <strong>{{ titulo }}</strong>
+    <p style="margin:8px 0 0;color:#64748b;">
+        Esta área será configurada na próxima etapa.
+    </p>
+</div>
+
+{% endblock %}

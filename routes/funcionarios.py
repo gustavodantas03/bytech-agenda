@@ -1,6 +1,9 @@
 """Rotas do módulo funcionarios."""
 
 from core import *  # noqa: F401,F403
+from uuid import uuid4
+from werkzeug.utils import secure_filename
+import os
 
 @app.route("/admin/funcionarios", methods=["GET", "POST"])
 @login_required
@@ -34,10 +37,32 @@ def admin_funcionarios():
             ui_segmento["cargo_padrao"],
         ).strip() or ui_segmento["cargo_padrao"]
 
+        arquivo_foto = request.files.get("foto")
+        foto_nome = None
+
+        if arquivo_foto and arquivo_foto.filename:
+            if not arquivo_permitido(arquivo_foto.filename):
+                conn.close()
+                flash(
+                    "Formato inválido. Envie uma imagem PNG, JPG, JPEG ou WEBP.",
+                    "erro",
+                )
+                return redirect(url_for("admin_funcionarios"))
+
+            extensao = secure_filename(
+                arquivo_foto.filename
+            ).rsplit(".", 1)[1].lower()
+
+            foto_nome = f"profissional_{empresa_id}_{uuid4().hex}.{extensao}"
+            pasta_fotos = app.config["PROFISSIONAIS_UPLOAD_FOLDER"]
+            os.makedirs(pasta_fotos, exist_ok=True)
+            caminho_foto = os.path.join(pasta_fotos, foto_nome)
+            arquivo_foto.save(caminho_foto)
+
         if nome:
             conn.execute(
-                "INSERT INTO funcionarios (empresa_id, nome, cargo) VALUES (?, ?, ?)",
-                (empresa_id, nome, cargo),
+                "INSERT INTO funcionarios (empresa_id, nome, cargo, foto) VALUES (?, ?, ?, ?)",
+                (empresa_id, nome, cargo, foto_nome),
             )
             conn.commit()
             flash("Funcionário cadastrado.", "sucesso")
@@ -81,12 +106,39 @@ def editar_funcionario(funcionario_id):
             "cargo",
             ui_segmento["cargo_padrao"],
         ).strip() or ui_segmento["cargo_padrao"]
+
+        foto_nome = funcionario["foto"]
+
+        arquivo_foto = request.files.get("foto")
+
+        if arquivo_foto and arquivo_foto.filename:
+            if not arquivo_permitido(arquivo_foto.filename):
+                conn.close()
+                flash(
+                    "Formato inválido. Envie uma imagem PNG, JPG, JPEG ou WEBP.",
+                    "erro",
+                )
+                return redirect(
+                    url_for("editar_funcionario", funcionario_id=funcionario_id)
+                )
+
+            extensao = secure_filename(
+                arquivo_foto.filename
+            ).rsplit(".", 1)[1].lower()
+
+            foto_nome = f"profissional_{empresa_id}_{uuid4().hex}.{extensao}"
+            pasta_fotos = app.config["PROFISSIONAIS_UPLOAD_FOLDER"]
+            os.makedirs(pasta_fotos, exist_ok=True)
+            caminho_foto = os.path.join(pasta_fotos, foto_nome)
+            arquivo_foto.save(caminho_foto)
+
         conn.execute(
-            "UPDATE funcionarios SET nome = ?, cargo = ? WHERE id = ? AND empresa_id = ?",
-            (nome, cargo, funcionario_id, empresa_id),
+            "UPDATE funcionarios SET nome = ?, cargo = ?, foto = ? WHERE id = ? AND empresa_id = ?",
+            (nome, cargo, foto_nome, funcionario_id, empresa_id),
         )
         conn.commit()
         conn.close()
+
         flash("Funcionário atualizado.", "sucesso")
         return redirect(url_for("admin_funcionarios"))
 

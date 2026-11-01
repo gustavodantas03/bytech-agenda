@@ -1,0 +1,237 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Produtos{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/produtos-mobile.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-premium.css') }}?v=1">
+
+<header class="estoque-hero">
+    <div class="estoque-hero-content">
+        <a class="estoque-back" href="{{ url_for('cadastro_produtos') }}">
+            ← Ir para cadastro de Produtos
+        </a>
+        <span class="estoque-eyebrow">VISÃO GERAL</span>
+        <h1>Produtos</h1>
+        <p>Visão geral do estoque e das movimentações.</p>
+    </div>
+</header>
+
+{% include 'admin/produtos_nav.html' %}
+
+<div class="produtos-dashboard-kpis" style="
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px;
+    margin-bottom:24px;
+">
+
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;">
+        <span style="font-size:13px;color:#64748b;font-weight:600;">
+            Produtos ativos
+        </span>
+        <div style="font-size:28px;font-weight:800;margin-top:8px;">
+            {{ resumo.produtos_ativos or 0 }}
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;">
+        <span style="font-size:13px;color:#64748b;font-weight:600;">
+            Unidades em estoque
+        </span>
+        <div style="font-size:28px;font-weight:800;margin-top:8px;">
+            {{ ('%g'|format((resumo.unidades_estoque or 0)|float))|replace('.', ',') }}
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #f59e0b;border-radius:14px;padding:20px;">
+        <span style="font-size:13px;color:#92400e;font-weight:600;">
+            Estoque baixo
+        </span>
+        <div style="font-size:28px;font-weight:800;margin-top:8px;color:#92400e;">
+            {{ resumo.estoque_baixo or 0 }}
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #ef4444;border-radius:14px;padding:20px;">
+        <span style="font-size:13px;color:#b91c1c;font-weight:600;">
+            Sem estoque
+        </span>
+        <div style="font-size:28px;font-weight:800;margin-top:8px;color:#b91c1c;">
+            {{ resumo.sem_estoque or 0 }}
+        </div>
+    </div>
+
+</div>
+
+
+<div class="produtos-dashboard-paineis" style="
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);
+    gap:20px;
+">
+
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;">
+
+        <h2 style="font-size:18px;margin:0 0 16px;">
+            Produtos que precisam de atenção
+        </h2>
+
+        {% for produto in produtos_atencao %}
+
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:12px;
+                padding:12px 0;
+                border-bottom:1px solid #f1f5f9;
+            ">
+
+                <div>
+                    <strong style="display:block;">
+                        {{ produto.nome }}
+                    </strong>
+
+                    <span style="font-size:12px;color:#64748b;">
+                        {% if produto.categoria_nome %}
+                            {{ produto.categoria_nome }} ·
+                        {% endif %}
+                        Mínimo: {{ produto.estoque_minimo }}
+                    </span>
+                </div>
+
+                <div style="text-align:right;">
+
+                    <strong>
+                        {{ produto.estoque }}
+                    </strong>
+
+                    {% if produto.estoque <= 0 %}
+                        <div style="font-size:11px;color:#b91c1c;font-weight:700;">
+                            SEM ESTOQUE
+                        </div>
+                    {% else %}
+                        <div style="font-size:11px;color:#92400e;font-weight:700;">
+                            ESTOQUE BAIXO
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div style="
+                padding:24px;
+                text-align:center;
+                background:#f8fafc;
+                border-radius:10px;
+                color:#64748b;
+            ">
+                Nenhum produto precisa de atenção.
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;">
+
+        <h2 style="font-size:18px;margin:0 0 16px;">
+            Últimas movimentações
+        </h2>
+
+        {% for movimento in movimentacoes %}
+
+            <div style="
+                display:grid;
+                grid-template-columns:minmax(0,1fr) auto;
+                gap:12px;
+                padding:12px 0;
+                border-bottom:1px solid #f1f5f9;
+            ">
+
+                <div>
+
+                    <strong style="display:block;">
+                        {{ movimento.produto_nome }}
+                    </strong>
+
+                    <span style="font-size:12px;color:#64748b;">
+                        {{ movimento.motivo or 'Sem motivo informado' }}
+                    </span>
+
+                    <div style="font-size:11px;color:#94a3b8;margin-top:3px;">
+                        {{ movimento.criado_em.strftime('%d/%m/%Y às %H:%M') if movimento.criado_em is not string and movimento.criado_em else ((movimento.criado_em|string)[8:10] ~ '/' ~ (movimento.criado_em|string)[5:7] ~ '/' ~ (movimento.criado_em|string)[0:4] ~ ' às ' ~ (movimento.criado_em|string)[11:16]) if movimento.criado_em else 'Data não informada' }}
+                        {% if movimento.responsavel %}
+                            · {{ movimento.responsavel }}
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div style="text-align:right;">
+
+                    {% if movimento.tipo == 'entrada' %}
+
+                        <strong style="color:#15803d;">
+                            +{{ ('%g'|format(movimento.quantidade|float))|replace('.', ',') }}
+                        </strong>
+
+                        <div style="font-size:11px;color:#15803d;font-weight:700;">
+                            ENTRADA
+                        </div>
+
+                    {% else %}
+
+                        <strong style="color:#b91c1c;">
+                            -{{ ('%g'|format(movimento.quantidade|float))|replace('.', ',') }}
+                        </strong>
+
+                        <div style="font-size:11px;color:#b91c1c;font-weight:700;">
+                            SAÍDA
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div style="
+                padding:24px;
+                text-align:center;
+                background:#f8fafc;
+                border-radius:10px;
+                color:#64748b;
+            ">
+                Nenhuma movimentação registrada.
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+
+<style>
+@media (max-width: 900px) {
+    .admin-content > div[style*="repeat(4"] {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .admin-content > div[style*="repeat(4"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+{% endblock %}

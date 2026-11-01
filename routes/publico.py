@@ -229,8 +229,58 @@ def criar_agendamento(slug):
     duracao_total = sum(int(servico["duracao"] or 0) for servico in servicos)
     valor_total = sum(float(servico["valor"] or 0) for servico in servicos)
 
-    inicio_novo = datetime.strptime(dados["hora"], "%H:%M")
+    # PROTECAO_AGENDAMENTO_PUBLICO_V1
+    try:
+        data_agendamento = date.fromisoformat(str(dados["data"]))
+        inicio_novo = datetime.strptime(str(dados["hora"]), "%H:%M")
+    except (TypeError, ValueError):
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "Data ou horário inválido."}), 400
+
+    agora = datetime.now()
+    if data_agendamento < agora.date() or (
+        data_agendamento == agora.date() and inicio_novo.time() <= agora.time()
+    ):
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "Não é possível agendar em horários passados."}), 400
+
+    if duracao_total <= 0 or duracao_total > 480:
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "Duração dos serviços inválida."}), 400
+
+    horarios_permitidos = gerar_horarios_do_dia(empresa, data_agendamento)
+    if dados["hora"] not in horarios_permitidos:
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "Horário fora do expediente disponível."}), 400
+
+    expediente = obter_horarios_funcionamento(empresa).get(
+        str(data_agendamento.weekday()), {}
+    )
+    try:
+        fechamento = datetime.strptime(expediente["fechamento"], "%H:%M")
+    except (KeyError, TypeError, ValueError):
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "Expediente inválido."}), 400
+
     fim_novo = inicio_novo + timedelta(minutes=duracao_total)
+    if fim_novo > fechamento:
+        conn.rollback()
+        conn.close()
+        return jsonify({"erro": "O atendimento ultrapassa o horário de fechamento."}), 400
+
+    # Bloqueio transacional ANTES de verificar conflitos. A segunda reserva
+    # espera a primeira confirmar, e so entao consulta os horarios ocupados.
+    conn.execute(
+        """SELECT id FROM funcionarios
+           WHERE id = ? AND empresa_id = ? AND ativo = 1
+           FOR UPDATE""",
+        (funcionario["id"], empresa["id"]),
+    ).fetchone()
 
     existentes = conn.execute(
         """
@@ -250,6 +300,7 @@ def criar_agendamento(slug):
             minutes=existente["duracao_total"] or 40
         )
         if inicio_novo < fim_existente and fim_novo > inicio_existente:
+            conn.rollback()
             conn.close()
             return jsonify({"erro": "Este intervalo de horário acabou de ser ocupado. Escolha outro."}), 409
 
@@ -420,3 +471,39 @@ def teste_gratis():
 @app.route("/politica-de-privacidade")
 def politica_privacidade():
     return render_template("politica_privacidade.html")
+
+
+# BYTECH_LANDING_PREVIEW_V2 — prévia autenticada, não substitui a landing atual.
+@app.route('/admin/preview-pagina-publica/<slug>')
+@login_required
+def preview_pagina_publica_v2(slug):
+    from flask import abort, redirect, url_for
+    import re
+    if not session.get('empresa_id'):
+        return redirect('/admin')
+    conn = get_connection()
+    try:
+        empresa = conn.execute(
+            'SELECT * FROM empresas WHERE slug = ? AND ativo = 1 AND id = ?',
+            (slug, session['empresa_id'])
+        ).fetchone()
+        if not empresa:
+            abort(404)
+        servicos = conn.execute(
+            'SELECT * FROM servicos WHERE empresa_id = ? AND ativo = 1 ORDER BY nome',
+            (empresa['id'],)
+        ).fetchall()
+        produtos = conn.execute("""SELECT p.*, c.nome AS categoria_nome
+            FROM produtos p LEFT JOIN categorias_produtos c
+            ON c.id = p.categoria_id AND c.empresa_id = p.empresa_id AND c.ativo = 1
+            WHERE p.empresa_id = ? AND p.ativo = 1 AND p.estoque > 0
+            ORDER BY p.ordem, p.nome""", (empresa['id'],)).fetchall()
+    finally:
+        conn.close()
+    whatsapp_numero = re.sub(r'\D', '', empresa['telefone'] or '')
+    if len(whatsapp_numero) in (10, 11):
+        whatsapp_numero = '55' + whatsapp_numero
+    if len(whatsapp_numero) not in (12, 13):
+        whatsapp_numero = ''
+    return render_template('landing_v2.html', empresa=empresa,
+        servicos=servicos, produtos=produtos, whatsapp_numero=whatsapp_numero)

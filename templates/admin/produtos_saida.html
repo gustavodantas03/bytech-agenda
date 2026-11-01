@@ -1,0 +1,133 @@
+{% extends 'admin/base.html' %}
+{% block title %}Saída de estoque{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-premium.css') }}?v=1">
+
+<header class="estoque-hero">
+    <div class="estoque-hero-content">
+        <a class="estoque-back" href="{{ url_for('admin_produtos') }}">
+            ← Voltar para Visão Geral
+        </a>
+        <span class="estoque-eyebrow">MOVIMENTAÇÃO DE ESTOQUE</span>
+        <h1>Saída de estoque</h1>
+        <p>Registre vendas, perdas, uso interno e outras saídas.</p>
+    </div>
+</header>
+
+{% include 'admin/produtos_nav.html' %}
+
+<div class="estoque-grid">
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px;">
+        <h2 style="font-size:18px;margin:0 0 18px;">Nova saída</h2>
+
+        <form method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div style="margin-bottom:16px;">
+                <label for="saida-produto">Produto</label>
+                <select id="saida-produto" name="produto_id" required style="width:100%;">
+                    <option value="">Selecione um produto</option>
+                    {% for produto in produtos %}
+                    <option value="{{ produto.id }}" data-estoque="{{ produto.estoque }}">
+                        {{ produto.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="saida-saldo" style="display:none;margin-bottom:16px;padding:12px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;">
+                <span style="font-size:12px;color:#64748b;">Disponível em estoque</span>
+                <strong id="saida-saldo-valor" style="display:block;font-size:20px;margin-top:3px;">0</strong>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label for="saida-quantidade">Quantidade</label>
+                <input id="saida-quantidade" type="number" name="quantidade"
+                       min="0.01" step="0.01" placeholder="Ex.: 2"
+                       required style="width:100%;">
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label for="saida-motivo">Motivo</label>
+                <input id="saida-motivo" type="text" name="motivo"
+                       maxlength="250" placeholder="Ex.: Venda"
+                       style="width:100%;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;">
+                Registrar saída
+            </button>
+        </form>
+    </section>
+
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px;">
+        <h2 style="font-size:18px;margin:0 0 18px;">Últimas saídas</h2>
+
+        {% for saida in saidas %}
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;">
+            <div>
+                <strong style="display:block;">{{ saida.produto_nome }}</strong>
+
+                <span style="font-size:12px;color:#64748b;">
+                    {{ saida.motivo or 'Sem motivo informado' }}
+                </span>
+
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
+                    {{ saida.criado_em.strftime('%d/%m/%Y às %H:%M') if saida.criado_em is not string and saida.criado_em else ((saida.criado_em|string)[8:10] ~ '/' ~ (saida.criado_em|string)[5:7] ~ '/' ~ (saida.criado_em|string)[0:4] ~ ' às ' ~ (saida.criado_em|string)[11:16]) if saida.criado_em else 'Data não informada' }}
+                    {% if saida.responsavel %}
+                        · {{ saida.responsavel }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="text-align:right;">
+                <strong style="color:#dc2626;font-size:17px;">
+                    -{{ ('%g'|format(saida.quantidade|float))|replace('.', ',') }}
+                </strong>
+
+                <div style="font-size:11px;color:#64748b;margin-top:3px;">
+                    {{ ('%g'|format(saida.estoque_anterior|float))|replace('.', ',') }} → {{ ('%g'|format(saida.estoque_posterior|float))|replace('.', ',') }}
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div style="padding:30px;text-align:center;background:#f8fafc;border-radius:10px;color:#64748b;">
+            Nenhuma saída registrada.
+        </div>
+        {% endfor %}
+    </section>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const produto = document.getElementById("saida-produto");
+    const saldo = document.getElementById("saida-saldo");
+    const valor = document.getElementById("saida-saldo-valor");
+
+    produto.addEventListener("change", function () {
+        const opcao = produto.options[produto.selectedIndex];
+
+        if (!opcao.value) {
+            saldo.style.display = "none";
+            return;
+        }
+
+        valor.textContent = opcao.dataset.estoque || "0";
+        saldo.style.display = "block";
+    });
+});
+</script>
+
+<style>
+.estoque-grid {
+    display:grid;
+    grid-template-columns:minmax(320px,.8fr) minmax(0,1.2fr);
+    gap:20px;
+}
+@media(max-width:850px) {
+    .estoque-grid { grid-template-columns:1fr; }
+}
+</style>
+{% endblock %}

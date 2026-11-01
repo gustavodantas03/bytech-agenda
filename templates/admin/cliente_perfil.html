@@ -2,7 +2,7 @@
 {% block title %}{{ cliente.nome }} | CRM Bytech Agenda{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/cliente-perfil-premium.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cliente-perfil-premium.css', v='5') }}">
 
 <div class="customer-profile-page">
   <header class="customer-hero">
@@ -129,7 +129,12 @@
         {% endif %}
       </article>
 
-      <article class="customer-panel">
+
+    </aside>
+  </section>
+
+  <section class="customer-notes-section">
+<article class="customer-panel">
         <div class="customer-panel-header">
           <div>
             <span>Uso interno</span>
@@ -142,7 +147,6 @@
           <button class="btn btn-primary" type="submit">Salvar observações</button>
         </form>
       </article>
-    </aside>
   </section>
 
   <section class="customer-panel customer-loyalty-panel">

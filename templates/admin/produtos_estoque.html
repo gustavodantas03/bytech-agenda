@@ -1,0 +1,222 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Estoque{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-premium.css') }}?v=2">
+
+<header class="estoque-hero">
+    <div class="estoque-hero-content">
+        <a class="estoque-back" href="{{ url_for('admin_produtos') }}">
+            ← Voltar para Visão Geral
+        </a>
+        <span class="estoque-eyebrow">CONTROLE DE PRODUTOS</span>
+        <h1>Estoque</h1>
+        <p>Acompanhe quantidades, valores e produtos que precisam de atenção.</p>
+    </div>
+</header>
+
+{% include 'admin/produtos_nav.html' %}
+
+<div class="estoque-resumo">
+    <article>
+        <span>Produtos ativos</span>
+        <strong>{{ resumo.total_produtos }}</strong>
+    </article>
+
+    <article>
+        <span>Unidades em estoque</span>
+        <strong>{{ ('%g'|format(resumo.unidades_estoque|float))|replace('.', ',') }}</strong>
+    </article>
+
+    <article>
+        <span>Estoque baixo</span>
+        <strong>{{ resumo.estoque_baixo }}</strong>
+    </article>
+
+    <article>
+        <span>Sem estoque</span>
+        <strong>{{ resumo.sem_estoque }}</strong>
+    </article>
+
+    <article>
+        <span>Valor do estoque</span>
+        <strong>R$ {{ '%.2f'|format(resumo.valor_estoque)|replace('.', ',') }}</strong>
+    </article>
+</div>
+
+
+<div class="estoque-toolbar">
+    <input
+        type="search"
+        id="buscaEstoque"
+        placeholder="Buscar produto ou categoria..."
+        style="flex:1;min-width:220px;padding:11px 14px;border:1px solid #d1d5db;border-radius:10px;"
+    >
+
+    <select
+        id="filtroEstoque"
+        style="padding:11px 14px;border:1px solid #d1d5db;border-radius:10px;background:#fff;"
+    >
+        <option value="todos">Todas as situações</option>
+        <option value="normal">Normal</option>
+        <option value="baixo">Estoque baixo</option>
+        <option value="sem">Sem estoque</option>
+    </select>
+</div>
+
+<div class="estoque-table-card">
+
+    <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:850px;">
+            <thead>
+                <tr style="background:#f8fafc;text-align:left;">
+                    <th style="padding:14px;">Produto</th>
+                    <th style="padding:14px;">Categoria</th>
+                    <th style="padding:14px;">Estoque</th>
+                    <th style="padding:14px;">Mínimo</th>
+                    <th style="padding:14px;">Situação</th>
+                    <th style="padding:14px;">Preço</th>
+                    <th style="padding:14px;">Valor em estoque</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for produto in produtos %}
+
+                <tr class="linha-estoque"
+    data-nome="{{ produto.nome|lower }}"
+    data-categoria="{{ (produto.categoria_nome or '')|lower }}"
+    data-situacao="{% if produto.estoque <= 0 %}sem{% elif produto.estoque_minimo > 0 and produto.estoque <= produto.estoque_minimo %}baixo{% else %}normal{% endif %}"
+    style="border-top:1px solid #f1f5f9;">
+
+                    <td style="padding:14px;">
+                        <strong>{{ produto.nome }}</strong>
+
+                        {% if not produto.ativo %}
+                        <div style="font-size:11px;color:#94a3b8;">
+                            Produto inativo
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <td style="padding:14px;color:#64748b;">
+                        {{ produto.categoria_nome or 'Sem categoria' }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        <strong>{{ ('%g'|format(produto.estoque|float))|replace('.', ',') }}</strong>
+                    </td>
+
+                    <td style="padding:14px;color:#64748b;">
+                        {{ ('%g'|format(produto.estoque_minimo|float))|replace('.', ',') }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {% if produto.estoque <= 0 %}
+                            <span style="display:inline-block;padding:5px 9px;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:700;">
+                                Sem estoque
+                            </span>
+
+                        {% elif produto.estoque_minimo > 0 and produto.estoque <= produto.estoque_minimo %}
+                            <span style="display:inline-block;padding:5px 9px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;">
+                                Estoque baixo
+                            </span>
+
+                        {% else %}
+                            <span style="display:inline-block;padding:5px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700;">
+                                Normal
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td style="padding:14px;">
+                        R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        <strong>
+                            R$ {{ '%.2f'|format((produto.preco or 0) * (produto.estoque or 0))|replace('.', ',') }}
+                        </strong>
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7" style="padding:40px;text-align:center;color:#64748b;">
+                        Nenhum produto cadastrado.
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<style>
+.estoque-resumo {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:20px;
+}
+.estoque-resumo article {
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:18px;
+}
+.estoque-resumo span {
+    display:block;
+    font-size:12px;
+    color:#64748b;
+    margin-bottom:7px;
+}
+.estoque-resumo strong {
+    font-size:20px;
+    color:#0f172a;
+}
+@media(max-width:1000px) {
+    .estoque-resumo { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:550px) {
+    .estoque-resumo { grid-template-columns:1fr; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const busca = document.getElementById("buscaEstoque");
+    const filtro = document.getElementById("filtroEstoque");
+    const linhas = document.querySelectorAll(".linha-estoque");
+
+    function filtrarEstoque() {
+        const termo = busca.value.toLowerCase().trim();
+        const situacao = filtro.value;
+
+        linhas.forEach(function (linha) {
+            const nome = linha.dataset.nome || "";
+            const categoria = linha.dataset.categoria || "";
+            const status = linha.dataset.situacao || "";
+
+            const correspondeBusca =
+                nome.includes(termo) || categoria.includes(termo);
+
+            const correspondeSituacao =
+                situacao === "todos" || status === situacao;
+
+            linha.style.display =
+                correspondeBusca && correspondeSituacao ? "" : "none";
+        });
+    }
+
+    busca.addEventListener("input", filtrarEstoque);
+    filtro.addEventListener("change", filtrarEstoque);
+});
+</script>
+
+{% endblock %}

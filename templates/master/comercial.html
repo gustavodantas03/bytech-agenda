@@ -1,0 +1,20 @@
+{% extends 'master/base.html' %}
+{% block title %}Carteira comercial | Bytech Master{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/master-comercial.css') }}?v=1">
+<div class="mc-page">
+ <header class="mc-head"><div><span class="mc-eyebrow">BYTECH AGENDA · MASTER</span><h1>Carteira comercial</h1><p>Planos, mensalidades e situação dos estabelecimentos em um só lugar.</p></div><a class="mc-btn mc-primary" href="{{ url_for('master_nova_empresa') }}">+ Nova empresa</a></header>
+ <div class="mc-metrics">
+  <article><span>Empresas</span><strong>{{ resumo.total }}</strong></article>
+  <article><span>Com mensalidade</span><strong>{{ resumo.com_cobranca }}</strong></article>
+  <article><span>Sem cobrança configurada</span><strong>{{ resumo.sem_cobranca }}</strong></article>
+  <article><span>Receita mensal prevista*</span><strong>R$ {{ '%.2f'|format(resumo.receita_prevista)|replace('.',',') }}</strong></article>
+  <article><span>Cobranças em aberto</span><strong>R$ {{ '%.2f'|format(resumo.em_aberto)|replace('.',',') }}</strong></article>
+ </div>
+ <section class="mc-panel"><div class="mc-panel-head"><div><h2>Estabelecimentos</h2><p>O Pix é confirmado manualmente no financeiro Master.</p></div><div class="mc-actions"><a class="mc-btn" href="{{ url_for('master_comercial',exportar='csv') }}">Exportar CSV ↓</a><a class="mc-btn" href="{{ url_for('master_financeiro') }}">Ver cobranças ↗</a></div></div>
+ <div class="mc-table-wrap"><table><thead><tr><th>Empresa</th><th>Plano</th><th>Mensalidade</th><th>Situação</th><th>Vencimento</th><th>Em aberto</th><th>Ações</th></tr></thead><tbody>
+ {% for e in registros %}<tr><td><strong>{{ e.nome }}</strong><small>/{{ e.slug }}</small></td><td>{{ e.plano }}</td><td>R$ {{ '%.2f'|format(e.mensalidade)|replace('.',',') }}</td><td><span class="mc-status {{ 'mc-ok' if e.situacao=='Em dia' else 'mc-muted' if e.situacao=='Sem cobrança configurada' else 'mc-alert' }}">{{ e.situacao }}</span></td><td>{{ e.vencimento.strftime('%d/%m/%Y') if e.vencimento and e.vencimento.strftime is defined else (e.vencimento|string) if e.vencimento else '—' }}</td><td>R$ {{ '%.2f'|format(e.valor_aberto)|replace('.',',') }}</td><td><a href="{{ url_for('master_empresa_financeiro',empresa_id=e.id) }}">Financeiro →</a></td></tr>{% else %}<tr><td colspan="7">Nenhuma empresa cadastrada.</td></tr>{% endfor %}
+ </tbody></table></div></section>
+ <p class="mc-note">* Projeção calculada pelas mensalidades cadastradas das empresas não suspensas. Não representa receita recebida. Empresas com mensalidade R$ 0,00 são identificadas como sem cobrança configurada, e não como assinaturas pagas. Esta página é somente leitura: não gera cobranças nem modifica o banco.</p>
+</div>
+{% endblock %}

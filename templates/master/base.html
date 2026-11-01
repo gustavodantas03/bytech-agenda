@@ -19,6 +19,7 @@
             filename='css/style.css'
         ) }}?v=25"
     >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/master-premium.css') }}?v=1">
 </head>
 
 <body class="master-page">
@@ -49,6 +50,7 @@
         <nav class="master-nav">
             <a class="{% if request.endpoint == 'master_dashboard' %}active{% endif %}" href="{{ url_for('master_dashboard') }}"><span>⌂</span> Dashboard</a>
             <a class="{% if request.endpoint in ['master_empresas','master_nova_empresa','master_editar_empresa','master_empresa_criada'] %}active{% endif %}" href="{{ url_for('master_empresas') }}"><span>🏢</span> Empresas</a>
+            <a class="{% if request.endpoint == 'master_comercial' %}active{% endif %}" href="{{ url_for('master_comercial') }}"><span>◈</span> Carteira comercial</a>
             <a class="{% if request.endpoint in ['master_planos','master_novo_plano','master_editar_plano'] %}active{% endif %}" href="{{ url_for('master_planos') }}"><span>◆</span> Planos</a>
             <a class="{% if request.endpoint == 'master_financeiro_dashboard' %}active{% endif %}" href="{{ url_for('master_financeiro_dashboard') }}"><span>📊</span> Dashboard financeiro</a>
             <a class="{% if request.endpoint in ['master_financeiro','master_recibo','master_empresa_financeiro','master_registrar_pagamento','master_estornar_pagamento'] %}active{% endif %}" href="{{ url_for('master_financeiro') }}"><span>💳</span> Cobranças</a>

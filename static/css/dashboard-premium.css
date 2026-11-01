@@ -1,0 +1,262 @@
+/* Bytech Agenda - Dashboard Premium */
+
+body.admin-page .dashboard-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+}
+
+body.admin-page .dashboard-metric-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e8ebf0;
+    border-radius: 18px;
+    box-shadow: 0 5px 22px rgba(15,23,42,.045);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+body.admin-page .dashboard-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(15,23,42,.08);
+}
+
+body.admin-page .dashboard-metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--empresa-cor-principal) 10%, white);
+    color: var(--empresa-cor-principal);
+    font-size: 23px;
+}
+
+body.admin-page .dashboard-metric-card > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+body.admin-page .dashboard-metric-card span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+body.admin-page .dashboard-metric-card strong {
+    color: #172033;
+    font-size: clamp(22px, 2vw, 30px);
+    font-weight: 800;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+body.admin-page .dashboard-metric-card small {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+    body.admin-page .dashboard-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    body.admin-page .dashboard-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    body.admin-page .dashboard-metric-card {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 15px;
+    }
+
+    body.admin-page .dashboard-metric-icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+        font-size: 21px;
+    }
+
+    body.admin-page .dashboard-metric-card strong {
+        font-size: 21px;
+    }
+}
+
+@media (max-width: 360px) {
+    body.admin-page .dashboard-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Bytech Dashboard - Refinamento responsivo */
+
+/* Cores personalizadas por estabelecimento */
+body.admin-page .dashboard-welcome .btn-primary,
+body.admin-page .dashboard-agenda-panel .btn-primary {
+    background: var(--empresa-cor-botao, #2563eb);
+    border-color: var(--empresa-cor-botao, #2563eb);
+    color: #fff;
+}
+
+body.admin-page .dashboard-quick-action > span,
+body.admin-page .setup-card-icon {
+    background: color-mix(
+        in srgb,
+        var(--empresa-cor-principal, #2563eb) 10%,
+        white
+    );
+    color: var(--empresa-cor-principal, #2563eb);
+}
+
+body.admin-page .dashboard-quick-action:hover {
+    border-color: var(--empresa-cor-principal, #2563eb);
+}
+
+/* Indicadores mais compactos */
+body.admin-page .dashboard-metric-card {
+    min-height: 0;
+}
+
+body.admin-page .dashboard-metric-card strong {
+    letter-spacing: -.035em;
+}
+
+/* Ajustes para celular */
+@media (max-width: 600px) {
+
+    body.admin-page .dashboard-welcome {
+        padding: 22px 18px;
+    }
+
+    body.admin-page .dashboard-welcome h1 {
+        font-size: clamp(23px, 6vw, 30px);
+        line-height: 1.2;
+    }
+
+    body.admin-page .dashboard-welcome-actions {
+        gap: 10px;
+    }
+
+    body.admin-page .dashboard-quick-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    body.admin-page .dashboard-quick-action {
+        min-height: 70px;
+        padding: 12px;
+        gap: 9px;
+        border-radius: 14px;
+    }
+
+    body.admin-page .dashboard-quick-action > span {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+    }
+
+    body.admin-page .dashboard-quick-action strong {
+        font-size: 13px;
+    }
+
+    body.admin-page .dashboard-quick-action small {
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    body.admin-page .dashboard-metrics-grid {
+        gap: 10px;
+        margin: 16px 0;
+    }
+
+    body.admin-page .dashboard-metric-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    body.admin-page .dashboard-metric-card strong {
+        font-size: clamp(19px, 5vw, 24px);
+    }
+
+    body.admin-page .dashboard-metric-card span {
+        font-size: 12px;
+    }
+
+    body.admin-page .dashboard-metric-card small {
+        font-size: 11px;
+    }
+
+    body.admin-page .setup-card {
+        padding: 16px;
+    }
+}
+
+/* Dashboard: indicadores compactos no celular */
+@media (max-width: 760px) {
+  body.admin-page .dashboard-metrics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  body.admin-page .dashboard-metric-card {
+    min-width: 0;
+    padding: 16px 12px !important;
+    min-height: 155px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  body.admin-page .dashboard-metric-card > div:last-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  body.admin-page .dashboard-metric-card strong {
+    font-size: clamp(1.25rem, 5vw, 1.65rem) !important;
+    overflow-wrap: anywhere;
+  }
+
+  body.admin-page .dashboard-metric-card span,
+  body.admin-page .dashboard-metric-card small {
+    font-size: .76rem !important;
+    line-height: 1.4;
+  }
+}
+
+/* Dashboard - gráfico semanal compacto no celular */
+@media (max-width: 600px) {
+    body.admin-page .dashboard-week-chart {
+        height: 105px;
+        padding-top: 6px;
+        gap: 6px;
+    }
+
+    body.admin-page .dashboard-week-item {
+        gap: 4px;
+    }
+
+    body.admin-page .dashboard-week-item strong {
+        font-size: 12px;
+    }
+
+    body.admin-page .dashboard-week-item small {
+        font-size: 10px;
+    }
+}

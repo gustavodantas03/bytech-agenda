@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}?v=rc2-3-2">
 
     {% block page_styles %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-responsive.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-theme.css') }}?v=6">
 
     <style>
         .admin-sidebar {
@@ -84,6 +86,7 @@
         }
     </style>
 
+    <script defer src="{{ url_for('static', filename='js/admin-submenus.js') }}?v=5"></script>
 </head>
 
 <body
@@ -249,23 +252,35 @@
             {% endif %}
 
             {% if session.get('papel') != 'colaborador' or 'servicos' in session.get('permissoes', []) %}
-            <a
-                class="admin-nav-link
-                {% if request.endpoint in [
-                    'admin_servicos',
-                    'editar_servico'
-                ] %}
-                    active
-                {% endif %}"
-                href="{{ url_for('admin_servicos') }}"
-            >
-                <span class="admin-nav-icon">
-                    ✦
-                </span>
-
-                <span>Serviços</span>
-            </a>
+            <details class="admin-nav-group" {% if request.endpoint in ['admin_servicos', 'editar_servico'] %}open{% endif %}>
+                <summary class="admin-nav-link admin-nav-group-toggle">
+                    <span class="admin-nav-icon">✦</span>
+                    <span>Serviços</span>
+                    <span class="admin-nav-chevron">⌄</span>
+                </summary>
+                <div class="admin-nav-submenu">
+                    <a class="admin-nav-sublink {% if request.endpoint in ['admin_servicos', 'editar_servico'] %}active{% endif %}"
+                       href="{{ url_for('admin_servicos') }}">
+                        Serviços cadastrados
+                    </a>
+                </div>
+            </details>
             {% endif %}
+            <a
+                class="admin-nav-link {% if request.endpoint == 'admin_produtos' %}active{% endif %}"
+                href="{{ url_for('admin_produtos') }}"
+            >
+                <span class="admin-nav-icon">▣</span>
+                <span>Produtos</span>
+            </a>
+
+            <a
+                class="admin-nav-link {% if request.endpoint and ('pdv' in request.endpoint or 'venda' in request.endpoint) %}active{% endif %}"
+                href="{{ url_for('admin_pdv') }}"
+            >
+                <span class="admin-nav-icon">▤</span>
+                <span>PDV / Vendas</span>
+            </a>
 
             {% if tem_recurso and tem_recurso('whatsapp') and (session.get('papel') != 'colaborador' or 'whatsapp' in session.get('permissoes', [])) %}
             <a
@@ -278,6 +293,9 @@
             {% endif %}
 
             {% if session.get('papel') != 'colaborador' or 'relatorios' in session.get('permissoes', []) %}
+            <a class="admin-nav-link {% if request.endpoint == 'admin_financeiro' %}active{% endif %}" href="{{ url_for('admin_financeiro') }}">
+                <span class="admin-nav-icon">◈</span><span>Financeiro</span>
+            </a>
             <a
                 class="admin-nav-link {% if request.endpoint and request.endpoint.startswith('admin_relatorios') %}active{% endif %}"
                 href="{{ url_for('admin_relatorios') }}"
@@ -288,6 +306,10 @@
             {% endif %}
 
             {% if session.get('papel') != 'colaborador' or 'configuracoes' in session.get('permissoes', []) %}
+            <a class="admin-nav-link {% if request.endpoint == 'admin_personalizacao_pagina_publica' %}active{% endif %}"
+               href="{{ url_for('admin_personalizacao_pagina_publica') }}">
+                <span class="admin-nav-icon">⚙</span><span>Personalização da página pública</span>
+            </a>
             <a
                 class="admin-nav-link
                 {% if request.endpoint == 'admin_meu_espaco' %}

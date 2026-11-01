@@ -302,12 +302,28 @@
                 onclick="selecionarServico(this)"
             >
 
-                <div>
-                    <span>{{ servico.nome }}</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    {% if servico.foto %}
+                    <img
+                        src="{{ url_for('static', filename='uploads/servicos/' ~ servico.foto) }}"
+                        alt="Foto de {{ servico.nome }}"
+                        width="56"
+                        height="56"
+                        style="width: 56px !important; height: 56px !important; min-width: 56px !important; border-radius: 10px !important; object-fit: cover !important; display: block !important;"
+                    >
+                    {% else %}
+                    <div style="width: 56px; height: 56px; min-width: 56px; border-radius: 10px; background: #f1f1f1; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                        ✂️
+                    </div>
+                    {% endif %}
 
-                    <small>
-                        {{ servico.duracao }} minutos
-                    </small>
+                    <div>
+                        <span>{{ servico.nome }}</span>
+
+                        <small>
+                            {{ servico.duracao }} minutos
+                        </small>
+                    </div>
                 </div>
 
                 <div class="booking-service-price">
@@ -429,9 +445,20 @@
 
                             <div class="booking-professional">
 
-                                <div class="booking-avatar">
-                                    {{ funcionario.nome[0]|upper }}
-                                </div>
+                                {% if funcionario.foto %}
+                                    <img
+                                        class="booking-avatar"
+                                        src="{{ url_for('static', filename='uploads/profissionais/' ~ funcionario.foto) }}"
+                                        alt="Foto de {{ funcionario.nome }}"
+                                        width="48"
+                                        height="48"
+                                        style="width: 48px !important; height: 48px !important; min-width: 48px !important; max-width: 48px !important; min-height: 48px !important; max-height: 48px !important; border-radius: 50% !important; object-fit: cover !important; display: block !important;"
+                                    >
+                                {% else %}
+                                    <div class="booking-avatar">
+                                        {{ funcionario.nome[0]|upper }}
+                                    </div>
+                                {% endif %}
 
                                 <div>
                                     <span>

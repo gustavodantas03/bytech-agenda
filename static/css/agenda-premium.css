@@ -854,3 +854,331 @@ body.client-drawer-open { overflow: hidden; }
         justify-self: start;
     }
 }
+
+/* ==========================================
+   AGENDA - REFINAMENTO RESPONSIVO 2026
+========================================== */
+
+.agenda-status-filters {
+    padding: 12px 16px 16px;
+}
+
+.agenda-status-filter.active,
+.agenda-status-filter:hover {
+    border-color: var(--empresa-cor-principal, var(--accent));
+    background: color-mix(
+        in srgb,
+        var(--empresa-cor-principal, var(--accent)) 10%,
+        white
+    );
+    color: var(--empresa-cor-principal, var(--accent));
+}
+
+.agenda-insight-header span,
+.agenda-insight-header a,
+.agenda-next-time,
+.agenda-occupancy-row span {
+    color: var(--empresa-cor-principal, var(--accent));
+}
+
+.agenda-occupancy-track span {
+    background: var(--empresa-cor-principal, var(--accent));
+}
+
+@media (max-width: 700px) {
+
+    .agenda-toolbar {
+        padding: 14px;
+        gap: 14px;
+        border-radius: 17px;
+        margin-bottom: 15px;
+    }
+
+    .agenda-date-navigation {
+        gap: 6px;
+    }
+
+    .agenda-nav-button,
+    .agenda-quick-date {
+        min-width: 0;
+        min-height: 42px;
+        padding: 0 8px;
+        border-radius: 11px;
+    }
+
+    .agenda-premium-filters {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .agenda-premium-filters > * {
+        min-width: 0;
+    }
+
+    .agenda-premium-filters .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .agenda-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 15px;
+    }
+
+    .agenda-kpi {
+        min-width: 0;
+        min-height: 108px;
+        padding: 12px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+        border-radius: 15px;
+    }
+
+    .agenda-kpi-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 11px;
+    }
+
+    .agenda-kpi div:last-child {
+        gap: 4px;
+        width: 100%;
+    }
+
+    .agenda-kpi span {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .agenda-kpi strong {
+        font-size: 22px;
+    }
+
+    .agenda-kpi small {
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .agenda-list-header {
+        padding: 17px 14px;
+        gap: 13px;
+    }
+
+    .agenda-list-header h2 {
+        font-size: 19px;
+    }
+
+    .agenda-status-filters {
+        padding: 11px 12px 14px;
+    }
+
+    .agenda-premium-list {
+        gap: 9px;
+    }
+
+    .agenda-premium-item {
+        border-radius: 15px;
+    }
+
+    .agenda-client-line > strong {
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .agenda-premium-time strong {
+        font-size: 18px;
+    }
+
+    .agenda-insights-grid {
+        gap: 13px;
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 460px) {
+    .agenda-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agenda-kpi {
+        min-height: 112px;
+    }
+
+    .agenda-kpi strong {
+        font-size: 21px;
+    }
+}
+
+/* Agenda mobile - refinamento visual 2 */
+@media (max-width: 700px) {
+
+    .agenda-premium-header {
+        gap: 12px;
+    }
+
+    .agenda-premium-header h1 {
+        margin: 4px 0;
+    }
+
+    .agenda-premium-header .page-subtitle {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .agenda-toolbar {
+        padding: 12px;
+    }
+
+    .agenda-filter-field label {
+        margin-bottom: 5px;
+    }
+
+    .agenda-filter-field input,
+    .agenda-filter-field select {
+        min-height: 42px;
+    }
+
+    .agenda-kpi {
+        min-height: 100px;
+        padding: 11px;
+    }
+
+    .agenda-kpi-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .agenda-kpi strong {
+        font-size: 20px;
+    }
+
+    .agenda-premium-empty {
+        padding: 28px 16px;
+    }
+
+    .agenda-premium-empty > div {
+        width: 54px;
+        height: 54px;
+        border-radius: 17px;
+    }
+
+    .agenda-premium-empty h3 {
+        font-size: 17px;
+    }
+
+    .agenda-premium-empty p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .agenda-insight-header {
+        padding: 15px;
+    }
+
+    .agenda-next-list,
+    .agenda-occupancy-list {
+        padding: 7px 15px 13px;
+    }
+}
+
+/* Agenda - cartões de atendimento refinados */
+@media (max-width: 700px) {
+
+    .agenda-premium-item {
+        grid-template-columns: 74px minmax(0, 1fr);
+        padding: 14px;
+        gap: 12px;
+        border-radius: 18px;
+        box-shadow: 0 4px 16px rgba(15,23,42,.035);
+    }
+
+    .agenda-premium-time {
+        min-height: 74px;
+        padding: 8px 4px;
+        border-radius: 14px;
+    }
+
+    .agenda-premium-data p {
+        margin: 8px 0;
+        font-size: 14px;
+    }
+
+    .agenda-meta {
+        gap: 7px;
+        font-size: 12px;
+    }
+
+    .agenda-quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        width: 100%;
+    }
+
+    .agenda-action {
+        width: 100%;
+        min-height: 43px;
+        padding: 9px 7px;
+        border-radius: 12px;
+        font-size: 12px;
+        white-space: normal;
+    }
+
+    .agenda-action-cancel {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Agenda - identidade visual e filtros */
+
+.agenda-premium-header .btn-primary,
+.agenda-premium-empty .btn-primary {
+    background: var(--empresa-cor-botao, var(--accent));
+    border-color: var(--empresa-cor-botao, var(--accent));
+    color: #fff;
+}
+
+.agenda-premium-header .btn-primary:hover,
+.agenda-premium-empty .btn-primary:hover {
+    filter: brightness(.94);
+}
+
+.agenda-status-filters {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.agenda-status-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.agenda-premium-time {
+    background: var(--empresa-cor-principal, var(--accent));
+}
+
+
+/* Botões principais da Agenda: respeitar a identidade da empresa */
+body.admin-page .agenda-premium-header .btn.btn-primary,
+body.admin-page .agenda-premium-empty .btn.btn-primary {
+    background: var(--empresa-cor-botao, var(--accent));
+    border-color: var(--empresa-cor-botao, var(--accent));
+    color: #fff;
+    box-shadow: 0 8px 20px color-mix(
+        in srgb,
+        var(--empresa-cor-botao, var(--accent)) 20%,
+        transparent
+    );
+}
+
+body.admin-page .agenda-premium-header .btn.btn-primary:hover,
+body.admin-page .agenda-premium-empty .btn.btn-primary:hover {
+    filter: brightness(.94);
+}
+
+/* Ícone do botão Novo agendamento */
+body.admin-page .agenda-premium-header .btn.btn-primary span {
+    color: inherit;
+}

@@ -1,0 +1,193 @@
+{% extends "admin/base.html" %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pdv-premium.css') }}?v=3">
+<input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
+<div class="pdv-page">
+    <header class="pdv-hero">
+        <div>
+            <a class="pdv-back" href="{{ url_for('admin_produtos') }}">
+                <span aria-hidden="true">←</span>
+                Voltar para Produtos
+            </a>
+
+            <span class="pdv-eyebrow">COMERCIAL · PONTO DE VENDA</span>
+            <h1>PDV / Vendas</h1>
+            <p>Registre produtos e serviços em uma venda rápida e organizada.</p>
+        </div>
+
+        <div class="pdv-hero-actions">
+            <a class="btn btn-secondary" href="{{ url_for('admin_vendas') }}">
+                Histórico de vendas
+            </a>
+        </div>
+    </header>
+
+    <div class="pdv-shell">
+        <section class="pdv-panel">
+            <header class="pdv-panel-header">
+                <div>
+                    <h2>Nova venda</h2>
+                    <p>Selecione o cliente e adicione produtos ou serviços.</p>
+                </div>
+            </header>
+
+            <div class="pdv-panel-body">
+
+        <section class="pdv-section">
+            <div class="pdv-field">
+                <label for="cliente-venda">Cliente da venda</label>
+                <select id="cliente-venda">
+                    <option value="">Consumidor não identificado</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+
+        <section class="pdv-section">
+            <div class="pdv-section-title">
+                <h3>Produtos</h3>
+                <span>{{ produtos|length }} disponível{{ '' if produtos|length == 1 else 'is' }}</span>
+            </div>
+
+            <div class="pdv-items">
+                {% for produto in produtos %}
+                <article class="pdv-item">
+                    <strong>{{ produto.nome }}</strong>
+                    <span>R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</span>
+                    <small>Estoque: {{ produto.estoque or 0 }}</small>
+
+                    <button
+                        type="button"
+                        class="btn-add"
+                        data-tipo="produto"
+                        data-id="{{ produto.id }}"
+                        data-nome="{{ produto.nome }}"
+                        data-preco="{{ produto.preco or 0 }}"
+                        data-estoque="{{ produto.estoque or 0 }}"
+                    >
+                        + Adicionar à venda
+                    </button>
+                </article>
+                {% else %}
+                <div class="pdv-empty">Nenhum produto disponível.</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="pdv-section">
+            <div class="pdv-section-title">
+                <h3>Serviços</h3>
+                <span>{{ servicos|length }} disponível{{ '' if servicos|length == 1 else 'is' }}</span>
+            </div>
+
+            <div class="pdv-items">
+                {% for servico in servicos %}
+                <article class="pdv-item">
+                    <strong>{{ servico.nome }}</strong>
+                    <span>R$ {{ '%.2f'|format(servico.valor or 0)|replace('.', ',') }}</span>
+                    <small>{{ servico.duracao or 0 }} min</small>
+
+                    <button
+                        type="button"
+                        class="btn-add"
+                        data-tipo="servico"
+                        data-id="{{ servico.id }}"
+                        data-nome="{{ servico.nome }}"
+                        data-preco="{{ servico.valor or 0 }}"
+                    >
+                        + Adicionar à venda
+                    </button>
+                </article>
+                {% else %}
+                <div class="pdv-empty">Nenhum serviço disponível.</div>
+                {% endfor %}
+            </div>
+        </section>
+            </div>
+        </section>
+
+        <aside class="pdv-panel pdv-cart">
+            <header class="pdv-panel-header">
+                <div>
+                    <h2>Venda atual</h2>
+                    <p>Confira os itens antes de finalizar.</p>
+                </div>
+            </header>
+
+            <div class="pdv-panel-body">
+
+        <select id="pdv-profissionais" style="display:none;">
+            {% for funcionario in funcionarios %}
+            <option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <div id="carrinho">
+            <div id="carrinho-vazio" class="pdv-empty">
+                Nenhum item adicionado.
+            </div>
+        </div>
+
+        <div class="pdv-summary">
+            <div class="pdv-summary-line">
+                <span>Subtotal</span>
+                <strong id="subtotal-venda">R$ 0,00</strong>
+            </div>
+
+            <div class="pdv-discount">
+                <div class="pdv-field">
+                    <label for="tipo-desconto">Desconto</label>
+                    <select id="tipo-desconto">
+                        <option value="valor">R$</option>
+                        <option value="percentual">%</option>
+                    </select>
+                </div>
+
+                <div class="pdv-field">
+                    <label for="valor-desconto">Valor</label>
+                    <input
+                        type="number"
+                        id="valor-desconto"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        inputmode="decimal"
+                    >
+                </div>
+            </div>
+
+            <div class="pdv-summary-line total">
+                <strong>Total</strong>
+                <strong id="total-venda">R$ 0,00</strong>
+            </div>
+
+            <div class="pdv-field">
+                <label for="forma-pagamento">Forma de pagamento</label>
+                <select id="forma-pagamento">
+                    <option value="pix">Pix</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="debito">Cartão de débito</option>
+                    <option value="credito">Cartão de crédito</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+
+            <button
+                type="button"
+                id="finalizar-venda"
+                class="pdv-finish"
+            >
+                Finalizar venda
+            </button>
+        </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdv.js', v='20261006-3') }}"></script>
+{% endblock %}

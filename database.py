@@ -234,6 +234,70 @@ def _column_exists(conn, table, column):
 
 MIGRATIONS = [
     (
+        "20261005_001_produtos",
+        [
+            """
+            CREATE TABLE IF NOT EXISTS categorias_produtos (
+                id BIGSERIAL PRIMARY KEY,
+                empresa_id BIGINT NOT NULL,
+                nome TEXT NOT NULL,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                ordem INTEGER NOT NULL DEFAULT 0,
+                CONSTRAINT categorias_produtos_empresa_fk
+                    FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+                    ON DELETE CASCADE
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS produtos (
+                id BIGSERIAL PRIMARY KEY,
+                empresa_id BIGINT NOT NULL,
+                categoria_id BIGINT,
+                nome TEXT NOT NULL,
+                descricao TEXT,
+                preco REAL NOT NULL DEFAULT 0,
+                estoque REAL NOT NULL DEFAULT 0,
+                estoque_minimo REAL NOT NULL DEFAULT 0,
+                foto TEXT,
+                ativo INTEGER NOT NULL DEFAULT 1,
+                ordem INTEGER NOT NULL DEFAULT 0,
+                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT produtos_empresa_fk
+                    FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+                    ON DELETE CASCADE,
+                CONSTRAINT produtos_categoria_fk
+                    FOREIGN KEY (categoria_id) REFERENCES categorias_produtos(id)
+                    ON DELETE SET NULL
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_categorias_produtos_empresa_ativo
+                ON categorias_produtos (empresa_id, ativo, ordem)
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_produtos_empresa_ativo
+                ON produtos (empresa_id, ativo, ordem)
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS idx_produtos_categoria
+                ON produtos (categoria_id)
+            """,
+        ],
+    ),
+    (
+        "20261004_001_fotos_servicos",
+        [
+            "ALTER TABLE servicos ADD COLUMN foto TEXT",
+        ],
+    ),
+    (
+        "20261003_001_fotos_profissionais",
+        [
+            "ALTER TABLE funcionarios ADD COLUMN foto TEXT",
+        ],
+    ),
+    (
         "20260729_001_hardening_indexes",
         [
             "CREATE INDEX IF NOT EXISTS idx_whatsapp_config_empresa_status ON whatsapp_configuracoes (empresa_id, status)",

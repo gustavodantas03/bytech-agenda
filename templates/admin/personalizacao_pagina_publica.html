@@ -1,0 +1,30 @@
+{% extends 'admin/base.html' %}
+{% block title %}Personalização da página pública{% endblock %}
+{% block content %}
+<header class="page-header"><div><span>Configurações</span><h1>Personalização da página pública</h1></div></header>
+<section class="panel" style="padding:24px;max-width:850px">
+  <p>Configure as cores, a logomarca e a foto de capa exibidas na prévia V2. A página pública atual não será alterada.</p>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <div class="admin-form-grid">
+      <div class="form-group"><label for="cor_principal">Cor principal</label><input id="cor_principal" type="color" name="cor_principal" value="{{ empresa.cor_principal if empresa.cor_principal and empresa.cor_principal|length == 7 else '#263b47' }}"></div>
+      <div class="form-group"><label for="cor_secundaria">Cor secundária</label><input id="cor_secundaria" type="color" name="cor_secundaria" value="{{ empresa.cor_secundaria if empresa.cor_secundaria and empresa.cor_secundaria|length == 7 else '#b28a54' }}"></div>
+      <div class="form-group"><label for="cor_botao">Cor dos botões</label><input id="cor_botao" type="color" name="cor_botao" value="{{ empresa.cor_botao if empresa.cor_botao and empresa.cor_botao|length == 7 else '#263b47' }}"></div>
+      <div class="form-group admin-form-full">
+        <label for="logo">Logomarca do estabelecimento (JPG, PNG ou WEBP, até 2 MB)</label>
+        {% if empresa.logo %}
+        <div style="margin:10px 0;padding:14px;border:1px solid #dce4ef;border-radius:12px;display:inline-flex;align-items:center;gap:12px">
+          <img src="{{ url_for('static', filename='uploads/logos/' ~ empresa.logo) }}" alt="Logomarca atual" style="max-width:150px;max-height:100px;object-fit:contain">
+          <small>Logomarca atual</small>
+        </div>
+        {% endif %}
+        <input id="logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp">
+        <small>Deixe vazio para manter a logomarca atual. A mesma logo será usada em Minha barbearia.</small>
+      </div>
+      <div class="form-group"><label for="foto_capa">Foto de capa (JPG, PNG ou WEBP, até 2 MB)</label><input id="foto_capa" type="file" name="foto_capa" accept="image/jpeg,image/png,image/webp"></div>
+    </div>
+    {% if empresa.foto_capa %}<p>Foto de capa atual:</p><img style="max-width:100%;max-height:280px;border-radius:16px;object-fit:cover" src="{{ url_for('static', filename='uploads/capas/' ~ empresa.foto_capa) }}" alt="Foto de capa atual">{% endif %}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px"><button class="btn btn-primary" type="submit">Salvar personalização</button><a class="btn" target="_blank" rel="noopener" href="{{ url_for('preview_pagina_publica_v2',slug=empresa.slug) }}">Visualizar página V2 ↗</a></div>
+  </form>
+</section>
+{% endblock %}

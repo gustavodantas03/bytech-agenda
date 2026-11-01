@@ -1,0 +1,14 @@
+/* Master Premium — melhorias isoladas, sem sobrescrever tema dos estabelecimentos */
+.master-page {background:#f5f7fb;}
+.master-page .master-content {min-width:0;}
+.master-page .master-page-header {gap:18px;align-items:center;}
+.master-page .master-page-header h1 {letter-spacing:-.035em;}
+.master-page .master-stats-grid {gap:16px;}
+.master-page .master-stats-grid article {border:1px solid #e6eaf2;box-shadow:0 8px 26px rgba(20,35,65,.045);border-radius:18px;transition:transform .18s,box-shadow .18s;}
+.master-page .master-stats-grid article:hover {transform:translateY(-2px);box-shadow:0 12px 32px rgba(20,35,65,.08);}
+.master-page .panel {border:1px solid #e6eaf2;border-radius:18px;box-shadow:0 8px 26px rgba(20,35,65,.045);}
+.master-page .master-sidebar {box-shadow:4px 0 28px rgba(15,23,42,.08);}
+.master-page .master-nav a {transition:background .16s,color .16s;}
+.master-page :is(a,button,input,select,textarea):focus-visible {outline:3px solid #8db8ff;outline-offset:2px;}
+@media(max-width:760px){.master-page .master-page-header{align-items:stretch;flex-direction:column}.master-page .master-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.master-page .master-stats-grid article{min-width:0;padding:14px}.master-page .master-stats-grid strong{overflow-wrap:anywhere}}
+@media(max-width:420px){.master-page .master-stats-grid{grid-template-columns:1fr}}

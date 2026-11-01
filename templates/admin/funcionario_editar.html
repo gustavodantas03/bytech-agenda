@@ -1,43 +1,16 @@
 {% extends 'admin/base.html' %}
-
-{% block title %}
-Editar {{ ui.profissional_singular if ui else 'profissional' }}
-{% endblock %}
-
+{% block title %}Editar {{ ui.profissional_singular if ui else 'profissional' }}{% endblock %}
 {% block content %}
-<header class="page-header">
-    <div>
-        <span>Equipe</span>
-        <h1>Editar {{ ui.profissional_singular if ui else 'profissional' }}</h1>
-    </div>
-</header>
-
-<section class="panel narrow-panel">
-    <form method="post">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <label for="nome">Nome</label>
-        <input
-            id="nome"
-            name="nome"
-            value="{{ funcionario.nome }}"
-            required
-        >
-
-        <label for="cargo">Cargo</label>
-        <input
-            id="cargo"
-            name="cargo"
-            value="{{ funcionario.cargo or (ui.cargo_padrao if ui else 'Profissional') }}"
-            required
-        >
-
-        <button class="btn btn-primary" type="submit">
-            Salvar alterações
-        </button>
-
-        <a class="btn btn-secondary" href="{{ url_for('admin_funcionarios') }}">
-            Voltar
-        </a>
-    </form>
-</section>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profissionais-premium.css') }}?v=1">
+<div class="prof-premium">
+<header class="prof-heading"><div><span>Equipe</span><h1>Editar {{ ui.profissional_singular if ui else 'profissional' }}</h1><p>Atualize os dados e a imagem desta pessoa.</p></div><a class="prof-back" href="{{ url_for('admin_funcionarios') }}">← Voltar à equipe</a></header>
+<section class="prof-panel prof-edit-panel"><h2>Informações do profissional</h2><p class="prof-subtitle">As alterações serão aplicadas à equipe do estabelecimento.</p>
+<form class="prof-form" method="post" enctype="multipart/form-data">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+<div class="prof-field"><label for="nome">Nome completo</label><input id="nome" name="nome" value="{{ funcionario.nome }}" autocomplete="name" required></div>
+<div class="prof-field"><label for="cargo">Cargo ou especialidade</label><input id="cargo" name="cargo" value="{{ funcionario.cargo or (ui.cargo_padrao if ui else 'Profissional') }}" required></div>
+{% if funcionario.foto %}<div class="prof-edit-avatar"><img class="prof-avatar" src="{{ url_for('static', filename='uploads/profissionais/' ~ funcionario.foto) }}" alt="Foto de {{ funcionario.nome }}" width="58" height="58"><small class="prof-hint">Foto atual do profissional</small></div>{% endif %}
+<div class="prof-field"><label for="foto">{{ 'Substituir foto' if funcionario.foto else 'Adicionar foto' }}</label><input id="foto" name="foto" type="file" accept="image/png,image/jpeg,image/webp"><small class="prof-hint">PNG, JPG, JPEG ou WEBP. Deixe vazio para manter a foto atual.</small></div>
+<div class="prof-footer"><button class="prof-primary" type="submit">✓ Salvar alterações</button><a class="prof-back" href="{{ url_for('admin_funcionarios') }}">Cancelar</a></div>
+</form></section></div>
 {% endblock %}

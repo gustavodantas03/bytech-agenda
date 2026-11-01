@@ -14,6 +14,9 @@ class Config:
     SECRET_KEY = os.getenv("BYTECH_SECRET_KEY", "bytech-dev-altere-em-producao")
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     UPLOAD_FOLDER = str(BASE_DIR / "static" / "uploads" / "logos")
+    PROFISSIONAIS_UPLOAD_FOLDER = str(BASE_DIR / "static" / "uploads" / "profissionais")
+    SERVICOS_UPLOAD_FOLDER = str(BASE_DIR / "static" / "uploads" / "servicos")
+    PRODUTOS_UPLOAD_FOLDER = str(BASE_DIR / "static" / "uploads" / "produtos")
     DATABASE_URL = os.getenv("DATABASE_URL", "")
     # URL pública onde o sistema está publicado (sem barra no final).
     # Usada para montar links de agendamento enviados por WhatsApp.

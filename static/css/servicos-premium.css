@@ -1,0 +1,40 @@
+/* Bytech Agenda - Serviços Premium */
+.services-premium{--sp-main:var(--empresa-cor-principal,var(--accent,#6366f1));--sp-button:var(--empresa-cor-botao,var(--accent,#6366f1));--sp-line:#e8eaf0;--sp-muted:#64748b}
+.services-premium .sp-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.services-premium .sp-header h1{margin:3px 0 5px;font-size:clamp(25px,3vw,34px);letter-spacing:-.035em}
+.services-premium .sp-header p{margin:0;color:var(--sp-muted)}
+.services-premium .sp-kicker{font-size:12px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--sp-main)}
+.services-premium .sp-layout{display:grid;grid-template-columns:minmax(300px,.85fr) minmax(0,1.5fr);gap:20px;align-items:start}
+.services-premium .sp-panel{background:#fff;border:1px solid var(--sp-line);border-radius:22px;padding:24px;box-shadow:0 10px 34px rgba(15,23,42,.045);min-width:0}
+.services-premium .sp-panel h2{font-size:19px;letter-spacing:-.02em;margin:0 0 5px}
+.services-premium .sp-panel-desc{color:var(--sp-muted);font-size:13px;margin:0 0 22px}
+.services-premium .sp-field{display:flex;flex-direction:column;gap:7px;margin-bottom:17px;min-width:0}
+.services-premium .sp-field label{font-size:13px;font-weight:750;color:#334155}
+.services-premium .sp-field input{width:100%;min-width:0;min-height:49px;border:1px solid #dbe1ea;border-radius:12px;padding:11px 13px;background:#fff;color:#0f172a;font-size:15px;box-sizing:border-box}
+.services-premium .sp-field input:focus{outline:2px solid color-mix(in srgb,var(--sp-main) 22%,transparent);border-color:var(--sp-main)}
+.services-premium .sp-fields-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.services-premium .sp-help{font-size:12px;color:var(--sp-muted)}
+.services-premium .sp-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:49px;background:var(--sp-button)!important;border-color:var(--sp-button)!important;color:#fff!important;border-radius:12px;font-weight:800}
+.services-premium .sp-count{display:inline-flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--sp-main) 10%,white);color:var(--sp-main);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}
+.services-premium .sp-list-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.services-premium .sp-list{display:grid;gap:12px}
+.services-premium .sp-item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px;border:1px solid var(--sp-line);border-radius:16px;min-width:0}
+.services-premium .sp-info{display:flex;align-items:center;gap:13px;min-width:0;flex:1}
+.services-premium .sp-photo{width:66px!important;height:66px!important;min-width:66px!important;object-fit:cover;border-radius:13px;display:block!important}
+.services-premium .sp-photo-placeholder{width:66px;height:66px;min-width:66px;border-radius:13px;display:grid;place-items:center;font-size:26px;background:color-mix(in srgb,var(--sp-main) 9%,white)}
+.services-premium .sp-details{min-width:0}.services-premium .sp-name{display:block;font-size:15px;font-weight:800;color:#172033;overflow-wrap:anywhere}
+.services-premium .sp-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:7px;font-size:13px;color:var(--sp-muted)}
+.services-premium .sp-price{font-weight:850;color:var(--sp-main)}
+.services-premium .sp-status{display:inline-flex;border-radius:99px;padding:3px 9px;font-size:11px;font-weight:800;background:#ecfdf5;color:#047857}
+.services-premium .sp-status.is-off{background:#f1f5f9;color:#64748b}
+.services-premium .sp-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.services-premium .sp-actions form{margin:0}
+.services-premium .sp-actions .btn{font-size:12px;white-space:nowrap;border-radius:9px;padding:8px 11px}
+.services-premium .sp-empty{padding:35px 18px;text-align:center;border:1px dashed #cbd5e1;border-radius:16px;color:var(--sp-muted)}
+.services-premium .sp-back{display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.services-premium .sp-edit-layout{max-width:720px}
+.services-premium .sp-preview{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.services-premium .sp-edit-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.services-premium .sp-edit-actions .sp-submit{width:auto;min-width:200px}
+@media(max-width:1020px){.services-premium .sp-layout{grid-template-columns:1fr}}
+@media(max-width:640px){.services-premium .sp-panel{padding:18px;border-radius:17px}.services-premium .sp-fields-row{grid-template-columns:1fr;gap:0}.services-premium .sp-item{align-items:stretch;flex-direction:column}.services-premium .sp-actions{justify-content:flex-start}.services-premium .sp-actions .btn{min-height:37px}.services-premium .sp-header{align-items:flex-start}.services-premium .sp-edit-actions .sp-submit{width:100%}}

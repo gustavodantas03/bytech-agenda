@@ -1267,7 +1267,7 @@ label {
     box-shadow: 0 13px 30px rgba(0, 102, 255, .1);
 }
 
-.booking-option div:not(.booking-avatar) {
+.booking-option > div > div:not(.booking-avatar) {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1776,11 +1776,44 @@ body.admin-menu-open {
     justify-content: space-between;
 }
 
-.service-admin-item > div {
+.service-admin-item > div:first-child {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.service-admin-item > div:first-child > div {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    align-items: flex-start;
+    gap: 3px;
 }
+
+.service-admin-item > div:first-child > div strong {
+    display: block;
+}
+
+.service-admin-item > div:first-child > div span {
+    display: block;
+    font-size: 14px;
+}
+
+.service-admin-item .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.service-admin-item .actions .btn {
+    min-width: 96px;
+    padding: 9px 12px;
+    font-size: 14px;
+}
+
 
 .filter-form,
 .agenda-filters {
@@ -4912,4 +4945,75 @@ body.modal-open{overflow:hidden}.payment-modal-card{width:min(620px,100%)}.payme
 button.booking-back {
     cursor: pointer;
     font: inherit;
+}
+
+
+/* Alinhamento correto dos serviços com foto */
+.booking-service-option > div:first-child {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+.booking-service-option > div:first-child > img {
+    position: relative !important;
+    left: 0 !important;
+    margin-left: 0 !important;
+}
+
+
+/* CORREÇÃO DEFINITIVA - SERVIÇOS COM FOTO */
+.booking-service-option {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 14px !important;
+}
+
+.booking-service-option > div:first-child {
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.booking-service-option > div:first-child > img {
+    flex: 0 0 56px !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+}
+
+.booking-service-option > div:first-child > div {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 4px !important;
+}
+
+.booking-service-option > div:first-child > div span {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+}
+
+.booking-service-option > .booking-service-price {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content !important;
+    margin: 0 !important;
 }

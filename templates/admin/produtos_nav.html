@@ -1,0 +1,54 @@
+<nav class="produtos-nav" style="
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin:0 0 24px 0;
+    padding:6px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+">
+
+    <a
+        href="{{ url_for('admin_produtos') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'dashboard' else 'btn-secondary' }}"
+    >
+        Visão geral
+    </a>
+
+    <a
+        href="{{ url_for('cadastro_produtos') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'produtos' else 'btn-secondary' }}"
+    >
+        Produtos
+    </a>
+
+    <a
+        href="{{ url_for('entrada_estoque') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'entrada' else 'btn-secondary' }}"
+    >
+        Entrada
+    </a>
+
+    <a
+        href="{{ url_for('saida_estoque') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'saida' else 'btn-secondary' }}"
+    >
+        Saída
+    </a>
+
+    <a
+        href="{{ url_for('estoque_produtos') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'estoque' else 'btn-secondary' }}"
+    >
+        Estoque
+    </a>
+
+    <a
+        href="{{ url_for('relatorios_produtos') }}"
+        class="btn btn-small {{ 'btn-primary' if aba_produtos == 'relatorios' else 'btn-secondary' }}"
+    >
+        Relatórios
+    </a>
+
+</nav>

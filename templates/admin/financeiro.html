@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Financeiro | Bytech Agenda{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/financeiro-premium.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/financeiro-despesas.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/financeiro-etapa3.css') }}?v=3">
+<div class="fin-page">
+  <header class="fin-head">
+    <div><span class="fin-eyebrow">GESTÃO FINANCEIRA · ESTABELECIMENTO</span><h1>Financeiro</h1><p>Recebimentos do PDV e visão de resultados do seu negócio.</p></div>
+    <a class="fin-outline" href="{{ url_for('admin_vendas') }}">Ver vendas <span aria-hidden="true">↗</span></a>
+  </header>
+  <nav class="fin-shortcuts" aria-label="Períodos rápidos">{% for nome, di, df in periodos_rapidos %}<a href="{{ url_for('admin_financeiro', inicio=di.isoformat(), fim=df.isoformat()) }}">{{ nome }}</a>{% endfor %}</nav>
+  <div class="fin-actions"><a href="{{ url_for('admin_financeiro_relatorios') }}">Relatórios e gráficos ↗</a><a href="{{ url_for('admin_financeiro_recorrencias') }}">Despesas recorrentes ↗</a></div>
+  <form class="fin-filter" method="get" aria-label="Filtrar período">
+    <label>Data inicial <input type="date" name="inicio" value="{{ inicio }}" required></label>
+    <label>Data final <input type="date" name="fim" value="{{ fim }}" required></label>
+    <button type="submit">Aplicar período</button>
+  </form>
+  <div class="fin-kpis">
+    <article class="fin-kpi"><span>Receitas recebidas no PDV</span><strong>R$ {{ '%.2f'|format(recebido)|replace('.', ',') }}</strong><small>Somente pagamentos de vendas finalizadas</small></article>
+    <article class="fin-kpi"><span>Vendas com pagamento</span><strong>{{ quantidade }}</strong><small>No período selecionado</small></article>
+    <article class="fin-kpi"><span>Ticket médio recebido</span><strong>R$ {{ '%.2f'|format(ticket)|replace('.', ',') }}</strong><small>Recebimentos ÷ vendas pagas no período</small></article>
+    <article class="fin-kpi fin-kpi-neutral"><span>Agendamentos previstos</span><strong>R$ {{ '%.2f'|format(previstos)|replace('.', ',') }}</strong><small>{{ previstos_quantidade }} agendamento(s) não cancelado(s) · não é receita confirmada</small></article>
+  </div>
+  <div class="fin-two">
+    <section class="fin-panel"><div class="fin-panel-title"><h2>Recebimentos por dia</h2><span>PDV</span></div>
+      {% if dias %}<div class="fin-bars">
+      {% set maximo = (dias|map(attribute='total')|max)|float %}
+      {% for dia in dias %}<div class="fin-bar-row"><span>{{ dia.dia.strftime('%d/%m') if dia.dia.strftime is defined else dia.dia }}</span><div class="fin-track"><div class="fin-fill" style="width: {{ ((dia.total|float / maximo * 100) if maximo else 0)|round(1) }}%"></div></div><strong>R$ {{ '%.2f'|format(dia.total)|replace('.', ',') }}</strong></div>{% endfor %}
+      </div>{% else %}<p class="fin-empty">Nenhum recebimento registrado neste período.</p>{% endif %}
+    </section>
+    <section class="fin-panel"><div class="fin-panel-title"><h2>Formas de pagamento</h2><span>Distribuição</span></div>
+      {% if formas %}<div class="fin-methods">{% for forma in formas %}<div class="fin-method"><span>{{ forma.forma|capitalize }}</span><strong>R$ {{ '%.2f'|format(forma.total)|replace('.', ',') }}</strong></div>{% endfor %}</div>{% else %}<p class="fin-empty">Sem pagamentos para exibir.</p>{% endif %}
+    </section>
+  </div>
+  <section class="fin-panel fin-sales"><div class="fin-panel-title"><h2>Últimas vendas finalizadas</h2><span>Até 12 registros</span></div>
+    {% if recentes %}<div class="fin-table-scroll"><table><thead><tr><th>Venda</th><th>Data</th><th>Responsável</th><th>Pagamento</th><th>Valor</th><th></th></tr></thead><tbody>
+    {% for venda in recentes %}<tr><td><strong>#{{ venda.id }}</strong></td><td>{{ venda.finalizado_em.strftime('%d/%m/%Y %H:%M') if venda.finalizado_em else '—' }}</td><td>{{ venda.responsavel or '—' }}</td><td>{{ venda.forma }}</td><td><strong>R$ {{ '%.2f'|format(venda.total)|replace('.', ',') }}</strong></td><td><a href="{{ url_for('admin_venda_detalhe', venda_id=venda.id) }}">Detalhes →</a></td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="fin-empty">Nenhuma venda finalizada neste período.</p>{% endif %}
+  </section>
+
+  <section class="fin-panel fin-despesas-overview">
+    <div class="fin-panel-title"><h2>Despesas e fluxo de caixa</h2><a class="fin-outline" href="{{ url_for('admin_financeiro_despesas') }}">Gerenciar contas a pagar →</a></div>
+    <div class="fin-despesas-grid">
+      <article><span>Despesas pagas no período</span><strong>R$ {{ '%.2f'|format(despesas_pagas)|replace('.', ',') }}</strong></article>
+      <article><span>Saldo do período</span><strong>R$ {{ '%.2f'|format(saldo_caixa)|replace('.', ',') }}</strong><small>PDV recebido − despesas pagas</small></article>
+      <article><span>Contas pendentes</span><strong>R$ {{ '%.2f'|format(contas_pendentes)|replace('.', ',') }}</strong><small>Independentemente do período</small></article>
+      <article><span>Contas vencidas</span><strong>R$ {{ '%.2f'|format(contas_vencidas)|replace('.', ',') }}</strong><small>Pendentes com vencimento anterior a hoje</small></article>
+    </div>
+  </section>
+  <p class="fin-note">Recebimentos são apurados pelos pagamentos registrados no PDV, excluindo vendas canceladas. Valores de agendamentos são apenas previsão e podem incluir serviços já lançados no PDV. O saldo apresentado considera apenas recebimentos registrados no PDV e despesas pagas.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Entrada de estoque{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-premium.css') }}?v=1">
+
+<header class="estoque-hero">
+    <div class="estoque-hero-content">
+        <a class="estoque-back" href="{{ url_for('admin_produtos') }}">
+            ← Voltar para Visão Geral
+        </a>
+        <span class="estoque-eyebrow">MOVIMENTAÇÃO DE ESTOQUE</span>
+        <h1>Entrada de estoque</h1>
+        <p>Registre compras, reposições e outras entradas de produtos.</p>
+    </div>
+</header>
+
+{% include 'admin/produtos_nav.html' %}
+
+<div class="estoque-grid">
+
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px;align-self:start;">
+
+        <h2 style="font-size:18px;margin:0 0 18px;">Nova entrada</h2>
+
+        <form method="post">
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div style="margin-bottom:16px;">
+                <label for="entrada-produto">Produto</label>
+
+                <select id="entrada-produto" name="produto_id" required style="width:100%;">
+                    <option value="">Selecione um produto</option>
+
+                    {% for produto in produtos %}
+                        <option
+                            value="{{ produto.id }}"
+                            data-estoque="{{ produto.estoque }}"
+                        >
+                            {{ produto.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="entrada-saldo" style="display:none;margin-bottom:16px;padding:12px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;">
+                <span style="font-size:12px;color:#64748b;">Estoque atual</span>
+                <strong id="entrada-saldo-valor" style="display:block;font-size:20px;margin-top:3px;">0</strong>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label for="entrada-quantidade">Quantidade</label>
+
+                <input
+                    id="entrada-quantidade"
+                    type="number"
+                    name="quantidade"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Ex.: 10"
+                    required
+                    style="width:100%;"
+                >
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label for="entrada-motivo">Motivo</label>
+
+                <input
+                    id="entrada-motivo"
+                    type="text"
+                    name="motivo"
+                    maxlength="250"
+                    placeholder="Ex.: Compra de fornecedor"
+                    style="width:100%;"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;">
+                Registrar entrada
+            </button>
+
+        </form>
+    </section>
+
+    <section style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px;">
+
+        <h2 style="font-size:18px;margin:0 0 18px;">Últimas entradas</h2>
+
+        {% for entrada in entradas %}
+
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;">
+
+                <div>
+                    <strong style="display:block;">{{ entrada.produto_nome }}</strong>
+
+                    <span style="font-size:12px;color:#64748b;">
+                        {{ entrada.motivo or 'Sem motivo informado' }}
+                    </span>
+
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
+                        {{ entrada.criado_em.strftime('%d/%m/%Y às %H:%M') if entrada.criado_em is not string and entrada.criado_em else ((entrada.criado_em|string)[8:10] ~ '/' ~ (entrada.criado_em|string)[5:7] ~ '/' ~ (entrada.criado_em|string)[0:4] ~ ' às ' ~ (entrada.criado_em|string)[11:16]) if entrada.criado_em else 'Data não informada' }}
+                        {% if entrada.responsavel %}
+                            · {{ entrada.responsavel }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="text-align:right;">
+                    <strong style="color:#15803d;font-size:17px;">
+                        +{{ ('%g'|format(entrada.quantidade|float))|replace('.', ',') }}
+                    </strong>
+
+                    <div style="font-size:11px;color:#64748b;margin-top:3px;">
+                        {{ ('%g'|format(entrada.estoque_anterior|float))|replace('.', ',') }} → {{ ('%g'|format(entrada.estoque_posterior|float))|replace('.', ',') }}
+                    </div>
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div style="padding:30px;text-align:center;background:#f8fafc;border-radius:10px;color:#64748b;">
+                Nenhuma entrada registrada.
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const produto = document.getElementById("entrada-produto");
+    const saldoBox = document.getElementById("entrada-saldo");
+    const saldoValor = document.getElementById("entrada-saldo-valor");
+
+    if (!produto || !saldoBox || !saldoValor) return;
+
+    function atualizarSaldo() {
+        const opcao = produto.options[produto.selectedIndex];
+
+        if (!opcao || !opcao.value) {
+            saldoBox.style.display = "none";
+            saldoValor.textContent = "0";
+            return;
+        }
+
+        saldoValor.textContent = opcao.dataset.estoque || "0";
+        saldoBox.style.display = "block";
+    }
+
+    produto.addEventListener("change", atualizarSaldo);
+    atualizarSaldo();
+});
+</script>
+
+<style>
+.estoque-grid {
+    display:grid;
+    grid-template-columns:minmax(320px,.8fr) minmax(0,1.2fr);
+    gap:20px;
+}
+
+@media (max-width:850px) {
+    .estoque-grid {
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+{% endblock %}

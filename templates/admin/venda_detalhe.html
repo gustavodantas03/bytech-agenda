@@ -1,0 +1,201 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="vd-page">
+
+    <div class="vd-header">
+        <div>
+            <a href="{{ url_for('admin_vendas') }}" class="vd-voltar">← Voltar para vendas</a>
+            <h1>Venda #{{ venda.id }}</h1>
+            <p>Detalhes da venda realizada.</p>
+        </div>
+
+        <div class="vd-header-acoes">
+            <span class="vd-status status-{{ venda.status }}">
+                {{ venda.status|capitalize }}
+            </span>
+
+            {% if venda.status == 'finalizada' %}
+            <form
+                method="POST"
+                action="{{ url_for('admin_venda_cancelar', venda_id=venda.id) }}"
+                onsubmit="return confirm('Cancelar esta venda e devolver os produtos ao estoque?');"
+            >
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="vd-btn-cancelar">
+                    Cancelar venda
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="vd-grid">
+        <section class="vd-card">
+            <h2>Informações da venda</h2>
+
+            <div class="vd-info-grid">
+                <div>
+                    <span>Cliente</span>
+                    <strong>{{ venda.cliente_nome }}</strong>
+                </div>
+
+                <div>
+                    <span>Telefone</span>
+                    <strong>{{ venda.cliente_telefone or '-' }}</strong>
+                </div>
+
+                <div>
+                    <span>Data</span>
+                    <strong>
+                        {% if venda.finalizado_em %}
+                            {{ venda.finalizado_em.strftime('%d/%m/%Y %H:%M') }}
+                        {% elif venda.criado_em %}
+                            {{ venda.criado_em.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Responsável</span>
+                    <strong>{{ venda.responsavel or '-' }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="vd-card">
+            <h2>Pagamento</h2>
+
+            {% if pagamentos %}
+                {% for pagamento in pagamentos %}
+                <div class="vd-pagamento">
+                    <span>
+                        {{ pagamento.forma
+                            |replace('pix', 'Pix')
+                            |replace('dinheiro', 'Dinheiro')
+                            |replace('debito', 'Débito')
+                            |replace('credito', 'Crédito')
+                            |replace('outro', 'Outro') }}
+                    </span>
+
+                    <strong>
+                        R$ {{ "%.2f"|format(pagamento.valor or 0)|replace('.', ',') }}
+                    </strong>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="vd-muted">Pagamento não informado.</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <section class="vd-card vd-itens-card">
+        <h2>Itens da venda</h2>
+
+        <div class="vd-table-wrap">
+            <table class="vd-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Valor unitário</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in itens %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.descricao }}</strong>
+                            {% if item.tipo == 'servico' and item.funcionario_nome %}
+                            <small style="display:block;margin-top:4px;color:#64748b;">
+                                Profissional: {{ item.funcionario_nome }}
+                            </small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ 'Produto' if item.tipo == 'produto' else 'Serviço' }}
+                        </td>
+                        <td>{{ "%g"|format(item.quantidade or 0) }}</td>
+                        <td>
+                            R$ {{ "%.2f"|format(item.valor_unitario or 0)|replace('.', ',') }}
+                        </td>
+                        <td>
+                            <strong>
+                                R$ {{ "%.2f"|format(item.subtotal or 0)|replace('.', ',') }}
+                            </strong>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="vd-totais">
+            <div>
+                <span>Subtotal</span>
+                <strong>R$ {{ "%.2f"|format(venda.subtotal or 0)|replace('.', ',') }}</strong>
+            </div>
+
+            <div>
+                <span>Desconto</span>
+                <strong>R$ {{ "%.2f"|format(venda.desconto or 0)|replace('.', ',') }}</strong>
+            </div>
+
+            <div class="vd-total-final">
+                <span>Total</span>
+                <strong>R$ {{ "%.2f"|format(venda.total or 0)|replace('.', ',') }}</strong>
+            </div>
+        </div>
+    </section>
+
+    {% if venda.observacoes %}
+    <section class="vd-card">
+        <h2>Observações</h2>
+        <p>{{ venda.observacoes }}</p>
+    </section>
+    {% endif %}
+
+</div>
+
+<style>
+.vd-page{max-width:1400px;margin:0 auto}
+.vd-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}
+.vd-header h1{margin:10px 0 4px}
+.vd-header p{margin:0;color:#64748b}
+.vd-voltar{text-decoration:none;color:#475569;font-weight:700}
+.vd-status{display:inline-flex;padding:7px 12px;border-radius:999px;font-size:.8rem;font-weight:800}
+.vd-header-acoes{display:flex;align-items:flex-end;flex-direction:column;gap:10px}
+.vd-btn-cancelar{border:1px solid #fecaca;background:#fff;color:#b91c1c;padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer}
+.vd-btn-cancelar:hover{background:#fef2f2}
+.status-finalizada{background:#dcfce7;color:#166534}
+.status-cancelada{background:#fee2e2;color:#991b1b}
+.status-aberta{background:#fef3c7;color:#92400e}
+.vd-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
+.vd-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:18px}
+.vd-card h2{font-size:1.05rem;margin:0 0 18px}
+.vd-info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.vd-info-grid div{display:flex;flex-direction:column;gap:5px}
+.vd-info-grid span,.vd-totais span{font-size:.78rem;text-transform:uppercase;color:#64748b;font-weight:700}
+.vd-pagamento{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid #e2e8f0}
+.vd-pagamento:last-child{border-bottom:0}
+.vd-muted{color:#64748b}
+.vd-table-wrap{overflow-x:auto}
+.vd-table{width:100%;border-collapse:collapse}
+.vd-table th,.vd-table td{padding:14px;text-align:left;border-bottom:1px solid #e2e8f0}
+.vd-table th{font-size:.76rem;text-transform:uppercase;color:#64748b;background:#f8fafc}
+.vd-totais{margin:20px 0 0 auto;max-width:360px}
+.vd-totais div{display:flex;justify-content:space-between;gap:20px;padding:8px 0}
+.vd-total-final{font-size:1.12rem;border-top:1px solid #cbd5e1;margin-top:5px;padding-top:13px!important}
+@media(max-width:768px){
+    .vd-grid{grid-template-columns:1fr}
+    .vd-info-grid{grid-template-columns:1fr}
+    .vd-header{flex-direction:column}
+}
+</style>
+
+{% endblock %}

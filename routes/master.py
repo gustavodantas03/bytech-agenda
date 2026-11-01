@@ -72,17 +72,17 @@ def master_dashboard():
         FROM empresas
     """).fetchone()
     recebido_mes = conn.execute(
-        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=?",
+        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE COALESCE(estornado,0)=0 AND substr(data_pagamento,1,7)=?",
         (mes_atual_competencia(),),
     ).fetchone()["total"]
-    historico = _historico_financeiro(conn)
+    historico = _historico_financeiro(conn, filtrar_estorno=True)
     empresas_recentes = conn.execute("""
         SELECT id,nome,segmento,plano,status_pagamento FROM empresas ORDER BY id DESC LIMIT 6
     """).fetchall()
     pagamentos_recentes = conn.execute("""
         SELECT p.valor,p.data_pagamento,p.forma_pagamento,e.nome empresa_nome
         FROM pagamentos p JOIN empresas e ON e.id=p.empresa_id
-        ORDER BY p.data_pagamento DESC,p.id DESC LIMIT 6
+        WHERE COALESCE(p.estornado,0)=0 ORDER BY p.data_pagamento DESC,p.id DESC LIMIT 6
     """).fetchall()
     conn.close()
     return render_template(
@@ -138,10 +138,10 @@ def master_empresas():
         COALESCE(SUM(mensalidade),0) receita_prevista FROM empresas
     """).fetchone()
     recebido_mes = conn.execute(
-        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE substr(data_pagamento,1,7)=?",
+        "SELECT COALESCE(SUM(valor),0) total FROM pagamentos WHERE COALESCE(estornado,0)=0 AND substr(data_pagamento,1,7)=?",
         (mes_atual_competencia(),),
     ).fetchone()["total"]
-    historico = _historico_financeiro(conn)
+    historico = _historico_financeiro(conn, filtrar_estorno=True)
     conn.close()
     return render_template("master/empresas.html", empresas=empresas,resumo=resumo,recebido_mes=recebido_mes,historico=historico,segmentos=SEGMENTOS,busca=busca,segmento_filtro=segmento_filtro,status_filtro=status_filtro)
 
@@ -197,8 +197,11 @@ def master_nova_empresa():
         if not plano_registro:
             plano_registro = conn.execute("SELECT * FROM planos WHERE ativo = 1 ORDER BY valor, id LIMIT 1").fetchone()
         plano = plano_registro["nome"] if plano_registro else "Essencial"
-        if mensalidade <= 0 and plano_registro:
-            mensalidade = float(plano_registro["valor"] or 0)
+        # Valor zero e uma escolha valida (teste/cortesia): nao cobrar automaticamente.
+        if mensalidade < 0:
+            conn.close()
+            flash("A mensalidade nao pode ser negativa.", "erro")
+            return redirect(url_for("master_nova_empresa"))
 
         slug_existente = conn.execute(
             "SELECT id FROM empresas WHERE slug = ?",
@@ -930,7 +933,8 @@ def master_editar_plano(plano_id):
             conn.execute("DELETE FROM plano_recursos WHERE plano_id=?",(plano_id,))
             for recurso_id in request.form.getlist("recursos"):
                 conn.execute("INSERT OR IGNORE INTO plano_recursos (plano_id,recurso_id) VALUES (?,?)",(plano_id,recurso_id))
-            conn.execute("UPDATE empresas SET plano=?, mensalidade=CASE WHEN mensalidade<=0 THEN ? ELSE mensalidade END WHERE plano_id=?",(nome,valor,plano_id))
+            # Atualizar o nome do plano nao altera contratos nem ativa cobrancas.
+            conn.execute("UPDATE empresas SET plano=? WHERE plano_id=?", (nome,plano_id))
             conn.commit(); conn.close(); flash("Plano atualizado com sucesso.","sucesso"); return redirect(url_for("master_planos"))
         except DatabaseIntegrityError:
             conn.rollback(); conn.close(); flash("Já existe outro plano com este nome.","erro"); return redirect(url_for("master_editar_plano",plano_id=plano_id))
@@ -1045,6 +1049,52 @@ def master_financeiro():
         plano_filtro=plano_id,
         competencia_filtro=competencia,
     )
+
+
+@app.route("/master/empresas/<int:empresa_id>/assinatura", methods=["POST"])
+@master_login_required
+def master_configurar_assinatura(empresa_id):
+    from datetime import date as _date
+    from services.financeiro import atualizar_empresa_financeiro, registrar_log
+    modo = request.form.get("assinatura_status", "").strip()
+    if modo not in ("isenta", "teste", "ativa"):
+        flash("Modalidade invalida.", "erro")
+        return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
+    inicio_txt = request.form.get("assinatura_inicio_cobranca", "").strip()
+    inicio = None
+    if modo != "isenta":
+        try:
+            inicio = _date.fromisoformat(inicio_txt)
+        except ValueError:
+            flash("Informe uma data valida.", "erro")
+            return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
+        if inicio < _date.today():
+            flash("Nao e permitido iniciar cobranca retroativa.", "erro")
+            return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
+    conn = get_connection()
+    try:
+        empresa = conn.execute("SELECT * FROM empresas WHERE id=?", (empresa_id,)).fetchone()
+        if not empresa:
+            flash("Empresa nao encontrada.", "erro")
+            return redirect(url_for("master_empresas"))
+        if modo != "isenta" and float(empresa["mensalidade"] or 0) <= 0:
+            flash("Configure uma mensalidade maior que zero em Editar empresa.", "erro")
+            return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
+        abertas = conn.execute("SELECT COUNT(*) AS total FROM cobrancas WHERE empresa_id=? AND status NOT IN ('paga','cancelada')", (empresa_id,)).fetchone()["total"]
+        if abertas:
+            flash("Resolva as cobrancas abertas antes de alterar a assinatura.", "erro")
+            return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
+        conn.execute("UPDATE empresas SET assinatura_status=?,assinatura_inicio_cobranca=? WHERE id=?", (modo, inicio.isoformat() if inicio else None, empresa_id))
+        registrar_log(conn, empresa_id, "assinatura_configurada", "Modalidade: "+modo+"; primeira cobranca: "+(inicio.isoformat() if inicio else "isenta"))
+        atualizar_empresa_financeiro(conn, empresa_id)
+        conn.commit()
+        flash("Assinatura configurada.", "sucesso")
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+    return redirect(url_for("master_empresa_financeiro", empresa_id=empresa_id))
 
 
 @app.route("/master/empresas/<int:empresa_id>/financeiro")
@@ -1187,3 +1237,64 @@ def master_configuracoes_financeiras():
             conn.rollback(); flash('Revise os valores informados.','erro')
         conn.close(); return redirect(url_for('master_configuracoes_financeiras'))
     conn.close(); return render_template('master/configuracoes_financeiras.html',cfg=cfg)
+
+
+# BYTECH_MASTER_COMERCIAL_FASE2_V1
+@app.route('/master/comercial')
+@master_login_required
+def master_comercial():
+    # Consulta sem gerar mensalidades ou modificar empresas.
+    from datetime import date
+    conn = get_connection()
+    try:
+        empresas = conn.execute('''
+            SELECT e.id, e.nome, e.slug, e.ativo, e.bloqueio_manual,
+                   e.status_pagamento, e.mensalidade, e.proximo_vencimento,
+                   e.plano_id, COALESCE(p.nome, e.plano, 'Sem plano') AS plano_nome,
+                   (SELECT COUNT(*) FROM cobrancas c WHERE c.empresa_id=e.id
+                    AND c.status IN ('aberta','vencida')) AS cobrancas_abertas,
+                   (SELECT COALESCE(SUM(c.valor_final),0) FROM cobrancas c
+                    WHERE c.empresa_id=e.id AND c.status IN ('aberta','vencida')) AS valor_aberto
+            FROM empresas e LEFT JOIN planos p ON p.id=e.plano_id
+            ORDER BY e.nome
+        ''').fetchall()
+    finally:
+        conn.close()
+    hoje = date.today()
+    registros=[]
+    for e in empresas:
+        valor=float(e['mensalidade'] or 0)
+        if not e['ativo'] or e['bloqueio_manual']:
+            situacao='Suspensa'
+        elif valor <= 0:
+            situacao='Sem cobrança configurada'
+        elif e['status_pagamento']=='inadimplente':
+            situacao='Inadimplente'
+        elif e['status_pagamento']=='pendente':
+            situacao='Pendente'
+        else:
+            situacao='Em dia'
+        registros.append(dict(id=e['id'],nome=e['nome'],slug=e['slug'],
+            plano=e['plano_nome'],mensalidade=valor,situacao=situacao,
+            vencimento=e['proximo_vencimento'],abertas=e['cobrancas_abertas'],
+            valor_aberto=float(e['valor_aberto'] or 0)))
+    if request.args.get('exportar')=='csv':
+        import csv
+        from io import StringIO
+        from flask import Response
+        saida=StringIO()
+        saida.write('\ufeff')
+        writer=csv.writer(saida,delimiter=';')
+        writer.writerow(['Empresa','Plano','Mensalidade (R$)','Situação','Próximo vencimento','Cobranças abertas','Valor em aberto (R$)'])
+        for r in registros:
+            writer.writerow([r['nome'],r['plano'],f"{r['mensalidade']:.2f}".replace('.',','),
+                r['situacao'],str(r['vencimento'] or ''),r['abertas'],
+                f"{r['valor_aberto']:.2f}".replace('.',',')])
+        return Response(saida.getvalue(),mimetype='text/csv; charset=utf-8',
+            headers={'Content-Disposition':'attachment; filename="bytech-carteira-comercial.csv"',
+                     'Cache-Control':'no-store'})
+    resumo={'total':len(registros),'com_cobranca':sum(x['mensalidade']>0 for x in registros),
+        'sem_cobranca':sum(x['mensalidade']<=0 for x in registros),
+        'receita_prevista':sum(x['mensalidade'] for x in registros if x['situacao']!='Suspensa'),
+        'em_aberto':sum(x['valor_aberto'] for x in registros)}
+    return render_template('master/comercial.html',registros=registros,resumo=resumo)

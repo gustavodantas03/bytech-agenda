@@ -1,0 +1,176 @@
+/* BYTECH AGENDA — FORMULÁRIO DE CLIENTES */
+
+body.admin-page .client-form-premium {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+body.admin-page .client-form-premium * {
+    box-sizing: border-box;
+}
+
+body.admin-page .client-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+body.admin-page .client-form-header h1 {
+    margin: 6px 0;
+    font-size: clamp(28px, 3vw, 36px);
+    letter-spacing: -1px;
+}
+
+body.admin-page .client-form-header p {
+    color: #64748b;
+    margin: 8px 0 0;
+}
+
+body.admin-page .client-form-card {
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 14px 40px rgba(15,23,42,.06);
+}
+
+body.admin-page .client-form-section {
+    margin-bottom: 30px;
+}
+
+body.admin-page .client-form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.admin-page .client-form-section-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: color-mix(in srgb,
+        var(--empresa-cor-principal, #2563eb) 12%, white);
+    font-size: 21px;
+}
+
+body.admin-page .client-form-section-title h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+}
+
+body.admin-page .client-form-section-title p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+body.admin-page .client-form-premium .client-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+body.admin-page .client-form-premium .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    font-weight: 600;
+    color: #334155;
+}
+
+body.admin-page .client-form-premium .form-field input,
+body.admin-page .client-form-premium .form-field select,
+body.admin-page .client-form-premium .form-field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #dbe3ef;
+    border-radius: 13px;
+    background: #fff;
+    color: #0f172a;
+    font: inherit;
+    outline: none;
+}
+
+body.admin-page .client-form-premium .form-field textarea {
+    min-height: 125px;
+    resize: vertical;
+}
+
+body.admin-page .client-form-premium .form-field input:focus,
+body.admin-page .client-form-premium .form-field select:focus,
+body.admin-page .client-form-premium .form-field textarea:focus {
+    border-color: var(--empresa-cor-principal, #2563eb);
+    box-shadow: 0 0 0 3px color-mix(in srgb,
+        var(--empresa-cor-principal, #2563eb) 14%, transparent);
+}
+
+body.admin-page .client-form-premium .client-form-full {
+    grid-column: 1 / -1;
+}
+
+body.admin-page .client-form-premium .client-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 22px;
+    border-top: 1px solid #e2e8f0;
+}
+
+body.admin-page .client-form-premium .client-form-actions .btn-primary {
+    background: var(--empresa-cor-botao,
+        var(--empresa-cor-principal, #2563eb)) !important;
+    border-color: var(--empresa-cor-botao,
+        var(--empresa-cor-principal, #2563eb)) !important;
+    color: #fff !important;
+}
+
+@media (max-width: 760px) {
+    body.admin-page .client-form-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    body.admin-page .client-form-header .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    body.admin-page .client-form-card {
+        padding: 22px 18px;
+        border-radius: 20px;
+    }
+
+    body.admin-page .client-form-premium .client-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    body.admin-page .client-form-premium .client-form-full {
+        grid-column: auto;
+    }
+
+    body.admin-page .client-form-premium .client-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    body.admin-page .client-form-premium .client-form-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Identidade visual personalizada da empresa */
+body.admin-page .client-form-premium .client-form-header > div > span {
+    color: var(--empresa-cor-principal, #2563eb);
+}

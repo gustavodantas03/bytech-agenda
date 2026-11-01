@@ -1,6 +1,9 @@
 """Rotas do módulo servicos."""
 
 from core import *  # noqa: F401,F403
+from uuid import uuid4
+from werkzeug.utils import secure_filename
+import os
 
 @app.route("/admin/servicos", methods=["GET", "POST"])
 @login_required
@@ -13,10 +16,32 @@ def admin_servicos():
         valor = request.form.get("valor", "0").replace(",", ".")
         duracao = request.form.get("duracao", "40")
 
+        foto_nome = None
+        arquivo_foto = request.files.get("foto")
+
+        if arquivo_foto and arquivo_foto.filename:
+            if not arquivo_permitido(arquivo_foto.filename):
+                conn.close()
+                flash(
+                    "Formato inválido. Envie uma imagem PNG, JPG, JPEG ou WEBP.",
+                    "erro",
+                )
+                return redirect(url_for("admin_servicos"))
+
+            extensao = secure_filename(
+                arquivo_foto.filename
+            ).rsplit(".", 1)[1].lower()
+
+            foto_nome = f"servico_{empresa_id}_{uuid4().hex}.{extensao}"
+            pasta_fotos = app.config["SERVICOS_UPLOAD_FOLDER"]
+            os.makedirs(pasta_fotos, exist_ok=True)
+            caminho_foto = os.path.join(pasta_fotos, foto_nome)
+            arquivo_foto.save(caminho_foto)
+
         if nome:
             conn.execute(
-                "INSERT INTO servicos (empresa_id, nome, valor, duracao) VALUES (?, ?, ?, ?)",
-                (empresa_id, nome, float(valor), int(duracao)),
+                "INSERT INTO servicos (empresa_id, nome, valor, duracao, foto) VALUES (?, ?, ?, ?, ?)",
+                (empresa_id, nome, float(valor), int(duracao), foto_nome),
             )
             conn.commit()
             flash("Serviço cadastrado.", "sucesso")
@@ -49,13 +74,37 @@ def editar_servico(servico_id):
         valor = request.form.get("valor", "0").replace(",", ".")
         duracao = request.form.get("duracao", "40")
 
+        foto_nome = servico["foto"]
+        arquivo_foto = request.files.get("foto")
+
+        if arquivo_foto and arquivo_foto.filename:
+            if not arquivo_permitido(arquivo_foto.filename):
+                conn.close()
+                flash(
+                    "Formato inválido. Envie uma imagem PNG, JPG, JPEG ou WEBP.",
+                    "erro",
+                )
+                return redirect(
+                    url_for("editar_servico", servico_id=servico_id)
+                )
+
+            extensao = secure_filename(
+                arquivo_foto.filename
+            ).rsplit(".", 1)[1].lower()
+
+            foto_nome = f"servico_{empresa_id}_{uuid4().hex}.{extensao}"
+            pasta_fotos = app.config["SERVICOS_UPLOAD_FOLDER"]
+            os.makedirs(pasta_fotos, exist_ok=True)
+            caminho_foto = os.path.join(pasta_fotos, foto_nome)
+            arquivo_foto.save(caminho_foto)
+
         conn.execute(
             """
             UPDATE servicos
-            SET nome = ?, valor = ?, duracao = ?
+            SET nome = ?, valor = ?, duracao = ?, foto = ?
             WHERE id = ? AND empresa_id = ?
             """,
-            (nome, float(valor), int(duracao), servico_id, empresa_id),
+            (nome, float(valor), int(duracao), foto_nome, servico_id, empresa_id),
         )
         conn.commit()
         conn.close()

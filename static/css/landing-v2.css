@@ -1,0 +1,170 @@
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#fff;color:#202124;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}a{color:inherit;text-decoration:none}img{max-width:100%;display:block}.nav{max-width:1200px;margin:auto;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px}.identity{display:flex;align-items:center;gap:12px;min-width:0}.identity img{width:45px;height:45px;object-fit:contain;border-radius:12px}.identity strong{font-size:18px;overflow-wrap:anywhere}.nav nav{display:flex;gap:23px;flex-wrap:wrap}.nav nav a{font-size:14px;color:#545454}.nav nav a:hover,.section-head>a:hover{color:var(--brand)}.button{background:var(--cta);color:white;display:inline-flex;align-items:center;justify-content:center;padding:13px 22px;border-radius:11px;font-weight:700;text-align:center;transition:transform .2s}.button:hover{transform:translateY(-2px)}.button.small{padding:10px 17px;font-size:14px}.button.ghost{background:transparent;color:var(--brand);border:1px solid #d2d2d2}.hero{background:linear-gradient(130deg,#faf8f5,#f3f2f0);padding:75px max(28px,calc((100vw - 1150px)/2));display:grid;grid-template-columns:1.1fr .9fr;gap:45px;align-items:center}.eyebrow{color:var(--brand);font-size:12px;letter-spacing:.17em;font-weight:800}.hero h1{font-size:clamp(36px,5vw,68px);line-height:1.1;margin:16px 0;overflow-wrap:anywhere}.hero p{max-width:520px;color:#5b5b5b;font-size:18px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.hero-art{min-height:330px;border-radius:30px;background:linear-gradient(145deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;gap:15px;box-shadow:0 24px 45px #0002}.hero-symbol{width:170px;height:170px;border-radius:30px;background:#fff2;display:grid;place-items:center;font-size:70px;overflow:hidden}.hero-symbol img{width:100%;height:100%;object-fit:contain;padding:16px}.hero-art>span{font-weight:600}.section{padding:78px max(28px,calc((100vw - 1150px)/2));scroll-margin-top:20px}.section.muted{background:#f8f8f8}.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:27px}.section-head>a{font-weight:700;font-size:14px}.section h2{font-size:clamp(28px,3.3vw,42px);margin:8px 0}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{border:1px solid #e8e8e8;border-radius:18px;overflow:hidden;background:white;box-shadow:0 6px 24px #00000006}.photo{height:200px;background:linear-gradient(145deg,#ece9e6,#e3e1de);display:grid;place-items:center;color:var(--brand);font-size:65px}.photo img{width:100%;height:100%;object-fit:cover}.card-body{padding:20px}.card h3{margin:0 0 6px;font-size:19px}.card p{color:#6c6c6c;font-size:14px;margin:4px 0 15px}.category{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--brand)}.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:20px}.card-foot strong{font-size:18px}.card-foot a{font-size:14px;color:var(--brand);font-weight:800}.about{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center}.about>div>p{color:#666;max-width:570px}.about-panel{padding:32px;background:#f8f8f8;border-radius:22px}.about-panel h3{margin-top:0}.contact>p{color:#555}footer{padding:24px max(28px,calc((100vw - 1150px)/2));display:flex;justify-content:space-between;gap:15px;color:#777;font-size:13px}@media(max-width:850px){.nav{flex-wrap:wrap}.nav nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;gap:20px;padding-bottom:5px}.nav nav a{white-space:nowrap}.hero{grid-template-columns:1fr;padding-top:46px;padding-bottom:46px}.hero-art{min-height:220px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.about{grid-template-columns:1fr}}@media(max-width:560px){.nav{padding:14px 18px}.nav .small{font-size:12px}.hero,.section{padding-left:20px;padding-right:20px}.hero h1{font-size:38px}.hero-art{min-height:180px}.hero-symbol{width:105px;height:105px}.cards{grid-template-columns:1fr}.photo{height:210px}.section{padding-top:55px;padding-bottom:55px}.section-head{align-items:start;flex-direction:column}.contact .actions .button{width:100%}footer{padding:25px 20px;flex-direction:column}}
+/* BYTECH V2 - acabamento visual automático por segmento */
+:root{color-scheme:light}body{--ink:#1a1b1d;--muted:#687078;--paper:#fff;--soft:#f7f7f7;--line:#e9e9e9;color:var(--ink);background:var(--paper)}
+body.theme-barbearia{--ink:#f8f6f0;--muted:#c2c2bf;--paper:#111719;--soft:#1a2326;--line:#354044}
+body.theme-beleza{--ink:#292329;--muted:#776d75;--paper:#fffafc;--soft:#f9edf3;--line:#f0dfe8}
+body.theme-estetica{--ink:#24312e;--muted:#687973;--paper:#f8fbf9;--soft:#edf4f0;--line:#d9e7df}
+body.theme-geral{--ink:#202735;--muted:#687181;--paper:#fff;--soft:#f3f6fb;--line:#e3e8ef}
+.nav{max-width:none;padding:17px max(24px,calc((100vw - 1160px)/2));background:var(--paper);color:var(--ink);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);box-shadow:0 4px 20px #00000008}
+.nav nav a{color:var(--muted)}.nav nav a:hover{color:var(--brand)}.identity strong{font-size:19px}.identity img{border-radius:50%;border:1px solid var(--line);background:white}
+.button{background:var(--cta);color:white;border-radius:999px;box-shadow:0 8px 24px #00000017}.button:hover{filter:brightness(1.08)}.button.ghost{color:var(--ink);border-color:var(--line)}
+.hero{min-height:520px;background:radial-gradient(ellipse at 80% 30%,color-mix(in srgb,var(--brand) 22%,transparent),transparent 50%),linear-gradient(125deg,var(--paper),var(--soft));color:var(--ink);gap:60px}
+.hero h1{letter-spacing:-.045em;max-width:720px}.hero p{color:var(--muted)}.hero-art{background:linear-gradient(145deg,var(--brand),var(--brand2));border:1px solid #ffffff24;box-shadow:0 22px 65px #0002}.hero-symbol{border-radius:24px}.hero-art>span{font-size:18px;letter-spacing:.015em}
+.eyebrow{color:var(--brand2);letter-spacing:.14em}.theme-beleza .eyebrow,.theme-estetica .eyebrow,.theme-geral .eyebrow{color:var(--brand)}
+.section{background:var(--paper);color:var(--ink)}.section.muted{background:var(--soft)}.section h2{letter-spacing:-.035em}.section-head>a{color:var(--brand2)}
+.card{background:var(--paper);border-color:var(--line);box-shadow:0 12px 36px #0000000b;transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-4px);box-shadow:0 20px 40px #0000001c}.card p{color:var(--muted)}.card-foot{align-items:center}.card-foot a{background:var(--cta);color:white;padding:9px 15px;border-radius:999px;white-space:nowrap}.photo{background:linear-gradient(145deg,color-mix(in srgb,var(--brand) 18%,var(--soft)),color-mix(in srgb,var(--brand2) 20%,var(--soft)));color:var(--brand2)}
+.about-panel{background:var(--soft);border:1px solid var(--line)}.about>div>p,.contact>p{color:var(--muted)}footer{background:var(--paper);color:var(--muted);border-top:1px solid var(--line)}
+.theme-barbearia .hero{background:radial-gradient(ellipse at 70% 30%,color-mix(in srgb,var(--brand2) 15%,transparent),transparent 48%),linear-gradient(130deg,#101617,#202a2c);color:#fff}.theme-barbearia .hero p{color:#d1d1ce}.theme-barbearia .card{background:#20292b}.theme-barbearia .photo{background:linear-gradient(145deg,#293336,#394449)}
+@media(max-width:850px){.nav{position:relative}.nav nav{scrollbar-width:thin}.hero{min-height:auto}.cards{gap:16px}}
+@media(max-width:560px){.nav{padding:14px 18px}.nav .identity strong{font-size:16px}.hero{gap:22px}.hero h1{font-size:clamp(34px,10vw,48px)}.hero-art{min-height:190px}.card-foot{flex-wrap:wrap}.card-foot a{margin-left:auto}.section{padding-top:56px;padding-bottom:56px}}
+
+/* BYTECH_PERSONALIZACAO_V2: capa do estabelecimento */
+.hero-art.has-cover{padding:0;overflow:hidden;background:#171717}.hero-art .cover-photo{width:100%;height:100%;min-height:330px;object-fit:cover}@media(max-width:560px){.hero-art .cover-photo{min-height:190px}}
+
+/* BYTECH_V2_HERO_CAPA_REFINADA_20261016 */
+/* Exclusivo da landing V2: destaque fotográfico e fallback sem imagem. */
+.hero-art {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  min-height: 390px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(145deg, var(--brand), var(--brand2));
+  box-shadow: 0 24px 65px rgba(0,0,0,.18);
+}
+.hero-art.has-cover {
+  display: block;
+  padding: 0;
+  background: var(--brand);
+}
+.hero-art.has-cover .cover-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 390px;
+  max-height: 550px;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  object-position: center;
+}
+.hero-art.has-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(0,0,0,.22));
+}
+.hero-art:not(.has-cover) {
+  background: radial-gradient(circle at 75% 20%, rgba(255,255,255,.18), transparent 40%),
+              linear-gradient(145deg, var(--brand), var(--brand2));
+}
+.hero-art:not(.has-cover)::before {
+  content: '';
+  position: absolute;
+  width: 330px;
+  height: 330px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 50%;
+  transform: translate(35%, -30%);
+  pointer-events: none;
+}
+.hero-art:not(.has-cover) .hero-symbol {
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.24);
+  box-shadow: 0 12px 36px rgba(0,0,0,.12);
+  z-index: 1;
+}
+.hero-art:not(.has-cover) > span { z-index: 1; text-align: center; padding: 0 18px; }
+@media (max-width: 850px) {
+  .hero-art { min-height: 300px; }
+  .hero-art.has-cover .cover-photo { min-height: 300px; max-height: 460px; aspect-ratio: 16 / 10; }
+}
+@media (max-width: 560px) {
+  .hero-art { min-height: 245px; border-radius: 22px; }
+  .hero-art.has-cover .cover-photo { min-height: 245px; max-height: 360px; aspect-ratio: 4 / 3; }
+  .hero-art:not(.has-cover) .hero-symbol { width: 115px; height: 115px; }
+}
+
+/* BYTECH_SERVICOS_CARDS_V2_20261016 — exclusivo da prévia V2 */
+.service-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border-radius:22px}
+.service-photo{height:auto;aspect-ratio:16/10;overflow:hidden;position:relative}
+.service-photo img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.service-card:hover .service-photo img{transform:scale(1.035)}
+.service-photo-empty{background:radial-gradient(circle at 78% 18%,color-mix(in srgb,var(--brand2) 30%,transparent),transparent 44%),linear-gradient(140deg,color-mix(in srgb,var(--brand) 18%,var(--soft)),var(--soft));border-bottom:1px solid var(--line)}
+.service-placeholder{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+.service-placeholder-ring{position:absolute;width:165px;height:165px;border:1px solid color-mix(in srgb,var(--brand2) 35%,transparent);border-radius:50%;transform:translate(45%,-25%)}
+.service-placeholder-symbol{font-size:74px;line-height:1;color:var(--brand2);opacity:.75;text-shadow:0 10px 30px #0002}
+.service-card-body{display:flex;flex:1;flex-direction:column;padding:22px}
+.service-card-body h3{font-size:20px;line-height:1.3;margin:0 0 12px}
+.service-duration{display:flex;align-items:center;gap:7px;margin:0!important;color:var(--muted)!important;font-size:14px}
+.service-duration svg{flex:none}
+.service-card-foot{margin-top:auto;padding-top:24px;gap:14px;align-items:end}
+.service-price{display:flex;flex-direction:column;gap:2px;min-width:0}
+.service-price small{font-size:11px;color:var(--muted);font-weight:600}
+.service-price strong{font-size:clamp(19px,2vw,24px);line-height:1.2;white-space:nowrap}
+.service-card-foot a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 17px;white-space:nowrap}
+@media(max-width:560px){.service-card-body{padding:20px}.service-photo{aspect-ratio:16/9}.service-card-foot{align-items:center}}
+@media(prefers-reduced-motion:reduce){.service-photo img{transition:none}.service-card:hover .service-photo img{transform:none}}
+
+/* BYTECH_PRODUTOS_V2_20261016 - cards de produtos na prévia */
+.products-v2 .products-intro{margin:9px 0 0;color:var(--muted);max-width:590px;font-size:15px}
+.products-v2 .products-grid{align-items:stretch}
+.products-v2 .product-card{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.products-v2 .product-photo{height:225px;overflow:hidden;position:relative}
+.products-v2 .product-photo img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.products-v2 .product-card:hover .product-photo img{transform:scale(1.045)}
+.products-v2 .product-placeholder{display:grid;place-items:center;width:100%;height:100%;font-size:80px;opacity:.85}
+.products-v2 .product-body{display:flex;flex:1;flex-direction:column;gap:7px;padding:22px}
+.products-v2 .product-category{display:inline-block;align-self:flex-start;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:var(--brand2)}
+.products-v2 .product-body h3{margin:0;font-size:20px;line-height:1.25;overflow-wrap:anywhere}
+.products-v2 .product-description{color:var(--muted);margin:0;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.products-v2 .product-foot{margin-top:auto;padding-top:20px;flex-wrap:wrap}
+.products-v2 .product-foot strong{font-size:21px}
+.products-v2 .product-foot a{background:var(--cta);color:#fff;border-radius:999px;padding:10px 17px;font-size:13px;font-weight:750}
+.products-v2 .product-contact-note{font-size:13px;color:var(--muted)}
+@media(max-width:560px){.products-v2 .product-photo{height:230px}.products-v2 .product-body{padding:20px}}
+
+/* BYTECH_MAPA_V2_20261020: contato e mapa por estabelecimento */
+.contact-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:38px;align-items:center}
+.contact-layout:not(:has(.contact-map)){grid-template-columns:1fr}
+.contact-details{min-width:0}.contact-info{overflow-wrap:anywhere;line-height:1.7}
+.contact-map{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px #00000012}
+.contact-map iframe{display:block;width:100%;height:320px;border:0;background:#e7e7e7}
+.contact-map p{margin:0;padding:10px 16px;color:var(--muted);font-size:12px}
+@media(max-width:850px){.contact-layout{grid-template-columns:1fr;gap:24px}.contact-map iframe{height:290px}}
+@media(max-width:560px){.contact-map iframe{height:250px}.contact-map{border-radius:16px}}
+
+/* BYTECH_MENU_MOBILE_V2_20261020 */
+.mobile-menu-toggle{display:none;align-items:center;justify-content:center;min-width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font-size:23px;cursor:pointer;line-height:1}
+.mobile-menu-toggle:focus-visible,.nav a:focus-visible{outline:3px solid var(--brand2);outline-offset:3px}
+@media(max-width:850px){
+  .nav{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+  .nav .identity{flex:1 1 auto;min-width:0}
+  .nav .identity strong{font-size:clamp(13px,3.8vw,17px)}
+  .nav .button.small{margin-left:auto;white-space:nowrap;order:1}
+  .nav .mobile-menu-toggle{display:inline-flex;order:2}
+  .nav nav#nav-mobile-v2{display:none;order:3;width:100%;flex-basis:100%;overflow:visible;flex-wrap:wrap;gap:0;padding:8px 0 4px;border-top:1px solid var(--line)}
+  .nav nav#nav-mobile-v2.mobile-menu-open{display:flex}
+  .nav nav#nav-mobile-v2 a{width:100%;padding:11px 8px;white-space:normal;color:var(--ink);border-radius:8px}
+  .nav nav#nav-mobile-v2 a:hover{background:var(--soft)}
+}
+@media(max-width:380px){
+  .nav{gap:8px}
+  .nav .identity{gap:7px}
+  .nav .identity img{width:36px;height:36px}
+  .nav .button.small{padding:9px 12px;font-size:12px}
+  .nav .mobile-menu-toggle{min-width:38px;height:38px}
+}
+
+/* BYTECH_AJUSTES_FINAIS_V2_20261020 */
+.footer-v2{align-items:center;gap:14px 30px}
+.footer-v2-company{display:flex;flex-direction:column;gap:4px;font-weight:700}
+.footer-v2-company small{font-size:12px;font-weight:400;opacity:.8}
+.footer-v2-credit{font-size:12px;opacity:.85}
+@media(max-width:560px){
+  .service-photo{aspect-ratio:2/1}
+  .footer-v2{align-items:flex-start;gap:12px}
+}

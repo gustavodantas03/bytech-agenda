@@ -1,0 +1,233 @@
+/* Bytech Agenda — Responsividade global */
+
+/* Evita que componentes ultrapassem seus containers */
+body.admin-page,
+body.admin-page * {
+    box-sizing: border-box;
+}
+
+.admin-layout,
+.admin-content {
+    min-width: 0;
+}
+
+.admin-content img,
+.admin-content video {
+    max-width: 100%;
+    height: auto;
+}
+
+.admin-content input,
+.admin-content select,
+.admin-content textarea {
+    max-width: 100%;
+}
+
+@media (max-width: 960px) {
+    .admin-layout {
+        margin-left: 0;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .admin-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .admin-sidebar {
+        max-width: 88vw;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-content {
+        padding: 18px 14px 32px;
+    }
+
+    .admin-content .page-header,
+    .admin-content .estoque-hero {
+        padding: 22px 18px;
+    }
+
+    .admin-content .page-header h1,
+    .admin-content .estoque-hero h1 {
+        font-size: clamp(1.55rem, 7vw, 2rem);
+        line-height: 1.15;
+    }
+
+    .admin-content .panel {
+        min-width: 0;
+    }
+
+    .admin-content input,
+    .admin-content select,
+    .admin-content textarea {
+        font-size: 16px;
+    }
+}
+
+/* Dashboard principal — celular */
+@media (max-width: 760px) {
+    .admin-content .dashboard-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .admin-content .dashboard-metric-card {
+        min-width: 0;
+        min-height: 120px;
+        padding: 14px;
+    }
+
+    .admin-content .dashboard-quick-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .admin-content .dashboard-quick-action {
+        min-width: 0;
+        min-height: 72px;
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .admin-content .dashboard-quick-action > span {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+    }
+
+    .admin-content .dashboard-quick-action strong {
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-content .dashboard-quick-action small {
+        font-size: 11px;
+    }
+
+    .admin-content .dashboard-main-grid,
+    .admin-content .dashboard-side-column {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-content .dashboard-metric-card {
+        padding: 11px;
+    }
+
+    .admin-content .dashboard-quick-action {
+        padding: 9px;
+    }
+}
+
+/* Dashboard — Primeiros passos no celular */
+@media (max-width: 600px) {
+    .admin-content .setup-card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .admin-content .setup-card-heading {
+        gap: 10px;
+    }
+
+    .admin-content .setup-card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .admin-content .setup-card-heading h2 {
+        font-size: 19px;
+        line-height: 1.3;
+    }
+
+    .admin-content .setup-card-heading p {
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .admin-content .setup-steps {
+        gap: 9px;
+        margin-top: 15px;
+    }
+
+    .admin-content .setup-step {
+        min-height: 0;
+        padding: 12px;
+        gap: 9px;
+    }
+
+    .admin-content .setup-step-copy p {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .admin-content .setup-step-title {
+        font-size: 14px;
+        line-height: 1.3;
+    }
+
+    .admin-content .setup-done-badge {
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+}
+
+/* Dashboard: paineis compactos no celular */
+@media (max-width: 600px) {
+  .admin-content .dashboard-welcome {
+    padding: 20px 16px;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .admin-content .dashboard-welcome h1 {
+    font-size: clamp(24px, 6vw, 30px);
+    line-height: 1.15;
+  }
+  .admin-content .dashboard-empty-agenda {
+    min-height: 230px;
+    padding: 22px 12px;
+  }
+  .admin-content .dashboard-agenda-panel {
+    min-height: 0;
+  }
+  .admin-content .dashboard-week-chart {
+    height: 135px;
+  }
+  .admin-content .dashboard-insight-card {
+    min-height: 0;
+    background: #14243d;
+    color: #fff;
+  }
+  .admin-content .dashboard-insight-card strong,
+  .admin-content .dashboard-insight-card p {
+    color: #fff;
+  }
+  .admin-content .dashboard-insight-card span {
+    color: #cbd5e1;
+  }
+}
+
+/* Agenda — indicadores no celular */
+@media (max-width: 600px) {
+    .admin-content .agenda-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .admin-content .agenda-kpi {
+        min-width: 0;
+        min-height: 94px;
+        padding: 12px;
+    }
+
+    .admin-content .agenda-kpi * {
+        overflow-wrap: anywhere;
+    }
+}

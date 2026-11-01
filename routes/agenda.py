@@ -696,27 +696,83 @@ def novo_agendamento():
             flash("Serviço ou profissional inválido.", "erro")
             return redirect(url_for("novo_agendamento"))
 
-        horario_ocupado = conn.execute(
-            """
-            SELECT id
-            FROM agendamentos
-            WHERE empresa_id = ?
-              AND funcionario_id = ?
-              AND data = ?
-              AND hora = ?
-              AND status != 'cancelado'
-            LIMIT 1
-            """,
-            (empresa_id, funcionario_id, data, hora),
-        ).fetchone()
-
-        if horario_ocupado:
+        # PROTECAO_AGENDA_ADMIN_V1: mesma trava utilizada pela API publica.
+        try:
+            data_obj = date.fromisoformat(data)
+            inicio_novo = datetime.strptime(hora, "%H:%M")
+        except (TypeError, ValueError):
+            conn.rollback()
             conn.close()
-            flash(
-                "Este horário já está ocupado para esse profissional.",
-                "erro",
-            )
+            flash("Data ou horário inválido.", "erro")
             return redirect(url_for("novo_agendamento"))
+
+        agora = datetime.now()
+        if data_obj < agora.date() or (
+            data_obj == agora.date() and inicio_novo.time() <= agora.time()
+        ):
+            conn.rollback()
+            conn.close()
+            flash("Não é possível agendar em horários passados.", "erro")
+            return redirect(url_for("novo_agendamento"))
+
+        servico_para_validar = conn.execute(
+            "SELECT duracao FROM servicos WHERE id = ? AND empresa_id = ? AND ativo = 1",
+            (servico_id, empresa_id),
+        ).fetchone()
+        duracao_nova = int(servico_para_validar["duracao"] or 40)
+        if not 1 <= duracao_nova <= 480:
+            conn.rollback()
+            conn.close()
+            flash("Duração do serviço inválida.", "erro")
+            return redirect(url_for("novo_agendamento"))
+
+        horarios_permitidos = gerar_horarios_do_dia(empresa, data_obj)
+        expediente = obter_horarios_funcionamento(empresa).get(str(data_obj.weekday()), {})
+        try:
+            fechamento = datetime.strptime(expediente["fechamento"], "%H:%M")
+        except (KeyError, TypeError, ValueError):
+            conn.rollback()
+            conn.close()
+            flash("Não há expediente configurado para essa data.", "erro")
+            return redirect(url_for("novo_agendamento"))
+
+        fim_novo = inicio_novo + timedelta(minutes=duracao_nova)
+        if hora not in horarios_permitidos or fim_novo > fechamento:
+            conn.rollback()
+            conn.close()
+            flash("Horário fora do expediente disponível.", "erro")
+            return redirect(url_for("novo_agendamento"))
+
+        # Serializa reservas administrativas e publicas do mesmo profissional.
+        profissional_bloqueado = conn.execute(
+            """SELECT id FROM funcionarios
+               WHERE id = ? AND empresa_id = ? AND ativo = 1
+               FOR UPDATE""",
+            (funcionario_id, empresa_id),
+        ).fetchone()
+        if not profissional_bloqueado:
+            conn.rollback()
+            conn.close()
+            flash("Profissional indisponível.", "erro")
+            return redirect(url_for("novo_agendamento"))
+
+        existentes = conn.execute(
+            """SELECT hora, COALESCE(duracao_total, 40) AS duracao_total
+               FROM agendamentos
+               WHERE empresa_id = ? AND funcionario_id = ? AND data = ?
+                 AND status != 'cancelado'""",
+            (empresa_id, funcionario_id, data),
+        ).fetchall()
+        for existente in existentes:
+            inicio_existente = datetime.strptime(existente["hora"], "%H:%M")
+            fim_existente = inicio_existente + timedelta(
+                minutes=int(existente["duracao_total"] or 40)
+            )
+            if inicio_novo < fim_existente and fim_novo > inicio_existente:
+                conn.rollback()
+                conn.close()
+                flash("Este intervalo de horário já está ocupado.", "erro")
+                return redirect(url_for("novo_agendamento"))
 
         try:
             servico_dados = conn.execute(

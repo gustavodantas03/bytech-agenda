@@ -1,104 +1,37 @@
 {% extends 'admin/base.html' %}
-
-{% block title %}
-{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}
-{% endblock %}
-
+{% block title %}{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}{% endblock %}
 {% block content %}
-<header class="page-header">
-    <div>
-        <span>Equipe</span>
-        <h1>{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}</h1>
-    </div>
-</header>
-
-<section class="admin-grid">
-    <article class="panel">
-        <h2>Novo {{ ui.profissional_singular if ui else 'profissional' }}</h2>
-
-        <form method="post">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <label for="nome">Nome</label>
-            <input id="nome" name="nome" required>
-
-            <label for="cargo">Cargo</label>
-            <input
-                id="cargo"
-                name="cargo"
-                value="{{ ui.cargo_padrao if ui else 'Profissional' }}"
-                required
-            >
-
-            <button class="btn btn-primary full" type="submit">
-                Cadastrar {{ ui.profissional_singular if ui else 'profissional' }}
-            </button>
-        </form>
-    </article>
-
-    <article class="panel">
-        <h2>
-            {{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}
-            cadastrados
-        </h2>
-
-        <div class="service-admin-list">
-            {% for funcionario in funcionarios %}
-                <div class="service-admin-item">
-                    <div>
-                        <strong>{{ funcionario.nome }}</strong>
-                        <span>
-                            {{ funcionario.cargo }} ·
-                            {{ 'Ativo' if funcionario.ativo else 'Inativo' }}
-                        </span>
-                    </div>
-
-                    <div class="actions">
-                        <a
-                            class="btn btn-small btn-secondary"
-                            href="{{ url_for(
-                                'editar_funcionario',
-                                funcionario_id=funcionario.id
-                            ) }}"
-                        >
-                            Editar
-                        </a>
-
-                        <form
-                            method="post"
-                            action="{{ url_for(
-                                'alternar_funcionario',
-                                funcionario_id=funcionario.id
-                            ) }}"
-                        >
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                            <button
-                                class="btn btn-small
-                                {{ 'btn-danger' if funcionario.ativo else 'btn-secondary' }}"
-                                type="submit"
-                            >
-                                {{ 'Desativar' if funcionario.ativo else 'Ativar' }}
-                            </button>
-                        </form>
-
-                        <form
-                            method="post"
-                            action="{{ url_for(
-                                'excluir_funcionario',
-                                funcionario_id=funcionario.id
-                            ) }}"
-                            onsubmit="return confirm('Deseja excluir este profissional?');"
-                        >
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                            <button class="btn btn-small btn-danger" type="submit">
-                                Excluir
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            {% else %}
-                <p>Nenhum profissional cadastrado.</p>
-            {% endfor %}
-        </div>
-    </article>
-</section>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profissionais-premium.css') }}?v=1">
+<div class="prof-premium">
+<header class="prof-heading"><div><span>Equipe</span><h1>{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }}</h1><p>Gerencie sua equipe e mantenha os atendimentos organizados.</p></div></header>
+<div class="prof-layout">
+<section class="prof-panel">
+<h2>Cadastrar {{ ui.profissional_singular if ui else 'profissional' }}</h2>
+<p class="prof-subtitle">Adicione uma pessoa à equipe do estabelecimento.</p>
+<form class="prof-form" method="post" enctype="multipart/form-data">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+<div class="prof-field"><label for="nome">Nome completo</label><input id="nome" name="nome" placeholder="Nome do profissional" autocomplete="name" required></div>
+<div class="prof-field"><label for="cargo">Cargo ou especialidade</label><input id="cargo" name="cargo" value="{{ ui.cargo_padrao if ui else 'Profissional' }}" required></div>
+<div class="prof-field"><label for="foto">Foto do profissional</label><input id="foto" name="foto" type="file" accept="image/png,image/jpeg,image/webp"><small class="prof-hint">PNG, JPG, JPEG ou WEBP.</small></div>
+<button class="prof-primary" type="submit">+ Cadastrar {{ ui.profissional_singular if ui else 'profissional' }}</button>
+</form></section>
+<section class="prof-panel">
+<h2>{{ ui.profissional_plural|capitalize if ui else 'Profissionais' }} cadastrados <span style="font-size:13px;color:var(--prof-accent)">({{ funcionarios|length }})</span></h2>
+<p class="prof-subtitle">Consulte e gerencie as pessoas da equipe.</p>
+<div class="prof-list">
+{% for funcionario in funcionarios %}
+<div class="prof-item">
+<div class="prof-identity">
+{% if funcionario.foto %}<img class="prof-avatar" src="{{ url_for('static', filename='uploads/profissionais/' ~ funcionario.foto) }}" alt="Foto de {{ funcionario.nome }}" width="58" height="58">
+{% else %}<div class="prof-avatar prof-avatar-placeholder">{{ funcionario.nome[:1]|upper }}</div>{% endif %}
+<div class="prof-details"><strong>{{ funcionario.nome }}</strong><div class="prof-meta">{{ funcionario.cargo }} <span class="prof-status {{ 'active' if funcionario.ativo else 'inactive' }}">{{ 'Ativo' if funcionario.ativo else 'Inativo' }}</span></div></div>
+</div>
+<div class="prof-actions">
+<a class="prof-action" href="{{ url_for('editar_funcionario', funcionario_id=funcionario.id) }}">Editar</a>
+<form method="post" action="{{ url_for('alternar_funcionario', funcionario_id=funcionario.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="prof-action" type="submit">{{ 'Desativar' if funcionario.ativo else 'Ativar' }}</button></form>
+<form method="post" action="{{ url_for('excluir_funcionario', funcionario_id=funcionario.id) }}" onsubmit="return confirm('Deseja realmente excluir este profissional?');"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="prof-action danger" type="submit">Excluir</button></form>
+</div></div>
+{% else %}<div class="prof-empty">Nenhum {{ ui.profissional_singular if ui else 'profissional' }} cadastrado.</div>{% endfor %}
+</div></section>
+</div></div>
 {% endblock %}

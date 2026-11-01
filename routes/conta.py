@@ -305,3 +305,100 @@ def admin_meu_espaco_horarios():
     flash("Horário de funcionamento atualizado.", "sucesso")
     return redirect(url_for("admin_meu_espaco"))
 
+
+
+# BYTECH_PERSONALIZACAO_V2 — edição isolada por empresa, prévia V2.
+@app.route('/admin/configuracoes/pagina-publica', methods=['GET', 'POST'])
+@login_required
+def admin_personalizacao_pagina_publica():
+    import re
+    from pathlib import Path
+    from uuid import uuid4
+    from werkzeug.utils import secure_filename
+    from flask import abort
+
+    if session.get('papel') == 'colaborador' and 'configuracoes' not in session.get('permissoes', []):
+        abort(403)
+    empresa_id = session['empresa_id']
+    conn = get_connection()
+    try:
+        empresa = conn.execute('SELECT * FROM empresas WHERE id = ?', (empresa_id,)).fetchone()
+        if not empresa:
+            abort(404)
+        if request.method == 'POST':
+            cores = {}
+            for campo in ('cor_principal', 'cor_secundaria', 'cor_botao'):
+                valor = (request.form.get(campo) or '').strip()
+                if not re.fullmatch(r'#[0-9A-Fa-f]{6}', valor):
+                    flash('Informe cores válidas no formato #RRGGBB.', 'erro')
+                    return redirect(url_for('admin_personalizacao_pagina_publica'))
+                cores[campo] = valor
+
+            # BYTECH_LOGO_PERSONALIZACAO_V1: validar antes de gravar imagens.
+            arquivo_logo = request.files.get('logo')
+            extensao_logo = None
+            if arquivo_logo and arquivo_logo.filename:
+                nome_logo_seguro = secure_filename(arquivo_logo.filename)
+                extensao_logo = nome_logo_seguro.rsplit('.', 1)[-1].lower() if '.' in nome_logo_seguro else ''
+                if extensao_logo not in ('jpg', 'jpeg', 'png', 'webp'):
+                    flash('A logo deve ser JPG, PNG ou WEBP.', 'erro')
+                    return redirect(url_for('admin_personalizacao_pagina_publica'))
+                assinatura_logo = arquivo_logo.stream.read(16)
+                arquivo_logo.stream.seek(0)
+                logo_valida = (
+                    assinatura_logo.startswith(bytes.fromhex('ffd8ff')) if extensao_logo in ('jpg', 'jpeg')
+                    else assinatura_logo.startswith(bytes.fromhex('89504e470d0a1a0a')) if extensao_logo == 'png'
+                    else assinatura_logo[:4] == b'RIFF' and assinatura_logo[8:12] == b'WEBP'
+                )
+                if not logo_valida:
+                    flash('O arquivo da logo não corresponde a uma imagem válida.', 'erro')
+                    return redirect(url_for('admin_personalizacao_pagina_publica'))
+
+            capa = empresa['foto_capa']
+            arquivo = request.files.get('foto_capa')
+            novo_arquivo = None
+            if arquivo and arquivo.filename:
+                nome_seguro = secure_filename(arquivo.filename)
+                extensao = nome_seguro.rsplit('.', 1)[-1].lower() if '.' in nome_seguro else ''
+                if extensao not in ('jpg', 'jpeg', 'png', 'webp'):
+                    flash('A foto deve ser JPG, PNG ou WEBP.', 'erro')
+                    return redirect(url_for('admin_personalizacao_pagina_publica'))
+                assinatura = arquivo.stream.read(16)
+                arquivo.stream.seek(0)
+                valido = (assinatura.startswith(bytes.fromhex('ffd8ff')) if extensao in ('jpg','jpeg')
+                    else assinatura.startswith(bytes.fromhex('89504e470d0a1a0a')) if extensao == 'png'
+                    else assinatura[:4] == b'RIFF' and assinatura[8:12] == b'WEBP')
+                if not valido:
+                    flash('O arquivo enviado não corresponde a uma imagem válida.', 'erro')
+                    return redirect(url_for('admin_personalizacao_pagina_publica'))
+                pasta = Path(app.static_folder) / 'uploads' / 'capas'
+                pasta.mkdir(parents=True, exist_ok=True)
+                novo_arquivo = f'capa_{empresa_id}_{uuid4().hex}.{extensao}'
+                arquivo.save(pasta / novo_arquivo)
+                capa = novo_arquivo
+            logo_atual = empresa['logo']
+            nova_logo = None
+            pasta_logos = Path(app.config['UPLOAD_FOLDER'])
+            try:
+                if extensao_logo:
+                    pasta_logos.mkdir(parents=True, exist_ok=True)
+                    nova_logo = f'empresa_{empresa_id}_{uuid4().hex}.{extensao_logo}'
+                    arquivo_logo.save(pasta_logos / nova_logo)
+                    logo_atual = nova_logo
+                conn.execute('''UPDATE empresas
+                    SET cor_principal = ?, cor_secundaria = ?, cor_botao = ?, foto_capa = ?, logo = ?
+                    WHERE id = ?''',
+                    (cores['cor_principal'], cores['cor_secundaria'], cores['cor_botao'], capa, logo_atual, empresa_id))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                if novo_arquivo:
+                    (Path(app.static_folder) / 'uploads' / 'capas' / novo_arquivo).unlink(missing_ok=True)
+                if nova_logo:
+                    (pasta_logos / nova_logo).unlink(missing_ok=True)
+                raise
+            flash('Personalização salva! Confira a prévia da página.', 'sucesso')
+            return redirect(url_for('admin_personalizacao_pagina_publica'))
+    finally:
+        conn.close()
+    return render_template('admin/personalizacao_pagina_publica.html', empresa=empresa)

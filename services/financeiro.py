@@ -33,9 +33,16 @@ def registrar_log(conn, empresa_id, acao, descricao, cobranca_id=None, pagamento
     )
 
 
-def garantir_cobranca_competencia(conn, empresa, ano, mes):
+def garantir_cobranca_competencia(conn, empresa, ano, mes, hoje=None):
     valor = float(empresa["mensalidade"] or 0)
     if valor <= 0:
+        return None
+    modo = empresa["assinatura_status"] or "legado"
+    inicio = _data(empresa["assinatura_inicio_cobranca"])
+    if modo == "isenta" or (modo in ("teste", "ativa") and not inicio):
+        return None
+    hoje = hoje or date.today()
+    if inicio and (hoje < inicio or vencimento_mes(ano, mes, empresa["dia_vencimento"] or 10) < inicio):
         return None
     vencimento = vencimento_mes(ano, mes, empresa["dia_vencimento"] or 10)
     competencia = vencimento.strftime("%Y-%m")
@@ -58,7 +65,7 @@ def garantir_cobranca_competencia(conn, empresa, ano, mes):
 
 def garantir_cobranca_atual(conn, empresa, hoje=None):
     hoje = hoje or date.today()
-    return garantir_cobranca_competencia(conn, empresa, hoje.year, hoje.month)
+    return garantir_cobranca_competencia(conn, empresa, hoje.year, hoje.month, hoje=hoje)
 
 
 def calcular_status(vencimento, pago, tolerancia, bloqueio, hoje=None):
@@ -79,9 +86,12 @@ def atualizar_empresa_financeiro(conn, empresa_id, hoje=None, criar_cobranca=Tru
     empresa = conn.execute("SELECT * FROM empresas WHERE id=?", (empresa_id,)).fetchone()
     if not empresa:
         return None
-    if criar_cobranca:
+    modo = empresa["assinatura_status"] or "legado"
+    inicio = _data(empresa["assinatura_inicio_cobranca"])
+    protegido = modo == "isenta" or (modo in ("teste", "ativa") and (not inicio or hoje < inicio))
+    if criar_cobranca and not protegido:
         garantir_cobranca_atual(conn, empresa, hoje)
-    cobranca = conn.execute(
+    cobranca = None if protegido else conn.execute(
         """SELECT * FROM cobrancas WHERE empresa_id=? AND status NOT IN ('paga','cancelada')
         ORDER BY vencimento ASC LIMIT 1""", (empresa_id,)
     ).fetchone()

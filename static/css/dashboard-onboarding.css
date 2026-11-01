@@ -34,3 +34,46 @@
 .dashboard-quick-action small { color: #7b8798; margin-top: 3px; font-size: .76rem; }
 @media (max-width: 1080px) { .setup-card-main { grid-template-columns: 1fr; gap: 18px; } .dashboard-quick-actions { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 760px) { .setup-card { padding: 18px; border-radius: 18px; } .setup-steps { grid-template-columns: 1fr; } .setup-step { grid-template-columns: auto minmax(0, 1fr); } .setup-step-action, .setup-done-badge { grid-column: 2; justify-self: start; } .dashboard-quick-actions { grid-template-columns: 1fr; } }
+
+/* Etapas concluídas: versão consolidada */
+.setup-completed-details {
+    margin-top: 14px;
+}
+
+.setup-completed-details > summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    color: #334155;
+    font-weight: 700;
+    list-style: none;
+}
+
+.setup-completed-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.setup-completed-details > summary::after {
+    content: "⌄";
+    margin-left: auto;
+    font-size: 22px;
+    transition: transform .2s ease;
+}
+
+.setup-completed-details[open] > summary::after {
+    transform: rotate(180deg);
+}
+
+.setup-completed-details:not([open]) > .setup-steps {
+    display: none !important;
+}
+
+.setup-completed-details[open] > .setup-steps {
+    display: grid;
+    margin-top: 12px;
+}

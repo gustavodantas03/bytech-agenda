@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ empresa.nome }} | Serviços e agendamentos</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing-v2.css') }}?v=4"></head>
+{% set segmento = (empresa.segmento or 'barbearia')|lower %}
+{% set tema = 'barbearia' if 'barb' in segmento else 'beleza' if ('salao' in segmento or 'salão' in segmento or 'beleza' in segmento or 'cabelo' in segmento or 'manicure' in segmento or 'unha' in segmento) else 'estetica' if ('estet' in segmento or 'clinica' in segmento or 'clínica' in segmento or 'spa' in segmento) else 'geral' %}
+<body class="theme-{{ tema }}" style="--brand:{{ empresa.cor_principal or '#171717' }};--brand2:{{ empresa.cor_secundaria or '#c8a56c' }};--cta:{{ empresa.cor_botao or empresa.cor_principal or '#171717' }}">
+<header class="nav"><a class="identity" href="#inicio">{% if empresa.logo %}<img src="{{ url_for('static', filename='uploads/logos/' ~ empresa.logo) }}" alt="Logo">{% endif %}<strong>{{ empresa.nome }}</strong></a>
+<nav aria-label="Navegação principal" id="nav-mobile-v2"><a href="#inicio">Início</a><a href="#servicos">Serviços</a>{% if produtos %}<a href="#produtos">Produtos</a>{% endif %}<a href="#sobre">Sobre</a><a href="#contato">Contato</a></nav><a class="button small" href="{{ url_for('agendar',slug=empresa.slug) }}">Agendar</a><button class="mobile-menu-toggle" type="button" aria-label="Abrir menu de navegação" aria-controls="nav-mobile-v2" aria-expanded="false"><span aria-hidden="true">☰</span></button></header>
+<main><section class="hero" id="inicio"><div class="hero-content"><span class="eyebrow">{{ "ESTILO E PERSONALIDADE" if tema == "barbearia" else "BELEZA E AUTOESTIMA" if tema == "beleza" else "CUIDADO E BEM-ESTAR" if tema == "estetica" else "SEJA BEM-VINDO(A)" }}</span><h1>{{ empresa.nome }}</h1><p>{{ empresa.descricao or 'Escolha seu serviço e reserve seu horário de maneira simples e rápida.' }}</p><div class="actions"><a class="button" href="{{ url_for('agendar',slug=empresa.slug) }}">Agendar meu horário →</a><a class="button ghost" href="#servicos">Ver serviços</a></div></div><div class="hero-art {% if empresa.foto_capa %}has-cover{% endif %}">{% if empresa.foto_capa %}<img class="cover-photo" src="{{ url_for('static', filename='uploads/capas/' ~ empresa.foto_capa) }}" alt="Foto de capa de {{ empresa.nome }}">{% else %}<div class="hero-symbol">{% if empresa.logo %}<img src="{{ url_for('static', filename='uploads/logos/' ~ empresa.logo) }}" alt="Logo da empresa">{% else %}<span>✦</span>{% endif %}</div><span>Seu momento, seu cuidado.</span>{% endif %}</div></section>
+<section class="section" id="servicos"><div class="section-head"><div><span class="eyebrow">NOSSOS SERVIÇOS</span><h2>{{ "Seu estilo, nosso cuidado" if tema == "barbearia" else "Cuidados para você" if tema in ("beleza", "estetica") else "Nossos serviços" }}</h2></div><a href="{{ url_for('agendar',slug=empresa.slug) }}">Agendar atendimento →</a></div><div class="cards">{% for servico in servicos %}<article class="card service-card"><div class="photo service-photo {% if not servico.foto %}service-photo-empty{% endif %}">{% if servico.foto %}<img loading="lazy" src="{{ url_for('static', filename='uploads/servicos/' ~ servico.foto) }}" alt="{{ servico.nome }}">{% else %}<div class="service-placeholder" aria-hidden="true"><span class="service-placeholder-ring"></span><span class="service-placeholder-symbol">✦</span></div>{% endif %}</div><div class="card-body service-card-body"><h3>{{ servico.nome }}</h3><p class="service-duration"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>{{ servico.duracao }} min</p><div class="card-foot service-card-foot"><div class="service-price"><small>Preço</small><strong>R$ {{ '%.2f'|format(servico.valor or 0)|replace('.', ',') }}</strong></div><a href="{{ url_for('agendar',slug=empresa.slug) }}" aria-label="Agendar {{ servico.nome }}">Agendar <span aria-hidden="true">→</span></a></div></div></article>{% else %}<p>Serviços disponíveis em breve.</p>{% endfor %}</div></section>
+{# BYTECH_PRODUTOS_V2_20261016: somente exibir quando houver produtos disponíveis #}
+{% if produtos %}
+<section class="section muted products-v2" id="produtos">
+  <div class="section-head">
+    <div><span class="eyebrow">ESCOLHAS PARA VOCÊ</span><h2>Produtos do nosso espaço</h2>
+      <p class="products-intro">Conheça os produtos disponíveis e consulte diretamente com nossa equipe.</p>
+    </div>
+  </div>
+  <div class="cards products-grid">
+    {% for produto in produtos %}
+    <article class="card product-card">
+      <div class="photo product-photo">
+        {% if produto.foto %}
+          <img loading="lazy" src="{{ url_for('static', filename='uploads/produtos/' ~ produto.foto) }}" alt="{{ produto.nome }}">
+        {% else %}<span class="product-placeholder" aria-hidden="true">✧</span>{% endif %}
+      </div>
+      <div class="card-body product-body">
+        {% if produto.categoria_nome %}<span class="category product-category">{{ produto.categoria_nome }}</span>{% endif %}
+        <h3>{{ produto.nome }}</h3>
+        {% if produto.descricao %}<p class="product-description">{{ produto.descricao }}</p>{% endif %}
+        <div class="card-foot product-foot">
+          <strong>R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</strong>
+          {% if whatsapp_numero %}
+            <a target="_blank" rel="noopener noreferrer" aria-label="Consultar {{ produto.nome }} pelo WhatsApp" href="https://wa.me/{{ whatsapp_numero }}?text={{ ('Olá! Gostaria de saber mais sobre o produto ' ~ produto.nome ~ ' da ' ~ empresa.nome ~ '.')|urlencode }}">Consultar ↗</a>
+          {% else %}<span class="product-contact-note">Consulte na loja</span>{% endif %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+<section class="section about" id="sobre"><div><span class="eyebrow">CONHEÇA NOSSO ESPAÇO</span><h2>Sobre nós</h2><p>{{ empresa.descricao or ('Bem-vindo(a) ao ' ~ empresa.nome ~ '. Nosso objetivo é oferecer uma excelente experiência em cada atendimento.') }}</p></div><div class="about-panel"><h3>Horários e atendimento</h3><p>{{ empresa.horario_texto or 'Consulte os horários disponíveis ao agendar.' }}</p><a class="button" href="{{ url_for('agendar',slug=empresa.slug) }}">Ver horários</a></div></section>
+{# BYTECH_MAPA_V2_20261020: mapa por endereço do estabelecimento, sem API key #}
+{% set endereco_mapa = (empresa.endereco or '')|trim %}
+{% set endereco_normalizado = endereco_mapa|lower %}
+{% set mostrar_mapa = endereco_mapa|length >= 12 and 'exemplo' not in endereco_normalizado and 'teste' not in endereco_normalizado and 'não informado' not in endereco_normalizado and 'nao informado' not in endereco_normalizado %}
+{% set link_mapa = (empresa.maps_url or '')|trim %}
+{% set link_google_valido = link_mapa.startswith('https://www.google.com/maps/') or link_mapa.startswith('https://maps.google.com/') or link_mapa.startswith('https://maps.app.goo.gl/') or link_mapa.startswith('https://goo.gl/maps/') or link_mapa.startswith('https://google.com/maps/') %}
+<section class="section contact muted" id="contato">
+  <div class="contact-layout">
+    <div class="contact-details">
+      <span class="eyebrow">FALE CONOSCO</span>
+      <h2>Contato e localização</h2>
+      {% if empresa.endereco %}<p class="contact-info">📍 {{ empresa.endereco }}</p>{% endif %}
+      {% if empresa.telefone %}<p class="contact-info">☎ {{ empresa.telefone }}</p>{% endif %}
+      <div class="actions">
+        {% if whatsapp_numero %}<a class="button" href="https://wa.me/{{ whatsapp_numero }}" target="_blank" rel="noopener noreferrer">Conversar no WhatsApp</a>{% endif %}
+        {% if link_google_valido %}<a class="button ghost" href="{{ link_mapa }}" target="_blank" rel="noopener noreferrer">Como chegar ↗</a>
+        {% elif mostrar_mapa %}<a class="button ghost" href="https://www.google.com/maps/search/?api=1&amp;query={{ endereco_mapa|urlencode }}" target="_blank" rel="noopener noreferrer">Como chegar ↗</a>{% endif %}
+        {% if empresa.instagram %}<a class="button ghost" href="{{ empresa.instagram if empresa.instagram.startswith('http') else 'https://instagram.com/' ~ empresa.instagram.lstrip('@') }}" target="_blank" rel="noopener noreferrer">Instagram</a>{% endif %}
+      </div>
+    </div>
+    {% if mostrar_mapa %}
+    <div class="contact-map">
+      <iframe title="Mapa de localização de {{ empresa.nome }}" src="https://maps.google.com/maps?q={{ endereco_mapa|urlencode }}&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <p>Confira o endereço antes de visitar o estabelecimento.</p>
+    </div>
+    {% endif %}
+  </div>
+</section></main>
+<footer class="footer-v2"><span class="footer-v2-company">{{ empresa.nome }} <small>© {{ ano_atual if ano_atual is defined else 2026 }} · Todos os direitos reservados.</small></span><span class="footer-v2-credit">Desenvolvido por <strong>Bytech</strong></span></footer>
+<!-- BYTECH_MENU_MOBILE_V2_20261020 -->
+<script>
+(function () {
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  const nav = document.getElementById('nav-mobile-v2');
+  if (!toggle || !nav) return;
+  function setOpen(open) {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fechar menu de navegação' : 'Abrir menu de navegação');
+    toggle.querySelector('span').textContent = open ? '✕' : '☰';
+    nav.classList.toggle('mobile-menu-open', open);
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  nav.addEventListener('click', function (event) {
+    if (event.target.closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+  window.matchMedia('(min-width: 851px)').addEventListener('change', function (event) {
+    if (event.matches) setOpen(false);
+  });
+})();
+</script>
+</body></html>

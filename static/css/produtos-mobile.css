@@ -1,0 +1,57 @@
+/* Bytech Agenda — Produtos no celular */
+
+@media (max-width: 767px) {
+
+    /* Indicadores: duas colunas compactas */
+    .produtos-dashboard-kpis {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .produtos-dashboard-kpis > div {
+        min-width: 0;
+        padding: 15px !important;
+        border-radius: 14px !important;
+    }
+
+    .produtos-dashboard-kpis > div > span {
+        font-size: 12px !important;
+        line-height: 1.4;
+    }
+
+    .produtos-dashboard-kpis > div > div {
+        font-size: 24px !important;
+        margin-top: 6px !important;
+    }
+
+    /* Painéis: uma coluna com largura integral */
+    .produtos-dashboard-paineis {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 14px !important;
+    }
+
+    .produtos-dashboard-paineis > section {
+        min-width: 0;
+        padding: 17px !important;
+    }
+
+    .produtos-dashboard-paineis h2 {
+        font-size: 17px !important;
+        line-height: 1.35;
+    }
+
+    /* Impede que textos longos estourem os cards */
+    .produtos-dashboard-paineis strong,
+    .produtos-dashboard-paineis span {
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 380px) {
+    .produtos-dashboard-kpis > div {
+        padding: 12px !important;
+    }
+}

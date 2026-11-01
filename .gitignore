@@ -19,3 +19,29 @@ Thumbs.db
 /docker/evolution/.env.evolution
 logs/*.log
 .venv/
+
+# Backups e arquivos temporarios
+backups/
+*.bak
+*.bak-*
+*.save
+*.backup
+*.dump
+*.sql.gz
+
+# Uploads dos estabelecimentos
+static/uploads/
+
+# Segredos e credenciais
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Arquivos locais
+*.log
+*.swp
+*.swo

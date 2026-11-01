@@ -1,0 +1,384 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Produtos{% endblock %}
+
+{% block content %}
+
+<style>
+.page-header .produtos-back {
+    display:table;
+    margin-bottom:16px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+    text-decoration:none;
+    text-transform:none;
+    letter-spacing:normal;
+}
+.page-header .produtos-back:hover {
+    color:#2563eb;
+}
+</style>
+
+<header class="page-header">
+    <div>
+        <a href="{{ url_for('admin_produtos') }}" class="produtos-back">
+            ← Voltar para Visão Geral
+        </a>
+        <span>Catálogo</span>
+        <h1>Produtos</h1>
+    </div>
+</header>
+
+<section class="admin-grid">
+
+    <!-- CATEGORIAS -->
+    <article class="panel">
+        <h2>Nova categoria</h2>
+
+        <form method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="tipo" value="categoria">
+
+            <label>Nome da categoria</label>
+            <input
+                name="nome"
+                type="text"
+                placeholder="Ex.: Cabelos, Unhas, Cosméticos..."
+                required
+            >
+
+            <button class="btn btn-primary full">
+                Cadastrar categoria
+            </button>
+        </form>
+
+        <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+        <h2>Categorias cadastradas</h2>
+
+        <div class="service-admin-list">
+
+            {% for categoria in categorias %}
+
+            <div class="service-admin-item">
+
+                <div style="flex: 1;">
+                    <form
+                        method="post"
+                        action="{{ url_for('editar_categoria_produto', categoria_id=categoria.id) }}"
+                    >
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input
+                                type="text"
+                                name="nome"
+                                value="{{ categoria.nome }}"
+                                required
+                                style="flex: 1; min-width: 150px;"
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn btn-small btn-secondary"
+                            >
+                                Salvar
+                            </button>
+                        </div>
+                    </form>
+
+                    <span>
+                        {{ 'Ativa' if categoria.ativo else 'Inativa' }}
+                    </span>
+                </div>
+
+                <form
+                    method="post"
+                    action="{{ url_for('alternar_status_categoria_produto', categoria_id=categoria.id) }}"
+                >
+                    <input
+                        type="hidden"
+                        name="_csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn btn-small {{ 'btn-danger' if categoria.ativo else 'btn-secondary' }}"
+                    >
+                        {{ 'Desativar' if categoria.ativo else 'Ativar' }}
+                    </button>
+                </form>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                Nenhuma categoria cadastrada.
+            </div>
+
+            {% endfor %}
+
+        </div>
+    </article>
+
+
+    <!-- PRODUTOS -->
+    <article class="panel">
+
+        <div class="panel-header">
+            <div>
+                <span>Catálogo</span>
+                <h2>Novo produto</h2>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="tipo" value="produto">
+
+            <label>Nome do produto</label>
+            <input
+                name="nome"
+                type="text"
+                placeholder="Ex.: Shampoo profissional"
+                required
+            >
+
+            <label>Categoria</label>
+            <select name="categoria_id">
+                <option value="">Sem categoria</option>
+                {% for categoria in categorias %}
+                    {% if categoria.ativo %}
+                        <option value="{{ categoria.id }}">
+                            {{ categoria.nome }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <label>Descrição</label>
+            <textarea
+                name="descricao"
+                rows="3"
+                placeholder="Descrição opcional do produto"
+            ></textarea>
+
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                <div>
+                    <label>Preço (R$)</label>
+                    <input
+                        name="preco"
+                        id="produto-preco"
+                        type="text"
+                        inputmode="numeric"
+                        value="0,00"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label>Estoque inicial</label>
+                    <div style="padding:11px 12px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;color:#64748b;">
+                        0 — após cadastrar, utilize a aba Entrada.
+                    </div>
+                </div>
+
+                <div>
+                    <label>Estoque mínimo</label>
+                    <input
+                        name="estoque_minimo"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        required
+                    >
+                </div>
+            </div>
+
+            <label>Foto do produto</label>
+            <input
+                name="foto"
+                type="file"
+                accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+            >
+
+            <button class="btn btn-primary full" type="submit">
+                Cadastrar produto
+            </button>
+        </form>
+
+        <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+        <div class="panel-header">
+            <div>
+                <span>Catálogo</span>
+                <h2>Produtos cadastrados</h2>
+            </div>
+        </div>
+
+        <div class="service-admin-list">
+
+            {% for produto in produtos %}
+
+            <div class="service-admin-item">
+
+                <div>
+
+                    {% if produto.foto %}
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/produtos/' ~ produto.foto) }}"
+                        alt="Foto de {{ produto.nome }}"
+                        width="56"
+                        height="56"
+                        style="width:56px!important;height:56px!important;min-width:56px!important;border-radius:10px!important;object-fit:cover!important;display:block!important;"
+                    >
+
+                    {% else %}
+
+                    <div style="width:56px;height:56px;min-width:56px;border-radius:10px;background:#f1f1f1;display:flex;align-items:center;justify-content:center;font-size:22px;">
+                        📦
+                    </div>
+
+                    {% endif %}
+
+                    <div>
+
+                        <strong>{{ produto.nome }}</strong>
+
+                        <span>
+                            R$ {{ '%.2f'|format(produto.preco)|replace('.', ',') }}
+
+                            {% if produto.categoria_nome %}
+                                · {{ produto.categoria_nome }}
+                            {% endif %}
+
+                            · Estoque: {{ produto.estoque }}
+                        </span>
+
+                        {% if produto.estoque <= 0 %}
+                            <span style="display:inline-block;margin-top:6px;padding:4px 8px;border-radius:6px;background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:700;">
+                                ⚠ Produto sem estoque
+                            </span>
+                        {% elif produto.estoque_minimo > 0 and produto.estoque <= produto.estoque_minimo %}
+                            <span style="display:inline-block;margin-top:6px;padding:4px 8px;border-radius:6px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;">
+                                ⚠ Estoque baixo · Mínimo: {{ produto.estoque_minimo }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="actions">
+
+                    <a
+                        class="btn btn-small btn-secondary"
+                        href="{{ url_for('editar_produto', produto_id=produto.id) }}"
+                    >
+                        Editar
+                    </a>
+
+                    <form
+                        method="post"
+                        action="{{ url_for('alternar_status_produto', produto_id=produto.id) }}"
+                        style="display: inline;"
+                    >
+                        <input
+                            type="hidden"
+                            name="_csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn btn-small {{ 'btn-danger' if produto.ativo else 'btn-secondary' }}"
+                        >
+                            {{ 'Desativar' if produto.ativo else 'Ativar' }}
+                        </button>
+                    </form>
+
+                </div>
+
+
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+                <strong>Nenhum produto cadastrado.</strong>
+                <span>Cadastre os produtos depois de configurar suas categorias.</span>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const campo = document.getElementById("produto-preco");
+    if (!campo) return;
+
+    function formatar(digitos) {
+        digitos = digitos.replace(/\D/g, "");
+
+        if (!digitos) {
+            digitos = "0";
+        }
+
+        const numero = parseInt(digitos, 10);
+
+        return (numero / 100).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    campo.value = "0,00";
+
+    campo.addEventListener("input", function () {
+        campo.value = formatar(campo.value);
+
+        campo.setSelectionRange(
+            campo.value.length,
+            campo.value.length
+        );
+    });
+
+    campo.addEventListener("focus", function () {
+        setTimeout(function () {
+            campo.setSelectionRange(
+                campo.value.length,
+                campo.value.length
+            );
+        }, 0);
+    });
+
+    const formulario = campo.closest("form");
+
+    if (formulario) {
+        formulario.addEventListener("submit", function () {
+            campo.value = campo.value
+                .replace(/\./g, "")
+                .replace(",", ".");
+        });
+    }
+});
+</script>
+
+{% endblock %}

@@ -5,211 +5,267 @@ Novo agendamento
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/agendamento-novo-premium.css') }}?v=3">
 
-<header class="page-header">
-
+<header class="page-header booking-new-header">
     <div>
         <span>Agenda</span>
         <h1>Novo agendamento</h1>
+        <p>Preencha os dados para reservar um horário.</p>
     </div>
-
-    <a
-        class="btn btn-secondary"
-        href="{{ url_for('admin_agenda') }}"
-    >
-        Voltar
+    <a class="btn btn-secondary" href="{{ url_for('admin_agenda') }}">
+        ← Voltar à Agenda
     </a>
-
 </header>
 
-<section class="panel narrow-panel">
+<section class="panel booking-new-panel">
+    <form method="post" id="bookingNewForm">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-    <form method="post">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <section class="booking-new-section">
+            <div class="booking-new-section-title">
+                <div class="booking-new-section-icon">👤</div>
+                <div>
+                    <h2>Dados do cliente</h2>
+                    <p>Identifique quem receberá o atendimento.</p>
+                </div>
+            </div>
+            <div class="booking-new-grid">
+                <div class="booking-new-field">
+                    <label for="cliente_nome">Nome do cliente</label>
+                    <input id="cliente_nome" name="cliente_nome" type="text"
+                           placeholder="Digite o nome do cliente" autocomplete="name" required>
+                </div>
+                <div class="booking-new-field">
+                    <label for="cliente_telefone">WhatsApp</label>
+                    <input id="cliente_telefone" name="cliente_telefone" type="tel"
+                           placeholder="(85) 99999-9999" autocomplete="tel" required>
+                </div>
+            </div>
+        </section>
 
-        <label for="cliente_nome">
-            Nome do cliente
-        </label>
+        <section class="booking-new-section">
+            <div class="booking-new-section-title">
+                <div class="booking-new-section-icon">✂</div>
+                <div>
+                    <h2>Serviço e profissional</h2>
+                    <p>Escolha o atendimento e quem irá realizá-lo.</p>
+                </div>
+            </div>
+            <div class="booking-new-grid">
+                <div class="booking-new-field">
+                    <label for="servico_id">Serviço</label>
+                    <select id="servico_id" name="servico_id" required>
+                        <option value="">Selecione o serviço</option>
+                        {% for servico in servicos %}
+                        <option value="{{ servico.id }}" data-duracao="{{ servico.duracao }}">
+                            {{ servico.nome }} — R$ {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="booking-new-field">
+                    <label for="funcionario_id">
+                        {{ ui.profissional_singular|capitalize if ui else 'Profissional' }}
+                    </label>
+                    <select id="funcionario_id" name="funcionario_id" required>
+                        <option value="">
+                            Selecione {{ ui.profissional_singular if ui else 'o profissional' }}
+                        </option>
+                        {% for funcionario in funcionarios %}
+                        <option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </section>
 
-        <input
-            id="cliente_nome"
-            name="cliente_nome"
-            type="text"
-            placeholder="Digite o nome do cliente"
-            required
-        >
-
-        <label for="cliente_telefone">
-            WhatsApp
-        </label>
-
-        <input
-            id="cliente_telefone"
-            name="cliente_telefone"
-            type="text"
-            placeholder="(85) 99999-9999"
-            required
-        >
-
-        <label for="servico_id">
-            Serviço
-        </label>
-
-        <select
-            id="servico_id"
-            name="servico_id"
-            required
-        >
-
-            <option value="">
-                Selecione o serviço
-            </option>
-
-            {% for servico in servicos %}
-
-                <option value="{{ servico.id }}" data-duracao="{{ servico.duracao }}">
-                    {{ servico.nome }}
-                    — R$
-                    {{ '%.2f'|format(servico.valor)|replace('.', ',') }}
-                </option>
-
-            {% endfor %}
-
-        </select>
-
-        <label for="funcionario_id">
-    {{ ui.profissional_singular|capitalize if ui else 'Profissional' }}
-</label>
-
-        <select
-            id="funcionario_id"
-            name="funcionario_id"
-            required
-        >
-
-           <option value="">
-    Selecione {{ ui.profissional_singular if ui else 'o profissional' }}
-</option>
-
-            {% for funcionario in funcionarios %}
-
-                <option value="{{ funcionario.id }}">
-                    {{ funcionario.nome }}
-                </option>
-
-            {% endfor %}
-
-        </select>
-
-        <label for="data">
-            Data
-        </label>
-
-        <input
-            id="data"
-            name="data"
-            type="date"
-            min="{{ data_hoje }}"
-            value="{{ data_hoje }}"
-            required
-        >
-
-        <label for="hora">
-            Horário
-        </label>
-
-        <select
-            id="hora"
-            name="hora"
-            required
-        >
-
-            <option value="">
-                Selecione o horário
-            </option>
-
-            {% for horario in horarios %}
-
-                <option value="{{ horario }}">
-                    {{ horario }}
-                </option>
-
-            {% endfor %}
-
-        </select>
+        <section class="booking-new-section">
+            <div class="booking-new-section-title">
+                <div class="booking-new-section-icon">📅</div>
+                <div>
+                    <h2>Data e horário</h2>
+                    <p>Os horários disponíveis dependem do serviço e do profissional.</p>
+                </div>
+            </div>
+            <div class="booking-new-grid">
+                <div class="booking-new-field">
+                    <label for="data">Data</label>
+                    <input id="data" name="data" type="date"
+                           min="{{ data_hoje }}" value="{{ data_hoje }}" required>
+                </div>
+                <div class="booking-new-field">
+                    <label for="hora">Horário</label>
+                    <select id="hora" name="hora" required>
+                        <option value="">Selecione o horário</option>
+                        {% for horario in horarios %}
+                        <option value="{{ horario }}">{{ horario }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </section>
 
         {% if tem_recurso and tem_recurso('whatsapp') %}
-        <label style="display:flex;align-items:center;gap:10px;margin:14px 0 18px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;">
-            <input type="checkbox" name="enviar_confirmacao" value="1" checked style="width:auto;">
-            <span><strong>Enviar confirmação pelo WhatsApp</strong><br><small style="color:#64748b;">A mensagem será enviada após salvar o agendamento.</small></span>
+        <label class="booking-new-whatsapp">
+            <input type="checkbox" name="enviar_confirmacao" value="1" checked>
+            <span>
+                <strong>Enviar confirmação pelo WhatsApp</strong>
+                <small>A mensagem será enviada após salvar o agendamento.</small>
+            </span>
         </label>
         {% endif %}
 
-        <button
-            class="btn btn-primary full"
-            type="submit"
-        >
-            Salvar agendamento
+        <button class="btn btn-primary booking-new-submit" type="submit">
+            ✓ Salvar agendamento
         </button>
-
     </form>
-
 </section>
-
 <script>
 (function () {
     const campoData = document.getElementById("data");
     const campoHora = document.getElementById("hora");
     const campoServico = document.getElementById("servico_id");
     const campoFuncionario = document.getElementById("funcionario_id");
-    if (!campoData || !campoHora) return;
+    const formulario = document.getElementById("bookingNewForm");
+
+    if (!campoData || !campoHora || !campoServico ||
+        !campoFuncionario || !formulario) return;
+
+    let requisicaoAtual = null;
+    let versaoConsulta = 0;
+
+    function mensagemHorario(mensagem) {
+        campoHora.innerHTML = "";
+        const opcao = document.createElement("option");
+        opcao.value = "";
+        opcao.textContent = mensagem;
+        campoHora.appendChild(opcao);
+        campoHora.value = "";
+        campoHora.disabled = true;
+    }
+
+    function dadosCompletos() {
+        return Boolean(
+            campoServico.value &&
+            campoFuncionario.value &&
+            campoData.value
+        );
+    }
 
     async function atualizarHorarios() {
-        const data = campoData.value;
-        const funcionarioId = campoFuncionario ? campoFuncionario.value : "";
-        if (!data) return;
+        const versao = ++versaoConsulta;
 
-        const opcaoServico = campoServico ? campoServico.selectedOptions[0] : null;
-        const duracao = opcaoServico ? (opcaoServico.dataset.duracao || 40) : 40;
+        if (requisicaoAtual) {
+            requisicaoAtual.abort();
+            requisicaoAtual = null;
+        }
 
-        const params = new URLSearchParams({
-            data: data,
-            duracao_total: duracao
+        if (!campoServico.value) {
+            mensagemHorario("Selecione primeiro o serviço");
+            return;
+        }
+
+        if (!campoFuncionario.value) {
+            mensagemHorario("Selecione primeiro a profissional");
+            return;
+        }
+
+        if (!campoData.value) {
+            mensagemHorario("Selecione uma data");
+            return;
+        }
+
+        const opcaoServico = campoServico.selectedOptions[0];
+        const duracao = Number(opcaoServico.dataset.duracao);
+
+        if (!Number.isFinite(duracao) || duracao <= 0) {
+            mensagemHorario("Duração do serviço inválida");
+            return;
+        }
+
+        mensagemHorario("Consultando horários...");
+
+        const controlador = new AbortController();
+        requisicaoAtual = controlador;
+
+        const parametros = new URLSearchParams({
+            data: campoData.value,
+            funcionario_id: campoFuncionario.value,
+            duracao_total: String(duracao)
         });
-        if (funcionarioId) params.set("funcionario_id", funcionarioId);
 
-        const horaAtual = campoHora.value;
         try {
             const resposta = await fetch(
-                "{{ url_for('admin_horarios_disponiveis') }}?" + params.toString(),
-                {headers: {"Accept": "application/json"}, credentials: "same-origin"}
+                "{{ url_for('admin_horarios_disponiveis') }}?" +
+                parametros.toString(),
+                {
+                    headers: {"Accept": "application/json"},
+                    credentials: "same-origin",
+                    signal: controlador.signal
+                }
             );
+
+            if (!resposta.ok) {
+                throw new Error("Falha ao consultar horários");
+            }
+
             const dados = await resposta.json();
-            const horarios = dados.horarios || [];
+
+            if (versao !== versaoConsulta) return;
+
+            const horarios = Array.isArray(dados.horarios)
+                ? dados.horarios
+                : [];
+
+            if (!horarios.length) {
+                mensagemHorario("Nenhum horário disponível nesta data");
+                return;
+            }
 
             campoHora.innerHTML = "";
-            const opcaoVazia = document.createElement("option");
-            opcaoVazia.value = "";
-            opcaoVazia.textContent = horarios.length
-                ? "Selecione o horário"
-                : "Nenhum horário disponível neste dia";
-            campoHora.appendChild(opcaoVazia);
+
+            const inicial = document.createElement("option");
+            inicial.value = "";
+            inicial.textContent = "Selecione o horário";
+            campoHora.appendChild(inicial);
 
             horarios.forEach(function (horario) {
                 const opcao = document.createElement("option");
                 opcao.value = horario;
                 opcao.textContent = horario;
-                if (horario === horaAtual) opcao.selected = true;
                 campoHora.appendChild(opcao);
             });
+
+            campoHora.disabled = false;
+
         } catch (erro) {
-            // Se a chamada falhar, mantém a lista atual do servidor.
+            if (erro.name === "AbortError") return;
+            if (versao !== versaoConsulta) return;
+
+            mensagemHorario("Erro ao consultar. Altere a data para tentar novamente.");
+        } finally {
+            if (requisicaoAtual === controlador) {
+                requisicaoAtual = null;
+            }
         }
     }
 
+    campoServico.addEventListener("change", atualizarHorarios);
+    campoFuncionario.addEventListener("change", atualizarHorarios);
     campoData.addEventListener("change", atualizarHorarios);
-    if (campoFuncionario) campoFuncionario.addEventListener("change", atualizarHorarios);
-    if (campoServico) campoServico.addEventListener("change", atualizarHorarios);
+
+    formulario.addEventListener("submit", function (evento) {
+        if (!dadosCompletos() ||
+            campoHora.disabled ||
+            !campoHora.value) {
+            evento.preventDefault();
+            atualizarHorarios();
+            campoHora.focus();
+        }
+    });
+
+    atualizarHorarios();
 })();
 </script>
 

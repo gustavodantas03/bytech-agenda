@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+{% block title %}Contas a pagar | Bytech Agenda{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/financeiro-premium.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/financeiro-despesas.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/financeiro-etapa3.css') }}?v=3">
+<div class="fin-page">
+  <header class="fin-head"><div><span class="fin-eyebrow">GESTÃO FINANCEIRA · ESTABELECIMENTO</span><h1>Contas a pagar</h1><p>Organize vencimentos e registre pagamentos.</p></div><a class="fin-outline" href="{{ url_for('admin_financeiro') }}">← Voltar ao Financeiro</a></header>
+  <div class="fin-despesas-grid fin-despesas-top"><article><span>Total pendente</span><strong>R$ {{ '%.2f'|format(total_pendente)|replace('.', ',') }}</strong></article><article><span>Contas vencidas</span><strong>R$ {{ '%.2f'|format(total_vencido)|replace('.', ',') }}</strong></article></div>
+  <div class="fin-actions"><a href="{{ url_for('admin_financeiro_recorrencias') }}">Despesas recorrentes ↗</a><a href="{{ url_for('admin_financeiro_relatorios') }}">Relatórios ↗</a></div>
+  <section class="fin-panel"><div class="fin-panel-title"><h2>Nova conta a pagar</h2><span>Cadastro</span></div>
+    <form method="post" action="{{ url_for('admin_financeiro_despesa_nova') }}" class="fin-expense-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <label>Descrição<input name="descricao" maxlength="200" required placeholder="Ex.: Aluguel de outubro"></label>
+      <label>Categoria<select name="categoria" required>{% for c in categorias %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select></label>
+      <label>Valor (R$)<input name="valor" id="fin-valor-despesa" type="text" inputmode="numeric" autocomplete="off" maxlength="16" required value="0,00" aria-label="Valor em reais, digite os centavos automaticamente"></label>
+      <label>Vencimento<input type="date" name="vencimento" value="{{ hoje.isoformat() }}" required></label>
+      <label class="fin-wide">Observações (opcional)<textarea name="observacoes" maxlength="2000" rows="2" placeholder="Detalhes da despesa"></textarea></label>
+      <button type="submit">Cadastrar conta</button>
+    </form>
+  </section>
+  <section class="fin-panel"><div class="fin-panel-title"><h2>Contas cadastradas</h2><span>Até 500 registros recentes por prioridade de vencimento</span></div>
+    <nav class="fin-expense-filters" aria-label="Filtrar contas"><a href="{{ url_for('admin_financeiro_despesas') }}" class="{{ 'selected' if not status_filtro else '' }}">Todas</a>{% for s, nome in [('pendente','Pendentes'),('vencida','Vencidas'),('paga','Pagas'),('cancelada','Canceladas')] %}<a href="{{ url_for('admin_financeiro_despesas', status=s) }}" class="{{ 'selected' if status_filtro == s else '' }}">{{ nome }}</a>{% endfor %}</nav>
+    {% if despesas %}<div class="fin-table-scroll"><table class="fin-expense-table"><thead><tr><th>Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    {% for d in despesas %}<tr><td><strong>{{ d.descricao }}</strong>{% if d.observacoes %}<small>{{ d.observacoes }}</small>{% endif %}</td><td>{{ d.categoria }}</td><td>{{ d.vencimento.strftime('%d/%m/%Y') }}</td><td><strong>R$ {{ '%.2f'|format(d.valor)|replace('.', ',') }}</strong></td><td>{% if d.status == 'pendente' and d.vencimento < hoje %}<span class="fin-expense-status late">Vencida</span>{% elif d.status == 'pendente' %}<span class="fin-expense-status pending">Pendente</span>{% elif d.status == 'paga' %}<span class="fin-expense-status paid">Paga</span><small>{{ d.data_pagamento.strftime('%d/%m/%Y') }} · {{ d.forma_pagamento }}</small>{% else %}<span class="fin-expense-status">Cancelada</span>{% endif %}</td><td>{% if d.status == 'pendente' %}<details class="fin-edit"><summary>Editar conta</summary><form method="post" action="{{ url_for('admin_financeiro_despesa_editar',despesa_id=d.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><label>Descrição<input name="descricao" maxlength="200" value="{{ d.descricao }}" required></label><label>Categoria<select name="categoria">{% for c in categorias %}<option value="{{ c }}" {{ 'selected' if c==d.categoria else '' }}>{{ c }}</option>{% endfor %}</select></label><label>Valor (R$)<input class="fin-money" name="valor" inputmode="numeric" value="{{ '%.2f'|format(d.valor)|replace('.',',') }}" required></label><label>Vencimento<input type="date" name="vencimento" value="{{ d.vencimento.isoformat() }}" required></label><label>Observações<textarea name="observacoes" maxlength="2000">{{ d.observacoes or '' }}</textarea></label><button>Salvar alterações</button></form></details><details class="fin-expense-pay"><summary>Registrar pagamento</summary><form method="post" action="{{ url_for('admin_financeiro_despesa_pagar', despesa_id=d.id) }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><label>Data<input type="date" name="data_pagamento" value="{{ hoje.isoformat() }}" required></label><label>Forma<select name="forma_pagamento" required>{% for f in formas %}<option value="{{ f }}">{{ f }}</option>{% endfor %}</select></label><button type="submit">Confirmar pagamento</button></form></details><form method="post" action="{{ url_for('admin_financeiro_despesa_cancelar', despesa_id=d.id) }}" onsubmit="return confirm('Cancelar esta conta pendente?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="fin-expense-cancel" type="submit">Cancelar conta</button></form>{% else %}—{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="fin-empty">Nenhuma conta encontrada.</p>{% endif %}
+  </section>
+  <p class="fin-note">Somente contas pagas entram como saídas no fluxo de caixa. Contas pendentes e canceladas não reduzem o saldo. Uma conta paga não pode ser cancelada nesta tela.</p>
+</div>
+<script src="{{ url_for('static',filename='js/financeiro-moeda.js') }}?v=3" defer></script>
+<script>
+(function () {
+  'use strict';
+  const campo = document.getElementById('fin-valor-despesa');
+  if (!campo) return;
+  let centavos = '0';
+  function mostrar() {
+    const inteiro = centavos.padStart(3, '0');
+    const reais = inteiro.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    campo.value = reais + ',' + inteiro.slice(-2);
+  }
+  campo.addEventListener('keydown', function (evento) {
+    if (evento.ctrlKey || evento.metaKey || evento.altKey) return;
+    if (/^[0-9]$/.test(evento.key)) {
+      evento.preventDefault();
+      centavos = (centavos + evento.key).replace(/^0+/, '') || '0';
+      centavos = centavos.slice(-12);
+      mostrar();
+    } else if (evento.key === 'Backspace' || evento.key === 'Delete') {
+      evento.preventDefault();
+      centavos = centavos.slice(0, -1) || '0';
+      mostrar();
+    } else if (evento.key.length === 1) {
+      evento.preventDefault();
+    }
+  });
+  campo.addEventListener('paste', function (evento) {
+    evento.preventDefault();
+    const texto = (evento.clipboardData || window.clipboardData).getData('text').trim();
+    if (!/^\d+(?:[,.]\d{1,2})?$/.test(texto)) return;
+    const partes = texto.split(/[,.]/);
+    const digitos = partes.length === 2
+      ? partes[0] + partes[1].padEnd(2, '0')
+      : partes[0] + '00';
+    centavos = digitos.replace(/^0+/, '').slice(-12) || '0';
+    mostrar();
+  });
+  campo.addEventListener('input', function () {
+    // Teclados móveis podem não emitir keydown.
+    const texto = campo.value.replace(/\D/g, '');
+    centavos = texto.replace(/^0+/, '').slice(-12) || '0';
+    mostrar();
+  });
+  mostrar();
+})();
+</script>
+{% endblock %}

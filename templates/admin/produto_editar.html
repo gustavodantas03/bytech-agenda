@@ -1,0 +1,181 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Editar produto{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <div>
+        <span>Catálogo</span>
+        <h1>Editar produto</h1>
+    </div>
+
+    <a href="{{ url_for('admin_produtos') }}" class="btn btn-secondary">
+        Voltar
+    </a>
+</header>
+
+<section class="panel">
+    <h2>{{ produto.nome }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-grid">
+
+            <div>
+                <label>Nome do produto</label>
+                <input
+                    type="text"
+                    name="nome"
+                    value="{{ produto.nome }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label>Categoria</label>
+                <select name="categoria_id">
+                    <option value="">Sem categoria</option>
+
+                    {% for categoria in categorias %}
+                        <option
+                            value="{{ categoria.id }}"
+                            {% if produto.categoria_id == categoria.id %}selected{% endif %}
+                        >
+                            {{ categoria.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <label>Descrição</label>
+                <textarea
+                    name="descricao"
+                    rows="4"
+                >{{ produto.descricao or '' }}</textarea>
+            </div>
+
+            <div>
+                <label>Preço (R$)</label>
+                <input
+                    type="text"
+                    name="preco"
+                    id="produto-preco"
+                    inputmode="numeric"
+                    value="0,00"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div>
+                <label>Estoque atual</label>
+                <div style="padding:11px 12px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;">
+                    <strong>{{ produto.estoque or 0 }}</strong>
+                    <small style="display:block;color:#64748b;margin-top:4px;">
+                        Para alterar o saldo, utilize Entrada ou Saída.
+                    </small>
+                </div>
+            </div>
+
+            <div>
+                <label>Estoque mínimo</label>
+                <input
+                    type="number"
+                    name="estoque_minimo"
+                    step="0.01"
+                    min="0"
+                    value="{{ produto.estoque_minimo or 0 }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label>Nova foto</label>
+                <input
+                    type="file"
+                    name="foto"
+                    accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                >
+
+                {% if produto.foto %}
+                    <p style="margin-top: 8px;">
+                        Foto atual mantida se nenhuma nova foto for enviada.
+                    </p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">
+                Salvar alterações
+            </button>
+
+            <a href="{{ url_for('admin_produtos') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const campo = document.getElementById("produto-preco");
+    if (!campo) return;
+
+    const precoInicial = {{ produto.preco or 0 }};
+
+    function formatarCentavos(digitos) {
+        digitos = digitos.replace(/\D/g, "");
+
+        if (!digitos) {
+            digitos = "0";
+        }
+
+        const numero = parseInt(digitos, 10);
+
+        return (numero / 100).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    campo.value = Number(precoInicial).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    campo.addEventListener("input", function () {
+        campo.value = formatarCentavos(campo.value);
+
+        campo.setSelectionRange(
+            campo.value.length,
+            campo.value.length
+        );
+    });
+
+    campo.addEventListener("focus", function () {
+        setTimeout(function () {
+            campo.setSelectionRange(
+                campo.value.length,
+                campo.value.length
+            );
+        }, 0);
+    });
+
+    const formulario = campo.closest("form");
+
+    if (formulario) {
+        formulario.addEventListener("submit", function () {
+            campo.value = campo.value
+                .replace(/\./g, "")
+                .replace(",", ".");
+        });
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Relatórios de Produtos{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estoque-premium.css') }}?v=3">
+
+<header class="estoque-hero">
+    <div class="estoque-hero-content">
+        <a class="estoque-back" href="{{ url_for('admin_produtos') }}">
+            ← Voltar para Visão Geral
+        </a>
+        <span class="estoque-eyebrow">CONTROLE DE PRODUTOS</span>
+        <h1>Relatórios</h1>
+        <p>Consulte e filtre o histórico de movimentações do estoque.</p>
+    </div>
+</header>
+
+{% include 'admin/produtos_nav.html' %}
+
+<form method="GET" style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+
+        <div>
+            <label>Data inicial</label>
+            <input type="date" name="data_inicio" value="{{ data_inicio }}"
+                   style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:9px;">
+        </div>
+
+        <div>
+            <label>Data final</label>
+            <input type="date" name="data_fim" value="{{ data_fim }}"
+                   style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:9px;">
+        </div>
+
+        <div>
+            <label>Produto</label>
+            <select name="produto_id"
+                    style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:9px;background:#fff;">
+                <option value="">Todos os produtos</option>
+                {% for produto in produtos %}
+                <option value="{{ produto.id }}"
+                    {% if produto_id|string == produto.id|string %}selected{% endif %}>
+                    {{ produto.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Movimentação</label>
+            <select name="tipo"
+                    style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:9px;background:#fff;">
+                <option value="">Entradas e saídas</option>
+                <option value="entrada" {% if tipo == 'entrada' %}selected{% endif %}>Entrada</option>
+                <option value="saida" {% if tipo == 'saida' %}selected{% endif %}>Saída</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{{ url_for('relatorios_produtos') }}" class="btn btn-secondary">Limpar filtros</a>
+    </div>
+</form>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px;" class="relatorio-resumo">
+
+    <article style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+        <span style="display:block;font-size:12px;color:#64748b;margin-bottom:7px;">
+            Movimentações
+        </span>
+        <strong style="font-size:22px;color:#0f172a;">
+            {{ resumo.movimentacoes }}
+        </strong>
+    </article>
+
+    <article style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+        <span style="display:block;font-size:12px;color:#64748b;margin-bottom:7px;">
+            Total de entradas
+        </span>
+        <strong style="font-size:22px;color:#0f172a;">
+            {{ ('%g'|format(resumo.entradas|float))|replace('.', ',') }}
+        </strong>
+    </article>
+
+    <article style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+        <span style="display:block;font-size:12px;color:#64748b;margin-bottom:7px;">
+            Total de saídas
+        </span>
+        <strong style="font-size:22px;color:#0f172a;">
+            {{ ('%g'|format(resumo.saidas|float))|replace('.', ',') }}
+        </strong>
+    </article>
+
+</div>
+
+<div class="estoque-table-card">
+    <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:1050px;">
+            <thead>
+                <tr style="background:#f8fafc;text-align:left;">
+                    <th style="padding:14px;">Data</th>
+                    <th style="padding:14px;">Produto</th>
+                    <th style="padding:14px;">Tipo</th>
+                    <th style="padding:14px;">Quantidade</th>
+                    <th style="padding:14px;">Anterior</th>
+                    <th style="padding:14px;">Posterior</th>
+                    <th style="padding:14px;">Motivo</th>
+                    <th style="padding:14px;">Responsável</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for movimento in movimentacoes %}
+                <tr style="border-top:1px solid #f1f5f9;">
+                    <td style="padding:14px;white-space:nowrap;">
+                        {{ movimento.criado_em.strftime('%d/%m/%Y às %H:%M') if movimento.criado_em is not string and movimento.criado_em else ((movimento.criado_em|string)[8:10] ~ '/' ~ (movimento.criado_em|string)[5:7] ~ '/' ~ (movimento.criado_em|string)[0:4] ~ ' às ' ~ (movimento.criado_em|string)[11:16]) if movimento.criado_em else 'Data não informada' }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        <strong>{{ movimento.produto_nome }}</strong>
+                    </td>
+
+                    <td style="padding:14px;">
+                        {% if movimento.tipo == 'entrada' %}
+                            <span style="color:#15803d;font-weight:700;">Entrada</span>
+                        {% else %}
+                            <span style="color:#dc2626;font-weight:700;">Saída</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {{ ('%g'|format(movimento.quantidade|float))|replace('.', ',') }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {{ ('%g'|format(movimento.estoque_anterior|float))|replace('.', ',') }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {{ ('%g'|format(movimento.estoque_posterior|float))|replace('.', ',') }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {{ movimento.motivo or '-' }}
+                    </td>
+
+                    <td style="padding:14px;">
+                        {{ movimento.responsavel or '-' }}
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="8" style="padding:30px;text-align:center;color:#64748b;">
+                        Nenhuma movimentação encontrada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+@media(max-width:800px) {
+    .relatorio-resumo {
+        grid-template-columns:1fr !important;
+    }
+}
+</style>
+
+{% endblock %}
